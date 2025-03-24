@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33110.190
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TabuSearchProductionScheduling", "TabuSearchProductionScheduling.csproj", "{6DC9DF1A-4295-4886-9EBB-8CC2F8E3F50D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6DC9DF1A-4295-4886-9EBB-8CC2F8E3F50D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6DC9DF1A-4295-4886-9EBB-8CC2F8E3F50D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6DC9DF1A-4295-4886-9EBB-8CC2F8E3F50D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6DC9DF1A-4295-4886-9EBB-8CC2F8E3F50D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6DEEEF82-7BB9-46C1-92DE-FEEA2D7ED840}
+	EndGlobalSection
+EndGlobal
