@@ -5,13 +5,14 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TabuSearchImplement.AggregateModels.JobInforAggregate;
-using TabuSearchImplement.AggregateModels.MaterialAggregate;
-using TabuSearchImplement.AggregateModels.JobInforAggregate;
-using static TabuSearchImplement.Constant;
-using static TabuSearchImplement.Constant;
+using SLAP.AggregateModels.JobInforAggregate;
+using SLAP.AggregateModels.MaterialAggregate;
+using SLAP.AggregateModels.JobInforAggregate;
+using static SLAP.Constant;
+using static SLAP.Constant;
+using Material = SLAP.Constant.Material;
 
-namespace TabuSearchImplement
+namespace SLAP
 {
     public class FindPlannedDate
     {
@@ -375,7 +376,7 @@ namespace TabuSearchImplement
             if (workLackPart.Id != null)
             {
                 //Console.WriteLine($"The job {workInfor.Id} is lack spare part");
-                var listSequencePartLack = TabuSearchImplement.CheckMaterial.returnListSequencePartLackOnWork(listWareHouseMaterials, listWorkAvailableChangedId, workLackPart);
+                var listSequencePartLack = SLAP.CheckMaterial.returnListSequencePartLackOnWork(listWareHouseMaterials, listWorkAvailableChangedId, workLackPart);
                 //Console.WriteLine($"The length of listSequencePartLack: {listSequencePartLack.Count}");
                 lastestStartDate = listWareHouseMaterials[listSequencePartLack[0] - 1].ExpectedAddDate;
                 //Console.WriteLine($"The sequence part is {listSequencePartLack[0]} with expected add date {listWareHouseMaterials[listSequencePartLack[0] - 1].ExpectedAddDate}");
@@ -490,7 +491,7 @@ namespace TabuSearchImplement
             //foreach (string key in maintenanceDeviceBreakTime.Keys)
             //{
             //    Console.WriteLine($"The name of device is checked: {key}");
-            //    foreach (List<DateTime> listTime in maintenanceDeviceBreakTime[key])
+            //    foreach (List<DateTime> listTime in maintenanceDeviceBreakTime)
             //    {
             //        Console.WriteLine(listTime[0].ToString() + " " + listTime[1].ToString());
             //    }
@@ -501,7 +502,7 @@ namespace TabuSearchImplement
             //foreach (string key in maintenanceTechnicianWorkTime.Keys)
             //{
             //    Console.WriteLine($"The sequence of technician is checked: {key}");
-            //    foreach (List<DateTime> listTime in maintenanceTechnicianWorkTime[key])
+            //    foreach (List<DateTime> listTime in maintenanceTechnicianWorkTime)
             //    {
             //        Console.WriteLine(listTime[0].ToString() + " " + listTime[1].ToString());
             //    }

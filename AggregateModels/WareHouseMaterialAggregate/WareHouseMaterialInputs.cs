@@ -1,6 +1,6 @@
-﻿using TabuSearchImplement.AggregateModels.WareHouseMaterialAggregate;
+﻿using SLAP.AggregateModels.WareHouseMaterialAggregate;
 
-namespace TabuSearchImplement.AggregateModels.WareHouseMaterialAggregate
+namespace SLAP.AggregateModels.WareHouseMaterialAggregate
 {
     public class WareHouseMaterialInputs
     {

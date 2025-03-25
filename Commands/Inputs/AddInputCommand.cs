@@ -1,9 +1,9 @@
 ﻿using MediatR;
-using TabuSearchImplement.AggregateModels.DeviceAggregate;
-using TabuSearchImplement.AggregateModels.InputAggregate;
-using TabuSearchImplement.AggregateModels.JobInforAggregate;
+using SLAP.AggregateModels.DeviceAggregate;
+using SLAP.AggregateModels.InputAggregate;
+using SLAP.AggregateModels.JobInforAggregate;
 
-namespace TabuSearchImplement.Commands.Inputs
+namespace SLAP.Commands.Inputs
 {
     public record AddInputCommand(ObjectInput input) : IRequest<List<JobInfor>>;
 }

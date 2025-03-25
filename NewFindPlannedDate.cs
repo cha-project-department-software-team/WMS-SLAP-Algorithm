@@ -94,7 +94,7 @@ namespace FindPlannedDate
             //foreach (string key in deviceDictionary.Keys)
             //{
             //    Console.WriteLine($"The name of device: {key}");
-            //    foreach (List<DateTime> listTime in deviceDictionary[key])
+            //    foreach (List<DateTime> listTime in deviceDictionary)
             //    {
             //        Console.WriteLine(listTime[0].ToString() + " " + listTime[1].ToString());
             //    }
@@ -166,7 +166,7 @@ namespace FindPlannedDate
             //foreach (string key in technicianDictionary.Keys)
             //{
             //    Console.WriteLine($"The name of device: {key}");
-            //    foreach (List<DateTime> listTime in technicianDictionary[key])
+            //    foreach (List<DateTime> listTime in technicianDictionary)
             //    {
             //        Console.WriteLine(listTime[0].ToString() + " " + listTime[1].ToString());
             //    }

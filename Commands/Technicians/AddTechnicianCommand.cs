@@ -1,7 +1,7 @@
 ﻿using MediatR;
-using TabuSearchImplement.AggregateModels.TechnicianAggregate;
+using SLAP.AggregateModels.TechnicianAggregate;
 
-namespace TabuSearchImplement.Commands.Technicians
+namespace SLAP.Commands.Technicians
 {
     public record AddTechnicianCommand(TechnicianInputs technicians) : IRequest<TechnicianInputs>;
 }

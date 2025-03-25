@@ -1,6 +1,6 @@
-﻿using TabuSearchImplement.AggregateModels.MaterialAggregate;
+﻿using SLAP.AggregateModels.MaterialAggregate;
 
-namespace TabuSearchImplement.Repository
+namespace SLAP.Repository
 {
     public class MaterialObjectInputRepository : IMaterialObjectInputRepository
     {

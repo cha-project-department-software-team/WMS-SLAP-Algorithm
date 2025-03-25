@@ -1,4 +1,4 @@
-﻿namespace TabuSearchImplement.AggregateModels.TechnicianAggregate
+﻿namespace SLAP.AggregateModels.TechnicianAggregate
 {
     public class WorkingTime
     {

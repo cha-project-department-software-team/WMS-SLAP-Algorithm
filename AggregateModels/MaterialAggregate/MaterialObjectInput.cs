@@ -1,6 +1,6 @@
-﻿using static TabuSearchImplement.Constant;
+﻿using static SLAP.Constant;
 
-namespace TabuSearchImplement.AggregateModels.MaterialAggregate
+namespace SLAP.AggregateModels.MaterialAggregate
 {
     public class MaterialObjectInput
     {

@@ -1,6 +1,6 @@
-﻿using TabuSearchImplement.AggregateModels.WareHouseMaterialAggregate;
+﻿using SLAP.AggregateModels.WareHouseMaterialAggregate;
 
-namespace TabuSearchImplement.AggregateModels.WorkAggregate
+namespace SLAP.AggregateModels.WorkAggregate
 {
     public class MaterialOnWork
     {

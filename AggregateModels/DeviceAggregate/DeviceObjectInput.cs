@@ -1,6 +1,6 @@
-﻿using TabuSearchImplement.AggregateModels.TechnicianAggregate;
+﻿using SLAP.AggregateModels.TechnicianAggregate;
 
-namespace TabuSearchImplement.AggregateModels.DeviceAggregate
+namespace SLAP.AggregateModels.DeviceAggregate
 {
     public class DeviceObjectInput
     {

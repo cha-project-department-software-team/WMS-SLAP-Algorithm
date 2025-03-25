@@ -1,10 +1,10 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using TabuSearchImplement.AggregateModels.InputAggregate;
-using TabuSearchImplement.AggregateModels.JobInforAggregate;
-using TabuSearchImplement.Commands.Inputs;
+using SLAP.AggregateModels.InputAggregate;
+using SLAP.AggregateModels.JobInforAggregate;
+using SLAP.Commands.Inputs;
 
-namespace TabuSearchImplement.Controllers
+namespace SLAP.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]

@@ -1,9 +1,9 @@
-﻿using TabuSearchImplement.AggregateModels.DeviceAggregate;
-using TabuSearchImplement.AggregateModels.TechnicianAggregate;
-using TabuSearchImplement.AggregateModels.WareHouseMaterialAggregate;
-using TabuSearchImplement.AggregateModels.WorkAggregate;
+﻿using SLAP.AggregateModels.DeviceAggregate;
+using SLAP.AggregateModels.TechnicianAggregate;
+using SLAP.AggregateModels.WareHouseMaterialAggregate;
+using SLAP.AggregateModels.WorkAggregate;
 
-namespace TabuSearchImplement.AggregateModels.InputAggregate
+namespace SLAP.AggregateModels.InputAggregate
 {
     public class ObjectInput
     {

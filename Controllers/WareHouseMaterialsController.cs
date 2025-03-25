@@ -1,9 +1,9 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using TabuSearchImplement.AggregateModels.WareHouseMaterialAggregate;
-using TabuSearchImplement.Commands.WareHouseMaterials;
+using SLAP.AggregateModels.WareHouseMaterialAggregate;
+using SLAP.Commands.WareHouseMaterials;
 
-namespace TabuSearchImplement.Controllers
+namespace SLAP.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]

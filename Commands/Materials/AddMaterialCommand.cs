@@ -1,7 +1,7 @@
 ﻿using MediatR;
-using TabuSearchImplement.AggregateModels.MaterialAggregate;
+using SLAP.AggregateModels.MaterialAggregate;
 
-namespace TabuSearchImplement.Commands.Materials
+namespace SLAP.Commands.Materials
 {
     public record AddMaterialCommand(MaterialInputs materials) : IRequest<MaterialInputs>;
 }

@@ -1,7 +1,7 @@
-﻿using TabuSearchImplement.AggregateModels.InputAggregate;
-using TabuSearchImplement.AggregateModels.JobInforAggregate;
+﻿using SLAP.AggregateModels.InputAggregate;
+using SLAP.AggregateModels.JobInforAggregate;
 
-namespace TabuSearchImplement.AggregateModels.InputAggregate
+namespace SLAP.AggregateModels.InputAggregate
 {
     public interface IObjectInputRepository
     {

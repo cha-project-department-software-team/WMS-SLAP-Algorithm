@@ -1,9 +1,9 @@
 ﻿using System.Globalization;
-using TabuSearchImplement.AggregateModels.WareHouseMaterialAggregate;
-using TabuSearchImplement.AggregateModels.WorkAggregate;
-using static TabuSearchImplement.Constant;
+using SLAP.AggregateModels.WareHouseMaterialAggregate;
+using SLAP.AggregateModels.WorkAggregate;
+using static SLAP.Constant;
 
-namespace TabuSearchImplement
+namespace SLAP
 {
     public class CheckMaterial
     {
@@ -80,11 +80,11 @@ namespace TabuSearchImplement
                     listSequencePart = new List<int>();
                     listQuantityPart = new List<int>();
 
-                    if (workObject.materials.Length > 0)
+                    if (workObject.materials?.Length > 0)
                     {
                         foreach (MaterialOnWork materialOnWork in workObject.materials)
                         {
-                            listNamePart.Add(materialOnWork.materialInfo.code);
+                            listNamePart.Add(materialOnWork.materialInfo?.code);
                             //Console.WriteLine($"The work {workObject.id} has material code {materialOnWork.materialInfo.code}");
                             foreach (WareHouseMaterial wareHouseMaterial in listWareHouseMaterials)
                             {

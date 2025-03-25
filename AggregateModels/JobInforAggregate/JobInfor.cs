@@ -1,8 +1,8 @@
 ﻿using Microsoft.VisualBasic;
-using TabuSearchImplement.AggregateModels.WorkAggregate;
-using static TabuSearchImplement.Constant;
+using SLAP.AggregateModels.WorkAggregate;
+using static SLAP.Constant;
 
-namespace TabuSearchImplement.AggregateModels.JobInforAggregate
+namespace SLAP.AggregateModels.JobInforAggregate
 {
     public class JobInfor
     {

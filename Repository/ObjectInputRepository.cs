@@ -1,13 +1,13 @@
 ﻿using System.Data;
-using TabuSearchImplement.AggregateModels.DeviceAggregate;
-using TabuSearchImplement.AggregateModels.InputAggregate;
-using TabuSearchImplement.AggregateModels.JobInforAggregate;
-using TabuSearchImplement.AggregateModels.TechnicianAggregate;
-using TabuSearchImplement.AggregateModels.WareHouseMaterialAggregate;
-using TabuSearchImplement.AggregateModels.WorkAggregate;
-using static TabuSearchImplement.Constant;
+using SLAP.AggregateModels.DeviceAggregate;
+using SLAP.AggregateModels.InputAggregate;
+using SLAP.AggregateModels.JobInforAggregate;
+using SLAP.AggregateModels.TechnicianAggregate;
+using SLAP.AggregateModels.WareHouseMaterialAggregate;
+using SLAP.AggregateModels.WorkAggregate;
+using static SLAP.Constant;
 
-namespace TabuSearchImplement.Repository
+namespace SLAP.Repository
 {
     public class ObjectInputRepository : IObjectInputRepository
     {
@@ -23,8 +23,8 @@ namespace TabuSearchImplement.Repository
             Dictionary<string, List<List<DateTime>>> technicianWorkingTime = ConvertFromObjectToTable.getTechnicianDictionary(listTechnicianObjects);
 
             var workTable = ConvertFromObjectToTable.ConvertObjectInputToWorksTable(listWorkObjects);
-            List<WareHouseMaterial> listwareHouseMaterials = TabuSearchImplement.CheckMaterial.getWareHouseMaterial(listWareHouseMaterialObjects);
-            List<Material> listMaterials = TabuSearchImplement.CheckMaterial.getListMaterial(listWorkObjects, listwareHouseMaterials);
+            List<WareHouseMaterial> listwareHouseMaterials = SLAP.CheckMaterial.getWareHouseMaterial(listWareHouseMaterialObjects);
+            List<Material> listMaterials = SLAP.CheckMaterial.getListMaterial(listWorkObjects, listwareHouseMaterials);
 
 
             DataTable wareHouseMaterialTable = ConvertFromObjectToTable.ConvertToWareHouseMaterialTable(listwareHouseMaterials);

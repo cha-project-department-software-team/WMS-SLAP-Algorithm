@@ -1,17 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TabuSearchImplement.AggregateModels.JobInforAggregate;
-using TabuSearchImplement.AggregateModels.MaterialAggregate;
-using TabuSearchImplement.AggregateModels.JobInforAggregate;
-using TabuSearchImplement;
-using static TabuSearchImplement.Constant;
-using static TabuSearchImplement.Constant;
+﻿using System.Data;
+using SLAP.AggregateModels.JobInforAggregate;
+using static SLAP.Constant;
 
-namespace TabuSearchImplement
+namespace SLAP
 {
     public class TabuSearch
     {
@@ -78,9 +69,9 @@ namespace TabuSearchImplement
             double objectValue = 0;
             DateTime endDate = DateTime.Now;
 
-            List<Material> listsparePartAvailable = TabuSearchImplement.CheckMaterial.getListWorkAvailable(listwareHouseMaterials, listMaterials);
-            List<Material> listWorkLackPart = TabuSearchImplement.CheckMaterial.getListWorkLackPartId(listwareHouseMaterials, listMaterials);
-            List<Material> listWorkEnoughPart = TabuSearchImplement.CheckMaterial.getListWorkEnoughPartId(listwareHouseMaterials, listMaterials);
+            List<Material> listsparePartAvailable = SLAP.CheckMaterial.getListWorkAvailable(listwareHouseMaterials, listMaterials);
+            List<Material> listWorkLackPart = SLAP.CheckMaterial.getListWorkLackPartId(listwareHouseMaterials, listMaterials);
+            List<Material> listWorkEnoughPart = SLAP.CheckMaterial.getListWorkEnoughPartId(listwareHouseMaterials, listMaterials);
 
             List<int> solutionEnough = new List<int>();
             List<int> solutionLack = new List<int>();

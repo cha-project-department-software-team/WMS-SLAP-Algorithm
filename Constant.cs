@@ -1,4 +1,4 @@
-﻿namespace TabuSearchImplement
+﻿namespace SLAP
 {
     public class Constant
     {

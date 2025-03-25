@@ -5,13 +5,14 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TabuSearchImplement.AggregateModels.DeviceAggregate;
-using TabuSearchImplement.AggregateModels.MaterialAggregate;
-using TabuSearchImplement.AggregateModels.TechnicianAggregate;
-using TabuSearchImplement.AggregateModels.WorkAggregate;
-using static TabuSearchImplement.Constant;
+using SLAP.AggregateModels.DeviceAggregate;
+using SLAP.AggregateModels.MaterialAggregate;
+using SLAP.AggregateModels.TechnicianAggregate;
+using SLAP.AggregateModels.WorkAggregate;
+using static SLAP.Constant;
+using Material = SLAP.Constant.Material;
 
-namespace TabuSearchImplement
+namespace SLAP
 {
     public class ConvertFromObjectToTable
     {
@@ -294,7 +295,7 @@ namespace TabuSearchImplement
             //foreach (string key in deviceDictionary.Keys)
             //{
             //    Console.WriteLine($"The name of device: {key}");
-            //    foreach (List<DateTime> listTime in deviceDictionary[key])
+            //    foreach (List<DateTime> listTime in deviceDictionary)
             //    {
             //        Console.WriteLine(listTime[0].ToString() + " " + listTime[1].ToString());
             //    }
@@ -345,7 +346,7 @@ namespace TabuSearchImplement
             //foreach (string key in technicianDictionary.Keys)
             //{
             //    Console.WriteLine($"The id of technician: {key}");
-            //    foreach (List<DateTime> listTime in technicianDictionary[key])
+            //    foreach (List<DateTime> listTime in technicianDictionary)
             //    {
             //        Console.WriteLine(listTime[0].ToString() + " " + listTime[1].ToString());
             //    }

@@ -1,6 +1,6 @@
-﻿using TabuSearchImplement.AggregateModels.DeviceAggregate;
+﻿using SLAP.AggregateModels.DeviceAggregate;
 
-namespace TabuSearchImplement.Repository
+namespace SLAP.Repository
 {
     public class DeviceObjectInputRepository : IDeviceObjectInputRepository
     {

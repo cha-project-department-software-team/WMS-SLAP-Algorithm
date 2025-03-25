@@ -1,9 +1,9 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using TabuSearchImplement.AggregateModels.DeviceAggregate;
-using TabuSearchImplement.Commands.Devices;
+using SLAP.AggregateModels.DeviceAggregate;
+using SLAP.Commands.Devices;
 
-namespace TabuSearchImplement.Controllers
+namespace SLAP.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]

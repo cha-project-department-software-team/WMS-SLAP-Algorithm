@@ -1,6 +1,6 @@
-﻿using TabuSearchImplement.AggregateModels.WorkAggregate;
+﻿using SLAP.AggregateModels.WorkAggregate;
 
-namespace TabuSearchImplement.Repository
+namespace SLAP.Repository
 {
     public class WorkObjectInputRepository : IWorkObjectInputRepository
     {

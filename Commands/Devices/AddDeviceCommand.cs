@@ -1,7 +1,7 @@
 ﻿using MediatR;
-using TabuSearchImplement.AggregateModels.DeviceAggregate;
+using SLAP.AggregateModels.DeviceAggregate;
 
-namespace TabuSearchImplement.Commands.Devices
+namespace SLAP.Commands.Devices
 {
     public record AddDeviceCommand(DeviceInputs devices) : IRequest<DeviceInputs>;
 }

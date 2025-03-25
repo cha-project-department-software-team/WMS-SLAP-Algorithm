@@ -1,9 +1,9 @@
 ﻿using MediatR;
-using TabuSearchImplement.AggregateModels.InputAggregate;
-using TabuSearchImplement.AggregateModels.JobInforAggregate;
-using TabuSearchImplement.Commands.Inputs;
+using SLAP.AggregateModels.InputAggregate;
+using SLAP.AggregateModels.JobInforAggregate;
+using SLAP.Commands.Inputs;
 
-namespace TabuSearchImplement.Commands.Inputs
+namespace SLAP.Commands.Inputs
 {
     public class AddInputHandler : IRequestHandler<AddInputCommand, List<JobInfor>>
     {

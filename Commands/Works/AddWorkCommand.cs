@@ -1,7 +1,7 @@
 ﻿using MediatR;
-using TabuSearchImplement.AggregateModels.WorkAggregate;
+using SLAP.AggregateModels.WorkAggregate;
 
-namespace TabuSearchImplement.Commands.Works
+namespace SLAP.Commands.Works
 {
     public record AddWorkCommand(WorkInputs works) : IRequest<WorkInputs>;
 }

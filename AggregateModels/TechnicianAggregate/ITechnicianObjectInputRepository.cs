@@ -1,6 +1,6 @@
-﻿using TabuSearchImplement.AggregateModels.WorkAggregate;
+﻿using SLAP.AggregateModels.WorkAggregate;
 
-namespace TabuSearchImplement.AggregateModels.TechnicianAggregate
+namespace SLAP.AggregateModels.TechnicianAggregate
 {
     public interface ITechnicianObjectInputRepository
     {

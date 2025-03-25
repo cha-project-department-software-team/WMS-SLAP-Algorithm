@@ -1,4 +1,4 @@
-﻿namespace TabuSearchImplement.AggregateModels.WorkAggregate
+﻿namespace SLAP.AggregateModels.WorkAggregate
 {
     public class WorkInputs
     {

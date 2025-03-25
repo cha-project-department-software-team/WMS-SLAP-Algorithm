@@ -1,4 +1,4 @@
-﻿namespace TabuSearchImplement.AggregateModels.WareHouseMaterialAggregate
+﻿namespace SLAP.AggregateModels.WareHouseMaterialAggregate
 {
     public interface IWareHouseMaterialObjectInputRepository
     {

@@ -1,6 +1,6 @@
-﻿using static TabuSearchImplement.Constant;
+﻿using static SLAP.Constant;
 
-namespace TabuSearchImplement.AggregateModels.TechnicianAggregate
+namespace SLAP.AggregateModels.TechnicianAggregate
 {
     public class TechnicianObjectInput
     {

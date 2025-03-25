@@ -1,11 +1,11 @@
 using Microsoft.Extensions.DependencyInjection;
-using TabuSearchImplement.AggregateModels.DeviceAggregate;
-using TabuSearchImplement.AggregateModels.InputAggregate;
-using TabuSearchImplement.AggregateModels.MaterialAggregate;
-using TabuSearchImplement.AggregateModels.TechnicianAggregate;
-using TabuSearchImplement.AggregateModels.WareHouseMaterialAggregate;
-using TabuSearchImplement.AggregateModels.WorkAggregate;
-using TabuSearchImplement.Repository;
+using SLAP.AggregateModels.DeviceAggregate;
+using SLAP.AggregateModels.InputAggregate;
+using SLAP.AggregateModels.MaterialAggregate;
+using SLAP.AggregateModels.TechnicianAggregate;
+using SLAP.AggregateModels.WareHouseMaterialAggregate;
+using SLAP.AggregateModels.WorkAggregate;
+using SLAP.Repository;
 
 var builder = WebApplication.CreateBuilder(args);
 

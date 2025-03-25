@@ -1,7 +1,7 @@
 ﻿using MediatR;
-using TabuSearchImplement.AggregateModels.WareHouseMaterialAggregate;
+using SLAP.AggregateModels.WareHouseMaterialAggregate;
 
-namespace TabuSearchImplement.Commands.WareHouseMaterials
+namespace SLAP.Commands.WareHouseMaterials
 {
     public record AddWareHouseMaterialCommand(WareHouseMaterialInputs wareHouseMaterials) : IRequest<WareHouseMaterialInputs>;
 }
