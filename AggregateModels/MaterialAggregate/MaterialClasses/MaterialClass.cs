@@ -5,7 +5,6 @@
         public string materialClassId { get; set; }
         public string className { get; set; }
         public List<MaterialClassProperty> properties { get; set; }
-        public List<Material> materials { get; set; }
 
         public MaterialClass(string materialClassId, string className, List<MaterialClassProperty> properties) : this(materialClassId, className)
         {

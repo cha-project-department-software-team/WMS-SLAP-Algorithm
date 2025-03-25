@@ -8,7 +8,6 @@ namespace SLAP.AggregateModels.PartyAggregate
         public string customerName { get; set; }
         public string address { get; set; }
         public string contactDetails { get; set; }
-        public List<InventoryIssue> inventoryIssues { get; set; }
 
         public Customer(string customerId, string customerName, string address, string contactDetails)
         {

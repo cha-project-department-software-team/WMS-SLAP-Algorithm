@@ -8,8 +8,6 @@ namespace SLAP.AggregateModels.StorageAggregate
         public string warehouseId { get; set; }
         public string warehouseName { get; set; }
         public List<Location> locations { get; set; }
-        public List<InventoryReceipt> inventoryReceipts { get; set; }
-        public List<InventoryIssue> inventoryIssues { get; set; }
 
         public Warehouse(string warehouseId, string warehouseName)
         {

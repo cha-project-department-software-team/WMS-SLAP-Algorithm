@@ -8,14 +8,17 @@ namespace SLAP.AggregateModels.StorageAggregate
     {
         public string locationId { get; set; }
         public List<MaterialSubLot> materialSubLots { get; set; }
-        public List<ReceiptSublot> receiptSublots { get; set; }
-        public string warehouseId { get; set; }
         public Warehouse warehouse { get; set; }
 
-        public Location(string locationId, string warehouseId)
+        public Location()
+        {
+        }
+
+        public Location(string locationId, List<MaterialSubLot> materialSubLots, Warehouse warehouse)
         {
             this.locationId = locationId;
-            this.warehouseId = warehouseId;
+            this.materialSubLots = materialSubLots;
+            this.warehouse = warehouse;
         }
     }
 }

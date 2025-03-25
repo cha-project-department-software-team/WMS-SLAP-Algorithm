@@ -21,7 +21,7 @@ builder.Services.AddScoped<ITechnicianObjectInputRepository, TechnicianObjectInp
 builder.Services.AddScoped<IDeviceObjectInputRepository, DeviceObjectInputRepository>();
 builder.Services.AddScoped<IMaterialObjectInputRepository, MaterialObjectInputRepository>();
 builder.Services.AddScoped<IWareHouseMaterialObjectInputRepository, WareHouseMaterialObjectInputRepository>();
-builder.Services.AddScoped<IObjectInputRepository, ObjectInputRepository>();
+builder.Services.AddScoped<IObjectInputRepository, SchedulingRepository>();
 builder.Services.AddMediatR(cfg =>
 {
     cfg.RegisterServicesFromAssemblyContaining<WorkObjectInput>();

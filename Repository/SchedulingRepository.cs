@@ -9,7 +9,7 @@ using static SLAP.Constant;
 
 namespace SLAP.Repository
 {
-    public class ObjectInputRepository : IObjectInputRepository
+    public class SchedulingRepository : IObjectInputRepository
     {
         public List<JobInfor> Implement(ObjectInput input)
         {
@@ -23,8 +23,8 @@ namespace SLAP.Repository
             Dictionary<string, List<List<DateTime>>> technicianWorkingTime = ConvertFromObjectToTable.getTechnicianDictionary(listTechnicianObjects);
 
             var workTable = ConvertFromObjectToTable.ConvertObjectInputToWorksTable(listWorkObjects);
-            List<WareHouseMaterial> listwareHouseMaterials = SLAP.CheckMaterial.getWareHouseMaterial(listWareHouseMaterialObjects);
-            List<Material> listMaterials = SLAP.CheckMaterial.getListMaterial(listWorkObjects, listwareHouseMaterials);
+            List<WareHouseMaterial> listwareHouseMaterials = CheckMaterial.getWareHouseMaterial(listWareHouseMaterialObjects);
+            List<Material> listMaterials = CheckMaterial.getListMaterial(listWorkObjects, listwareHouseMaterials);
 
 
             DataTable wareHouseMaterialTable = ConvertFromObjectToTable.ConvertToWareHouseMaterialTable(listwareHouseMaterials);

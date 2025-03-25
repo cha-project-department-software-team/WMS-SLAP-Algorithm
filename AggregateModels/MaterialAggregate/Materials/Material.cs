@@ -1,7 +1,4 @@
-﻿using SLAP.AggregateModels.InventoryIssueAggregate;
-using SLAP.AggregateModels.InventoryReceiptAggregate;
-
-namespace SLAP.AggregateModels.MaterialAggregate
+﻿namespace SLAP.AggregateModels.MaterialAggregate
 {
     public class Material
     {
@@ -10,9 +7,6 @@ namespace SLAP.AggregateModels.MaterialAggregate
         public string materialClassId { get; set; }
         public MaterialClass materialClass { get; set; }
         public List<MaterialProperty> properties { get; set; }
-        public List<MaterialLot> lots { get; set; }
-        public List<InventoryReceiptEntry> receiptEntries  { get; set; }
-        public List<InventoryIssueEntry> issueEntries  { get; set; }
 
         public Material(string materialId, string materialName, string materialClassId)
         {

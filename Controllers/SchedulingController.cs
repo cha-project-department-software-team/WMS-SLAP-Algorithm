@@ -8,11 +8,11 @@ namespace SLAP.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class InputsController : ControllerBase
+    public class SchedulingController : ControllerBase
     {
         private readonly IMediator _mediator;
 
-        public InputsController(IMediator mediator)
+        public SchedulingController(IMediator mediator)
         {
             _mediator = mediator;
         }
@@ -20,7 +20,7 @@ namespace SLAP.Controllers
         [HttpPost]
         public async Task<List<JobInfor>> Post(ObjectInput input)
         {
-            return await _mediator.Send(new AddInputCommand(input));
+            return await _mediator.Send(new AddSchedulingCommand(input));
         }
     }
 }
