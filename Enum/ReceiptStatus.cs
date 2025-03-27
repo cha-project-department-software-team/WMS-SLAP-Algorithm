@@ -10,7 +10,5 @@
         Completed,
         Cancelled,
         Accepted
-
-
     }
 }

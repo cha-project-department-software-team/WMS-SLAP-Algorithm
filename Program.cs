@@ -1,9 +1,4 @@
-using Microsoft.Extensions.DependencyInjection;
-using SLAP.AggregateModels.DeviceAggregate;
 using SLAP.AggregateModels.InputAggregate;
-using SLAP.AggregateModels.MaterialAggregate;
-using SLAP.AggregateModels.TechnicianAggregate;
-using SLAP.AggregateModels.WareHouseMaterialAggregate;
 using SLAP.AggregateModels.WorkAggregate;
 using SLAP.Repository;
 
@@ -16,11 +11,6 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddScoped<IWorkObjectInputRepository, WorkObjectInputRepository>();
-builder.Services.AddScoped<ITechnicianObjectInputRepository, TechnicianObjectInputRepository>();
-builder.Services.AddScoped<IDeviceObjectInputRepository, DeviceObjectInputRepository>();
-builder.Services.AddScoped<IMaterialObjectInputRepository, MaterialObjectInputRepository>();
-builder.Services.AddScoped<IWareHouseMaterialObjectInputRepository, WareHouseMaterialObjectInputRepository>();
 builder.Services.AddScoped<IObjectInputRepository, SchedulingRepository>();
 builder.Services.AddMediatR(cfg =>
 {

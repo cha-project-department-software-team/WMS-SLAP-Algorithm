@@ -1,7 +1,8 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using SLAP.AggregateModels.InputAggregate;
-using SLAP.AggregateModels.JobInforAggregate;
+using SLAP.AggregateModels.InventoryReceiptAggregate;
+using SLAP.AggregateModels.MaterialAggregate;
+using SLAP.AggregateModels.StorageAggregate;
 using SLAP.Commands.Inputs;
 
 namespace SLAP.Controllers
@@ -18,9 +19,9 @@ namespace SLAP.Controllers
         }
 
         [HttpPost]
-        public async Task<List<JobInfor>> Post(ObjectInput input)
+        public async Task<List<ReceiptSubLot>> Post(InventoryReceipt inventoryReceipt, Warehouse warehouse, List<Material> materials)
         {
-            return await _mediator.Send(new AddSchedulingCommand(input));
+            return await _mediator.Send(new AddSchedulingCommand(inventoryReceipt, warehouse, materials));
         }
     }
 }
