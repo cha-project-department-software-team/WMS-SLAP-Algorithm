@@ -1,31 +1,32 @@
-﻿using SLAP.AggregateModels.PartyAggregate;
-using SLAP.AggregateModels.StorageAggregate;
-using SLAP.Enum;
+﻿using SLAP.Enum;
+using System.Text.Json.Serialization;
 
 namespace SLAP.AggregateModels.InventoryReceiptAggregate
 {
-    public class InventoryReceipt 
+    public class InventoryReceipt
     {
-        public string inventoryReceiptId { get; set; }
-        public Supplier supplier { get; set; }
-        public Person receivedBy { get; set; }
-        public Warehouse warehouse { get; set; }
-        public DateTime receiptDate { get; set; }
-        public ReceiptStatus receiptStatus { get; set; }
-        public List<InventoryReceiptEntry> entries { get; set; }
+        public string InventoryReceiptId { get; set; }
+        public DateTime ReceiptDate { get; set; }
+        [JsonConverter(typeof(JsonStringEnumConverter))]
+        public ReceiptStatus ReceiptStatus { get; set; }
+        public string SupplierName { get; set; }
+        public string PersonName { get; set; }
+        public string WarehouseName { get; set; }
+        public List<InventoryReceiptEntry> Entries { get; set; }
+
         public InventoryReceipt()
         {
         }
 
-        public InventoryReceipt(string inventoryReceiptId, DateTime receiptDate, ReceiptStatus receiptStatus, Supplier supplier, Person receivedBy, Warehouse warehouse, List<InventoryReceiptEntry> entries)
+        public InventoryReceipt(string inventoryReceiptId, DateTime receiptDate, ReceiptStatus receiptStatus, string supplierName, string personName, string warehouseName, List<InventoryReceiptEntry> entries)
         {
-            this.inventoryReceiptId = inventoryReceiptId;
-            this.receiptDate = receiptDate;
-            this.receiptStatus = receiptStatus;
-            this.supplier = supplier;
-            this.receivedBy = receivedBy;
-            this.warehouse = warehouse;
-            this.entries = entries;
+            InventoryReceiptId = inventoryReceiptId;
+            ReceiptDate = receiptDate;
+            ReceiptStatus = receiptStatus;
+            SupplierName = supplierName;
+            PersonName = personName;
+            WarehouseName = warehouseName;
+            Entries = entries;
         }
     }
 }

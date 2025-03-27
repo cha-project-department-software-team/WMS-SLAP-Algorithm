@@ -1,22 +1,25 @@
-﻿using SLAP.AggregateModels.InventoryIssueAggregate;
-using SLAP.AggregateModels.InventoryReceiptAggregate;
-using SLAP.AggregateModels.PartyAggregate.People;
-using SLAP.Enum;
+﻿using SLAPScheduling.AggregateModels.Properties;
 
 namespace SLAP.AggregateModels.PartyAggregate
 {
     public class Person
     {
-        public string personId { get; set; }
-        public string personName { get; set; }
-        public EmployeeType role { get; set; }
-        public List<PersonProperty> properties { get; set; }
+        public string PersonId { get; set; }
+        public string PersonName { get; set; }
+        public string EmployeeType { get; set; }
+        public List<Property> personProperties { get; set; }
 
-        public Person(string personId, string personName, EmployeeType role)
+        public Person()
         {
-            this.personId = personId;
-            this.personName = personName;
-            this.role = role;
+
+        }
+
+        public Person(string personId, string personName, string employeeType, List<Property> personProperties)
+        {
+            PersonId = personId;
+            PersonName = personName;
+            EmployeeType = employeeType;
+            this.personProperties = personProperties;
         }
     }
 }

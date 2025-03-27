@@ -1,20 +1,18 @@
-﻿using SLAP.AggregateModels.InventoryReceiptAggregate;
-
-namespace SLAP.AggregateModels.PartyAggregate
+﻿namespace SLAP.AggregateModels.PartyAggregate
 {
-    public class Supplier  
+    public class Supplier
     {
-        public string supplierId { get; set; }
-        public string supplierName { get; set; }
-        public string address { get; set; }
-        public string contactDetails { get; set; }
+        public string SupplierId { get; set; }
+        public string SupplierName { get; set; }
+        public string Address { get; set; }
+        public string ContactDetails { get; set; }
 
         public Supplier(string supplierId, string supplierName, string address, string contactDetails)
         {
-            this.supplierId = supplierId;
-            this.supplierName = supplierName;
-            this.address = address;
-            this.contactDetails = contactDetails;
+            SupplierId = supplierId;
+            SupplierName = supplierName;
+            Address = address;
+            ContactDetails = contactDetails;
         }
     }
 }

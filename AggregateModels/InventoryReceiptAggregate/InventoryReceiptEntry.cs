@@ -1,28 +1,35 @@
-﻿using SLAP.AggregateModels.MaterialAggregate;
-
-namespace SLAP.AggregateModels.InventoryReceiptAggregate
+﻿namespace SLAP.AggregateModels.InventoryReceiptAggregate
 {
-    public class InventoryReceiptEntry 
+    public class InventoryReceiptEntry
     {
-        public string inventoryReceiptEntryId { get; set; }
-        public string lotNumber { get; set; }
-        public string purchaseOrderNumber { get; set; }
-        public Material material { get; set; }
-        public ReceiptLot receiptLot { get; set; }
-        public string note { get; set; }
+        public string InventoryReceiptEntryId { get; private set; }
+        public string PurchaseOrderNumber { get; private set; }
+        public string MaterialName { get; private set; }
+        public string MaterialCode { get; private set; }
+        public double ImportedQuantity { get; private set; }
+        public string Note { get; private set; }
+        public string InventoryReceiptId { get; private set; }
+        public string LotNumber { get; private set; }
+        public ReceiptLot ReceiptLot { get; private set; }
 
         public InventoryReceiptEntry()
         {
         }
 
-        public InventoryReceiptEntry(string inventoryReceiptEntryId, string purchaseOrderNumber, Material material, string note, string lotNumber)
+        public InventoryReceiptEntry(string inventoryReceiptEntryId, string purchaseOrderNumber, string materialCode, string materialName, string note, string inventoryReceiptId, string lotNumber)
         {
-            this.inventoryReceiptEntryId = inventoryReceiptEntryId;
-            this.purchaseOrderNumber = purchaseOrderNumber;
-            this.material = material;
-            this.note = note;
-            this.lotNumber = lotNumber;
-            this.receiptLot = new ReceiptLot();
+            InventoryReceiptEntryId = inventoryReceiptEntryId;
+            PurchaseOrderNumber = purchaseOrderNumber;
+            MaterialCode = materialCode;
+            MaterialName = materialName;
+            Note = note;
+            InventoryReceiptId = inventoryReceiptId;
+            LotNumber = lotNumber;
+        }
+
+        public void AddReceiptLot(ReceiptLot receiptLot)
+        {
+            ReceiptLot = receiptLot;
         }
     }
 }

@@ -1,21 +1,24 @@
-﻿namespace SLAP.AggregateModels.MaterialAggregate
+﻿using SLAPScheduling.AggregateModels.Properties;
+
+namespace SLAP.AggregateModels.MaterialAggregate
 {
     public class MaterialClass
     {
-        public string materialClassId { get; set; }
-        public string className { get; set; }
-        public List<MaterialClassProperty> properties { get; set; }
+        public string MaterialClassId { get; set; }
+        public string ClassName { get; set; }
+        public List<Property> Properties { get; set; }
+        public List<Material> Materials { get; set; }
 
-        public MaterialClass(string materialClassId, string className, List<MaterialClassProperty> properties) : this(materialClassId, className)
+        public MaterialClass()
         {
-            this.properties = properties;
         }
 
-        public MaterialClass(string materialClassId, string className)
+        public MaterialClass(string materialClassId, string className, List<Property> properties, List<Material> materials)
         {
-            this.materialClassId = materialClassId;
-            this.className = className;
-            this.properties = new List<MaterialClassProperty>();
+            MaterialClassId = materialClassId;
+            ClassName = className;
+            Properties = properties;
+            Materials = materials;
         }
     }
 }

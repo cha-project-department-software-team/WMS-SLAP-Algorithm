@@ -1,26 +1,29 @@
-﻿using SLAP.Enum;
+﻿using SLAP.AggregateModels.MaterialAggregate;
+using SLAP.Enum;
+using System.Text.Json.Serialization;
 
 namespace SLAP.AggregateModels.InventoryReceiptAggregate
 {
-    public class ReceiptLot 
+    public class ReceiptLot
     {
-        public string receiptLotId { get; set; }
-        public double importedQuantity { get; set; }
-        public List<ReceiptSublot> receiptSublots { get; set; }
-        public InventoryReceiptEntry inventoryReceiptEntry { get; set; }
-        public LotStatus receiptLotStatus { get; set; }
+        public string ReceiptLotId { get; set; }
+        public Material Material { get; set; }
+        public double ImportedQuantity { get; set; }
+        [JsonConverter(typeof(JsonStringEnumConverter))]
+        public LotStatus ReceiptLotStatus { get; set; }
+        public List<ReceiptSubLot> ReceiptSublots { get; set; }
 
         public ReceiptLot()
         {
         }
 
-        public ReceiptLot(string receiptLotId, double importedQuantity, List<ReceiptSublot> receiptSublots, InventoryReceiptEntry inventoryReceiptEntry, LotStatus receiptLotStatus)
+        public ReceiptLot(string receiptLotId, Material material, double importedQuantity, LotStatus receiptLotStatus)
         {
-            this.receiptLotId = receiptLotId;
-            this.importedQuantity = importedQuantity;
-            this.receiptSublots = receiptSublots;
-            this.inventoryReceiptEntry = inventoryReceiptEntry;
-            this.receiptLotStatus = receiptLotStatus;
+            this.ReceiptLotId = receiptLotId;
+            this.Material = material;
+            this.ImportedQuantity = importedQuantity;
+            this.ReceiptLotStatus = receiptLotStatus;
+            this.ReceiptSublots = new List<ReceiptSubLot>();
         }
     }
 }
