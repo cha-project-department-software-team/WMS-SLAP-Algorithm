@@ -1,0 +1,35 @@
+﻿using SLAPScheduling.Domain.AggregateModels.MaterialAggregate.MaterialSubLots;
+using SLAPScheduling.Domain.Seedwork;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace SLAPScheduling.Domain.AggregateModels.InventoryIssueAggregate
+{
+    public class IssueSublot : Entity, IAggregateRoot
+    {
+        [Key]
+        public string issueSublotId { get; set; }
+
+        public double requestedQuantity { get; set; }
+
+        [ForeignKey("materialSublotId")]
+        public string sublotId { get; set; }
+        public MaterialSubLot materialSublot { get; set; }
+
+        [ForeignKey("issueLotId")]
+        public string issueLotId { get; set; }
+        public IssueLot issueLot { get; set; }
+
+        public IssueSublot()
+        {
+        }
+
+        public IssueSublot(string issueSublotId, double requestedQuantity, string materialSublotId, string issueLotId)
+        {
+            this.issueSublotId = issueSublotId;
+            this.requestedQuantity = requestedQuantity;
+            this.sublotId = materialSublotId;
+            this.issueLotId = issueLotId;
+        }
+    }
+}

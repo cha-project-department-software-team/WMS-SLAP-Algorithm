@@ -1,6 +1,5 @@
-using SLAP.AggregateModels.InventoryReceiptAggregate;
-using SLAP.Repository;
-using SLAPScheduling.AggregateModels.SchedulingAggregate;
+using SLAPScheduling.Domain.InterfaceRepositories.IScheduling;
+using SLAPScheduling.Infrastructure.Repository.Scheduling;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,7 +10,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddScoped<ISchedulingtRepository, SchedulingRepository>();
+builder.Services.AddScoped<ISchedulingRepository, SchedulingRepository>();
 builder.Services.AddMediatR(config =>
 {
     config.RegisterServicesFromAssemblies(AppDomain.CurrentDomain.GetAssemblies());
