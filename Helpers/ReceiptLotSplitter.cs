@@ -2,20 +2,26 @@
 using SLAP.AggregateModels.StorageAggregate;
 using Material = SLAP.AggregateModels.MaterialAggregate.Material;
 
-namespace SLAPScheduling.Algorithms
+namespace SLAPScheduling.Helpers
 {
     public class ReceiptLotSplitter : IDisposable
     {
         private List<InventoryReceiptEntry> entries { get; set; }
         private Dictionary<string, Material> materialDictionary { get; set; }
-        private double locationVolumeSize { get; set; }
+        private double locationVolume { get; set; }
+
+        #region Constructor
 
         public ReceiptLotSplitter(List<InventoryReceiptEntry> entries, List<Material> materials, Warehouse warehouse)
         {
             this.entries = entries;
             this.materialDictionary = materials?.Count > 0 ? materials.ToDictionary(x => x.MaterialId, y => y) : new Dictionary<string, Material>();
-            this.locationVolumeSize = warehouse?.Locations?.Count > 0 ? warehouse.GetLocationVolumeSize() : 0;
+            this.locationVolume = warehouse?.Locations?.Count > 0 ? warehouse.GetLocationVolume() : 0;
         }
+
+        #endregion
+
+        #region Split Receipt Entries to Sublots
 
         /// <summary>
         /// Split receipt entries to multiple sublots (with empty location) based on the volume size.
@@ -59,7 +65,7 @@ namespace SLAPScheduling.Algorithms
         /// <returns></returns>
         private int CalculateNumberOfSubLot(double lotQuantity, int quantityPerLocation)
         {
-           return (int)Math.Ceiling(lotQuantity / quantityPerLocation);
+           return quantityPerLocation > 0 ? (int)Math.Ceiling(lotQuantity / quantityPerLocation) : 0;
         }
 
         /// <summary>
@@ -69,8 +75,13 @@ namespace SLAPScheduling.Algorithms
         /// <returns></returns>
         private int CalculateQuantityPerLocation(Material material)
         {
-            return locationVolumeSize > 0 ? (int)Math.Floor(locationVolumeSize / material.GetVolumeSize()) : 0;
-        }   
+            var materialVolume = material.GetVolume();
+            return locationVolume > 0 && materialVolume > 0 ? (int)Math.Floor(locationVolume / materialVolume) : 0;
+        }
+
+        #endregion
+
+        #region Dispose Method
 
         /// <summary>
         /// Clean up after using this class .
@@ -79,5 +90,7 @@ namespace SLAPScheduling.Algorithms
         {
             GC.SuppressFinalize(this);
         }
+
+        #endregion
     }
 }

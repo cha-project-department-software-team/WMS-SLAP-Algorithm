@@ -1,4 +1,5 @@
-﻿using SLAP.Enum;
+﻿using SLAP.AggregateModels.StorageAggregate;
+using SLAP.Enum;
 using System.Text.Json.Serialization;
 
 namespace SLAP.AggregateModels.MaterialAggregate
@@ -14,8 +15,11 @@ namespace SLAP.AggregateModels.MaterialAggregate
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public UnitOfMeasure UnitOfMeasure { get; set; }
         public string LocationId { get; set; }
+        public Location Location { get; set; }
         public string LotNumber { get; set; }
+        public MaterialLot MaterialLot { get; set; }
 
+        #region Constructor
         public MaterialSubLot(string subLotId, LotStatus subLotStatus, double existingQuality, UnitOfMeasure unitOfMeasure, string locationId, string lotNumber)
         {
             SubLotId = subLotId;
@@ -25,5 +29,20 @@ namespace SLAP.AggregateModels.MaterialAggregate
             LocationId = locationId;
             LotNumber = lotNumber;
         }
+
+        #endregion
+
+        #region Retrieve Methods
+
+        /// <summary>
+        /// Retrieve the Material in the Material Lot.
+        /// </summary>
+        /// <returns></returns>
+        public Material? GetMaterial()
+        {
+            return this.MaterialLot?.Material;
+        }
+
+        #endregion
     }
 }

@@ -1,6 +1,5 @@
 ﻿using MediatR;
 using SLAP.AggregateModels.InventoryReceiptAggregate;
-using SLAP.AggregateModels.JobInforAggregate;
 using SLAP.AggregateModels.MaterialAggregate;
 using SLAP.AggregateModels.StorageAggregate;
 

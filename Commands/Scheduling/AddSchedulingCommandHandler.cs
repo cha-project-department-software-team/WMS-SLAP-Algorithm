@@ -1,16 +1,16 @@
 ﻿using MediatR;
-using SLAP.AggregateModels.InputAggregate;
 using SLAP.AggregateModels.InventoryReceiptAggregate;
+using SLAPScheduling.AggregateModels.SchedulingAggregate;
 
 namespace SLAP.Commands.Inputs
 {
     public class AddSchedulingHandler : IRequestHandler<AddSchedulingCommand, List<ReceiptSubLot>>
     {
-        private readonly IObjectInputRepository _objectInputRepository;
+        private readonly ISchedulingtRepository _schedulingRepository;
 
-        public AddSchedulingHandler(IObjectInputRepository objectInputRepository)
+        public AddSchedulingHandler(ISchedulingtRepository schedulingRepository)
         {
-            _objectInputRepository = objectInputRepository;
+            _schedulingRepository = schedulingRepository;
         }
 
         /// <summary>
@@ -21,7 +21,7 @@ namespace SLAP.Commands.Inputs
         /// <returns></returns>
         public Task<List<ReceiptSubLot>> Handle(AddSchedulingCommand request, CancellationToken cancellationToken)
         {
-            List<ReceiptSubLot> newListJobInfor = _objectInputRepository.Implement(request.inventoryReceipt, request.warehouse, request.materials);
+            List<ReceiptSubLot> newListJobInfor = _schedulingRepository.Implement(request.inventoryReceipt, request.warehouse, request.materials);
 
             return Task.FromResult(newListJobInfor);
         }

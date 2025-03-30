@@ -1,6 +1,6 @@
-using SLAP.AggregateModels.InputAggregate;
-using SLAP.AggregateModels.WorkAggregate;
+using SLAP.AggregateModels.InventoryReceiptAggregate;
 using SLAP.Repository;
+using SLAPScheduling.AggregateModels.SchedulingAggregate;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,13 +11,13 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddScoped<IObjectInputRepository, SchedulingRepository>();
-builder.Services.AddMediatR(cfg =>
+builder.Services.AddScoped<ISchedulingtRepository, SchedulingRepository>();
+builder.Services.AddMediatR(config =>
 {
-    cfg.RegisterServicesFromAssemblyContaining<WorkObjectInput>();
+    config.RegisterServicesFromAssemblies(AppDomain.CurrentDomain.GetAssemblies());
 });
-var app = builder.Build();
 
+var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -26,9 +26,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
-
 app.MapControllers();
-
 app.Run();

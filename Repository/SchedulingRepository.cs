@@ -1,53 +1,18 @@
-﻿using System.Data;
-using SLAP.AggregateModels.DeviceAggregate;
-using SLAP.AggregateModels.InputAggregate;
-using SLAP.AggregateModels.InventoryReceiptAggregate;
-using SLAP.AggregateModels.JobInforAggregate;
+﻿using SLAP.AggregateModels.InventoryReceiptAggregate;
 using SLAP.AggregateModels.StorageAggregate;
-using SLAP.AggregateModels.TechnicianAggregate;
-using SLAP.AggregateModels.WareHouseMaterialAggregate;
-using SLAP.AggregateModels.WorkAggregate;
+using SLAPScheduling.AggregateModels.SchedulingAggregate;
+using SLAPScheduling.Helpers;
+using SLAPScheduling.TabuSearch;
 using Material = SLAP.AggregateModels.MaterialAggregate.Material;
-using static SLAP.Constant;
-using SLAPScheduling.Algorithms;
 
 namespace SLAP.Repository
 {
-    public class SchedulingRepository : IObjectInputRepository
+    public class SchedulingRepository : ISchedulingtRepository
     {
-        //public List<JobInfor> Implement(ObjectInput input)
-        //{
-
-        //    List<WorkObjectInput> listWorkObjects = input.works.JsonInput.ToList();
-        //    List<DeviceObjectInput> listDeviceObjects = input.devices.JsonInput.ToList();
-        //    List<TechnicianObjectInput> listTechnicianObjects = input.technicians.JsonInput.ToList();
-        //    List<WareHouseMaterialObjectInput> listWareHouseMaterialObjects = input.wareHouseMaterials.JsonInput.ToList();
-
-        //    Dictionary<string, List<List<DateTime>>> deviceBreakingTime = ConvertFromObjectToTable.getDeviceDictionary(listDeviceObjects);
-        //    Dictionary<string, List<List<DateTime>>> technicianWorkingTime = ConvertFromObjectToTable.getTechnicianDictionary(listTechnicianObjects);
-
-        //    var workTable = ConvertFromObjectToTable.ConvertObjectInputToWorksTable(listWorkObjects);
-        //    List<WareHouseMaterial> listwareHouseMaterials = CheckMaterial.getWareHouseMaterial(listWareHouseMaterialObjects);
-        //    List<Material> listMaterials = CheckMaterial.getListMaterial(listWorkObjects, listwareHouseMaterials);
-
-
-        //    DataTable wareHouseMaterialTable = ConvertFromObjectToTable.ConvertToWareHouseMaterialTable(listwareHouseMaterials);
-        //    DataTable materialTable = ConvertFromObjectToTable.ConvertToMaterialTable(listMaterials);
-
-        //    List<Material> listsparePartAvailable = CheckMaterial.getListWorkAvailable(listwareHouseMaterials, listMaterials);
-        //    DataTable workAvailableTable = TabuSearch.getWorkAvailableTable(workTable, listsparePartAvailable);
-
-        //    List<JobInfor> listJobInfor = TabuSearch.tabuSearch(workAvailableTable, deviceBreakingTime, technicianWorkingTime,
-        //                                                        wareHouseMaterialTable, materialTable,
-        //                                                        listwareHouseMaterials, listMaterials);
-
-        //    return listJobInfor;
-        //}
-
         public List<ReceiptSubLot> Implement(InventoryReceipt inventoryReceipt, Warehouse warehouse, List<Material> materials)
         {
             if (inventoryReceipt == null || warehouse == null || materials == null)
-                return null;
+                return new List<ReceiptSubLot>();
 
             var receiptSubLots = new List<ReceiptSubLot>();
             using (var receiptLotSplitter = new ReceiptLotSplitter(inventoryReceipt.Entries, materials, warehouse))
@@ -56,7 +21,29 @@ namespace SLAP.Repository
                 receiptSubLots = receiptLotSplitter.GetReceiptSubLots().ToList();
             }
 
-            return new List<ReceiptSubLot>();
+            // Order by descending based on the movement ratio of a product
+            receiptSubLots = receiptSubLots.OrderByDescending(x => x.Material.GetMovementRatio()).ToList();
+
+            // Retrieve the available locations (not full) in the warehouse
+            var availableLocations = warehouse.Locations.Where(x => x.GetCurrentStoragePercentage() < 1.0);
+
+            // Find the optimal solution of location assignment for each receipt sublot using Tabu Search algorithm
+            TabuSearch tabuSearch = new TabuSearch(receiptSubLots, availableLocations.ToList());
+            List<Location> optimalLocations = tabuSearch.Implement();
+
+            UpdateLocationForReceiptSubLot(optimalLocations, ref receiptSubLots);
+            return receiptSubLots;
+        }
+
+        private void UpdateLocationForReceiptSubLot(List<Location> locations, ref List<ReceiptSubLot> receiptSubLots)
+        {
+            if (receiptSubLots?.Count > 0 && locations?.Count > 0)
+            {
+                for (int i = 0; i < receiptSubLots.Count; i++)
+                {
+                    receiptSubLots[i].UpdateLocation(locations[i]);
+                }
+            }
         }
     }
 }

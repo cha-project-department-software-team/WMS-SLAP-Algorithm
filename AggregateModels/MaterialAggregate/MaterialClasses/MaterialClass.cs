@@ -9,10 +9,6 @@ namespace SLAP.AggregateModels.MaterialAggregate
         public List<Property> Properties { get; set; }
         public List<Material> Materials { get; set; }
 
-        public MaterialClass()
-        {
-        }
-
         public MaterialClass(string materialClassId, string className, List<Property> properties, List<Material> materials)
         {
             MaterialClassId = materialClassId;

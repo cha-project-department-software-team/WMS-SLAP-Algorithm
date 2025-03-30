@@ -1,5 +1,6 @@
 ﻿using SLAP.Enum;
 using SLAPScheduling.AggregateModels.Properties;
+using SLAPScheduling.Extensions;
 using SLAPScheduling.Utilities;
 
 namespace SLAP.AggregateModels.MaterialAggregate
@@ -11,6 +12,7 @@ namespace SLAP.AggregateModels.MaterialAggregate
         public string MaterialClassId { get; set; }
         public List<Property> Properties { get; set; }
 
+        #region Constructors
         public Material()
         {
         }
@@ -23,61 +25,102 @@ namespace SLAP.AggregateModels.MaterialAggregate
             Properties = new List<Property>();
         }
 
+        #endregion
+
         #region Calculate Volume Size
 
         /// <summary>
         /// Calculate the Volume of Material as Cubic Meter.
         /// </summary>
         /// <returns></returns>
-        public double GetVolumeSize()
+        public double GetVolume()
         {
-            double length = GetBoxParameter("Length");
-            double width = GetBoxParameter("Width");
-            double height = GetBoxParameter("Height");
+            double length = this.Properties.GetSizeParameter("Length");
+            double width = this.Properties.GetSizeParameter("Width");
+            double height = this.Properties.GetSizeParameter("Height");
 
             return length * width * height;
         }
 
         #endregion
 
-        #region Retrieve Properties
+        #region Retrieve Allow Storage Level 
 
         /// <summary>
-        /// Retrieve the value as Meter of Length, Width, or Height.
+        /// Retrieve the allow storage level from Material Properties
         /// </summary>
-        /// <param name="propertyName"></param>
         /// <returns></returns>
-        public double GetBoxParameter(string propertyName = "Length")
+        public int GetLimitStorageLevel()
         {
-            if (GetPropertyValue(propertyName, out string propertyValue, out UnitOfMeasure unitOfMeasure) && double.TryParse(propertyValue, out double sizeValue))
+            if (this.Properties.TryGetPropertyValue("Storage Level", out string level, out UnitOfMeasure none))
             {
-                return sizeValue * Utility.GetMeterMultiplier(unitOfMeasure);
+                return int.TryParse(level, out int storageLevel) ? storageLevel : 0;
+            }
+
+            return 0;
+        }
+
+        #endregion
+
+        #region Calculate the movement ratio of a product
+
+        /// <summary>
+        /// Calculate the movement ratio of a product.
+        /// </summary>
+        /// <returns></returns>
+        public double GetMovementRatio()
+        {
+            var numberOfOrdersInMonth = GetNumberOfOrdersInAMonth();
+            var numberOfStorageLocations = GetNumberOfStorageLocations();
+
+            return numberOfOrdersInMonth / numberOfStorageLocations;
+        }
+
+
+        /// <summary>
+        /// Tp means the number of issue orders for this product in a month (order/ month).
+        /// </summary>
+        /// <returns></returns>
+        private int GetNumberOfOrdersInAMonth()
+        {
+            if (this.Properties.TryGetPropertyValue("Tp", out string propertyValue, out UnitOfMeasure unitOfMeasure))
+            {
+                return int.TryParse(propertyValue, out int tp) ? tp : 0;
             }
 
             return 0;
         }
 
         /// <summary>
-        /// Retrieve the property value from property name.
+        /// Sp means the number of storage locations for this product (location).
         /// </summary>
-        /// <param name="propertyName"></param>
         /// <returns></returns>
-        public bool GetPropertyValue(string propertyName, out string propertyValue, out UnitOfMeasure unitOfMeasure)
+        private int GetNumberOfStorageLocations()
         {
-            if (!string.IsNullOrEmpty(propertyName))
+            if (this.Properties.TryGetPropertyValue("Sp", out string propertyValue, out UnitOfMeasure unitOfMeasure))
             {
-                var property = Properties.FirstOrDefault(p => p.PropertyName == propertyName);
-                if (property != null)
-                {
-                    propertyValue = property.PropertyValue;
-                    unitOfMeasure = property.UnitOfMeasure;
-                    return true;
-                }
+                return int.TryParse(propertyValue, out int sp) ? sp : 0;
             }
 
-            propertyValue = string.Empty;
-            unitOfMeasure = UnitOfMeasure.None;
-            return false;
+            return 0;
+        }
+
+        #endregion
+
+        #region Validation Method
+        private bool? _isValid { get; set; }
+
+        /// <summary>
+        /// Validate the Material object
+        /// </summary>
+        /// <returns></returns>
+        public bool IsValid()
+        {
+            if (_isValid.HasValue)
+                return _isValid.Value;
+
+            _isValid = !string.IsNullOrEmpty(this.MaterialId) && !string.IsNullOrEmpty(this.MaterialName) && !string.IsNullOrEmpty(this.MaterialClassId);
+            return _isValid.Value;
         }
 
         #endregion
