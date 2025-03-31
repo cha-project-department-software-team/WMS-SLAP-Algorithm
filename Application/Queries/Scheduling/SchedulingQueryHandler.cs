@@ -21,7 +21,7 @@ namespace SLAPScheduling.Application.Queries.Scheduling
             var receiptSubLots = _schedulingRepository.Execute(null, null, null);
             if (receiptSubLots == null || receiptSubLots.Count == 0)
             {
-                throw new Exception("No result for Storage Location Assignement Problem");
+                throw new Exception("No result for Storage Locations Assignement Problem");
             }
 
             var receipSubLotDTOs = new List<ReceiptSubLotDTO>();

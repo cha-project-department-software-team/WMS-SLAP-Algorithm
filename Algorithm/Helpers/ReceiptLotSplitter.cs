@@ -28,35 +28,35 @@ namespace SLAPScheduling.Algorithm.Helpers
         /// Split receipt entries to multiple sublots (with empty location) based on the volume size.
         /// </summary>
         /// <returns></returns>
-        public IEnumerable<ReceiptSublot> GetReceiptSubLots()
-        {
-            foreach (var entry in entries)
-            {
-                if (materialDictionary.TryGetValue(entry.MaterialCode, out Material? material))
-                {
-                    ReceiptLot receiptLot = new ReceiptLot(receiptLotId: entry.PurchaseOrderNumber,
-                                                           material: material,
-                                                           importedQuantity: entry.ImportedQuantity,
-                                                           receiptLotStatus: LotStatus.Approved);
+        //public IEnumerable<ReceiptSublot> GetReceiptSubLots()
+        //{
+        //    foreach (var entry in entries)
+        //    {
+        //        if (materialDictionary.TryGetValue(entry.materialId, out Material? material))
+        //        {
+        //            ReceiptLot receiptLot = new ReceiptLot(receiptLotId: entry.purchaseOrderNumber,
+        //                                                   material: material,
+        //                                                   importedQuantity: entry.receiptLot.ImportedQuantity,
+        //                                                   receiptLotStatus: LotStatus.Approved);
 
-                    entry.AddReceiptLot(receiptLot);
+        //            entry.AddReceiptLot(receiptLot);
 
-                    int quantityPerLocation = CalculateQuantityPerLocation(receiptLot.Material);
-                    int subLotCount = CalculateNumberOfSubLot(receiptLot.ImportedQuantity, quantityPerLocation);
+        //            int quantityPerLocation = CalculateQuantityPerLocation(receiptLot.Material);
+        //            int subLotCount = CalculateNumberOfSubLot(receiptLot.ImportedQuantity, quantityPerLocation);
 
-                    for (int subLotIndex = 0; subLotIndex < subLotCount; subLotIndex++)
-                    {
-                        var subLotId = $"{entry.PurchaseOrderNumber}_{subLotIndex}";
-                        var subLotQuantity = subLotIndex == subLotCount - 1 ? receiptLot.ImportedQuantity % quantityPerLocation : quantityPerLocation;
+        //            for (int subLotIndex = 0; subLotIndex < subLotCount; subLotIndex++)
+        //            {
+        //                var subLotId = $"{entry.purchaseOrderNumber}_{subLotIndex}";
+        //                var subLotQuantity = subLotIndex == subLotCount - 1 ? receiptLot.ImportedQuantity % quantityPerLocation : quantityPerLocation;
 
-                        yield return new ReceiptSublot(receiptSublotId: subLotId,
-                                                       material: receiptLot.Material,
-                                                       location: null,
-                                                       importedQuantity: subLotQuantity);
-                    }
-                }
-            }
-        }
+        //                yield return new ReceiptSublot(receiptSublotId: subLotId,
+        //                                               material: receiptLot.Material,
+        //                                               location: null,
+        //                                               importedQuantity: subLotQuantity);
+        //            }
+        //        }
+        //    }
+        //}
 
         /// <summary>
         /// Calculate the locations which 

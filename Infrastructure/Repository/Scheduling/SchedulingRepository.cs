@@ -27,28 +27,28 @@ namespace SLAPScheduling.Infrastructure.Repository.Scheduling
                 return new List<ReceiptSublot>();
 
             var receiptSubLots = new List<ReceiptSublot>();
-            using (var receiptLotSplitter = new ReceiptLotSplitter(inventoryReceipt.Entries, materials, warehouse))
-            {
-                // Receipt Sublots do not include the Location information
-                receiptSubLots = receiptLotSplitter.GetReceiptSubLots().ToList();
-            }
+            //using (var receiptLotSplitter = new ReceiptLotSplitter(inventoryReceipt.entries, materials, warehouse))
+            //{
+            //    // Receipt Sublots do not include the Locations information
+            //    receiptSubLots = receiptLotSplitter.GetReceiptSubLots().ToList();
+            //}
 
-            // Order by descending based on the movement ratio of a product
-            receiptSubLots = receiptSubLots.OrderByDescending(x => x.Material.GetMovementRatio()).ToList();
+            //// Order by descending based on the movement ratio of a product
+            //receiptSubLots = receiptSubLots.OrderByDescending(x => x.Material.GetMovementRatio()).ToList();
 
-            // Retrieve the available locations (not full) in the warehouse
-            var availableLocations = warehouse.locations.Where(x => x.GetCurrentStoragePercentage() < 1.0);
+            //// Retrieve the available locations (not full) in the warehouse
+            //var availableLocations = warehouse.locations.Where(x => x.GetCurrentStoragePercentage() < 1.0);
 
-            // Find the optimal solution of location assignment for each receipt sublot using Tabu Search algorithm
-            TabuSearch tabuSearch = new TabuSearch(receiptSubLots, availableLocations.ToList());
-            List<Location> optimalLocations = tabuSearch.Implement();
+            //// Find the optimal solution of location assignment for each receipt sublot using Tabu Search algorithm
+            //TabuSearch tabuSearch = new TabuSearch(receiptSubLots, availableLocations.ToList());
+            //List<Location> optimalLocations = tabuSearch.Implement();
 
-            UpdateLocationForReceiptSubLot(optimalLocations, ref receiptSubLots);
+            //UpdateLocationForReceiptSubLot(optimalLocations, ref receiptSubLots);
             return receiptSubLots;
         }
 
         /// <summary>
-        /// Assign the Location to each ReceiptSubLot based on the optimal solution
+        /// Assign the Locations to each ReceiptSubLot based on the optimal solution
         /// </summary>
         /// <param name="locations"></param>
         /// <param name="receiptSubLots"></param>

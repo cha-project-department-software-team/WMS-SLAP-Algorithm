@@ -1,6 +1,4 @@
-﻿using MediatR;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
+﻿using Microsoft.EntityFrameworkCore.Storage;
 using SLAPScheduling.Domain.AggregateModels.InventoryIssueAggregate;
 using SLAPScheduling.Domain.AggregateModels.InventoryLogAggregate;
 using SLAPScheduling.Domain.AggregateModels.InventoryReceiptAggregate;
@@ -8,13 +6,10 @@ using SLAPScheduling.Domain.AggregateModels.MaterialAggregate.MaterialClasses;
 using SLAPScheduling.Domain.AggregateModels.MaterialAggregate.MaterialLots;
 using SLAPScheduling.Domain.AggregateModels.MaterialAggregate.Materials;
 using SLAPScheduling.Domain.AggregateModels.MaterialAggregate.MaterialSubLots;
-using SLAPScheduling.Domain.AggregateModels.MaterialLotAdjustmentAggregate;
 using SLAPScheduling.Domain.AggregateModels.PartyAggregate.Customers;
 using SLAPScheduling.Domain.AggregateModels.PartyAggregate.People;
 using SLAPScheduling.Domain.AggregateModels.PartyAggregate.Suppliers;
-using SLAPScheduling.Domain.AggregateModels.StorageAggregate.Locations;
 using SLAPScheduling.Domain.AggregateModels.StorageAggregate.Warehouses;
-using SLAPScheduling.Domain.Seedwork;
 
 namespace SLAPScheduling.Infrastructure
 {
@@ -57,16 +52,16 @@ namespace SLAPScheduling.Infrastructure
         public DbSet<InventoryLog> InventoryLogs { get; set; }
 
         // MaterialLotAdjustment Aggregate
-        public DbSet<MaterialLotAdjustment> MaterialLotAdjustments { get; set; }
+        //public DbSet<MaterialLotAdjustment> MaterialLotAdjustments { get; set; }
 
         private readonly IMediator _mediator;
         private IDbContextTransaction? _currentTransaction;
         public IDbContextTransaction? GetCurrentTransaction() => _currentTransaction;
         public bool HasActiveTransaction => _currentTransaction != null;
 
-        //#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-        //        public WMSDbContext(DbContextOptions options) : base(options) { }
-        //#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+//#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+//        public SLAPDbContext(DbContextOptions options) : base(options) { }
+//#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
 
         public SLAPDbContext(DbContextOptions options, IMediator mediator) : base(options)
         {
@@ -75,6 +70,19 @@ namespace SLAPScheduling.Infrastructure
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            
+
+            modelBuilder.Entity<IssueLot>()
+                .HasOne(il => il.inventoryIssueEntry)  
+                .WithOne(iie => iie.issueLot)       
+                .HasForeignKey<InventoryIssueEntry>(iie => iie.issueLotId) 
+                .OnDelete(DeleteBehavior.Cascade); 
+
+
+
+
+
+
             base.OnModelCreating(modelBuilder);
         }
 

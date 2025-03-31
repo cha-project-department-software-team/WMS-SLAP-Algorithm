@@ -13,6 +13,7 @@ namespace SLAPScheduling.Domain.AggregateModels.StorageAggregate.Locations
     {
         [Key]
         public string locationId { get; set; }
+
         public List<MaterialSubLot> materialSubLots { get; set; }
         public List<ReceiptSublot> receiptSublots { get; set; }
         public List<LocationProperty> properties { get; set; }
@@ -25,25 +26,29 @@ namespace SLAPScheduling.Domain.AggregateModels.StorageAggregate.Locations
         private int? _columnIndex { get; set; }
         private int? _levelIndex { get; set; }
 
-        #region Constructors
         public Location(string locationId, string warehouseId)
         {
             this.locationId = locationId;
             this.warehouseId = warehouseId;
         }
 
-        public Location(string locationId)
-        {
-            if (!string.IsNullOrEmpty(locationId) && TryGetLocationIdentification(out string warehouseId, out int rackIndex, out int rowIndex, out int columnIndex, out int levelIndex))
-            {
-                this.locationId = locationId;
-                this.warehouseId = warehouseId;
-                _rackIndex = rackIndex;
-                _rowIndex = rowIndex;
-                _columnIndex = columnIndex;
-                _levelIndex = levelIndex;
-            }
-        }
+
+
+        #region Constructors
+
+
+        //public Location(string locationId)
+        //{
+        //    if (!string.IsNullOrEmpty(locationId) && TryGetLocationIdentification(out string warehouseId, out int rackIndex, out int rowIndex, out int columnIndex, out int levelIndex))
+        //    {
+        //        this.locationId = locationId;
+        //        this.warehouseId = warehouseId;
+        //        _rackIndex = rackIndex;
+        //        _rowIndex = rowIndex;
+        //        _columnIndex = columnIndex;
+        //        _levelIndex = levelIndex;
+        //    }
+        //}
 
         #endregion
 
@@ -118,13 +123,13 @@ namespace SLAPScheduling.Domain.AggregateModels.StorageAggregate.Locations
         /// </summary>
         /// <param name="receiptSubLot"></param>
         /// <returns></returns>
-        public double GetStoragePercentage(ReceiptSublot receiptSubLot)
-        {
-            var subLotVolume = receiptSubLot.IsValid() ? receiptSubLot.Material.GetVolume() * receiptSubLot.ImportedQuantity : 0;
+        //public double GetStoragePercentage(ReceiptSublot receiptSubLot)
+        //{
+        //    var subLotVolume = receiptSubLot.IsValid() ? receiptSubLot.Material.GetVolume() * receiptSubLot.ImportedQuantity : 0;
 
-            var locationVolume = GetVolume();
-            return locationVolume > 0 ? subLotVolume / locationVolume : 0;
-        }
+        //    var locationVolume = GetVolume();
+        //    return locationVolume > 0 ? subLotVolume / locationVolume : 0;
+        //}
 
         #endregion
 
@@ -162,6 +167,16 @@ namespace SLAPScheduling.Domain.AggregateModels.StorageAggregate.Locations
 
         public bool TryGetLocationIdentification(out string warehouseId, out int rackIndex, out int rowIndex, out int columnIndex, out int levelIndex)
         {
+
+            warehouseId = string.Empty;
+            rackIndex = rowIndex = columnIndex = levelIndex = 0;
+
+            // Kiểm tra xem locationId có bị null không
+            if (string.IsNullOrWhiteSpace(this.locationId))
+            {
+                return false;
+            }
+
             var locationParts = this.locationId.Split('.');
             if (locationParts?.Length == 5)
             {
@@ -186,7 +201,7 @@ namespace SLAPScheduling.Domain.AggregateModels.StorageAggregate.Locations
         private static bool? _isValid { get; set; }
 
         /// <summary>
-        /// Check the validation of the Location object
+        /// Check the validation of the Locations object
         /// </summary>
         /// <returns></returns>
         public bool IsValid()

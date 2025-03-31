@@ -2,8 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using SLAPScheduling.Application.Commands.Scheduling;
 using SLAPScheduling.Domain.AggregateModels.InventoryReceiptAggregate;
-using SLAPScheduling.Domain.AggregateModels.MaterialAggregate.Materials;
-using SLAPScheduling.Domain.AggregateModels.StorageAggregate.Warehouses;
 
 namespace SLAPScheduling.Application.Controllers
 {
@@ -19,9 +17,9 @@ namespace SLAPScheduling.Application.Controllers
         }
 
         [HttpPost]
-        public async Task<List<ReceiptSublot>> Post(InventoryReceipt inventoryReceipt, Warehouse warehouse, List<Material> materials)
-        {
-            return await _mediator.Send(new AddSchedulingCommand(inventoryReceipt, warehouse, materials));
+        public async Task<List<ReceiptSublot>> Post([FromBody] AddSchedulingCommand command)
+        { 
+            return await _mediator.Send(command);
         }
     }
 }

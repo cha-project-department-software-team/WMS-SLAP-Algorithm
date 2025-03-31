@@ -6,24 +6,23 @@ namespace SLAPScheduling.Domain.AggregateModels.InventoryReceiptAggregate
 {
     public class ReceiptLot
     {
-        public string ReceiptLotId { get; set; }
-        public Material Material { get; set; }
-        public double ImportedQuantity { get; set; }
-        [JsonConverter(typeof(JsonStringEnumConverter))]
-        public LotStatus ReceiptLotStatus { get; set; }
-        public List<ReceiptSublot> ReceiptSublots { get; set; }
+        [Key]
+        public string receiptLotId { get; set; }
 
-        public ReceiptLot()
-        {
-        }
+        public double importedQuantity { get; set; }
+        public List<ReceiptSublot> receiptSublots { get; set; }
+        public LotStatus receiptLotStatus { get; set; }
 
-        public ReceiptLot(string receiptLotId, Material material, double importedQuantity, LotStatus receiptLotStatus)
+        [ForeignKey("inventoryReceiptEntryId")]
+        public string InventoryReceiptEntryId { get; set; }
+        public InventoryReceiptEntry inventoryReceiptEntry { get; set; }
+
+        public ReceiptLot(string receiptLotId, double importedQuantity, LotStatus receiptLotStatus, string inventoryReceiptEntryId)
         {
-            ReceiptLotId = receiptLotId;
-            Material = material;
-            ImportedQuantity = importedQuantity;
-            ReceiptLotStatus = receiptLotStatus;
-            ReceiptSublots = new List<ReceiptSublot>();
+            this.receiptLotId = receiptLotId;
+            this.importedQuantity = importedQuantity;
+            this.receiptLotStatus = receiptLotStatus;
+            InventoryReceiptEntryId = inventoryReceiptEntryId;
         }
     }
 }

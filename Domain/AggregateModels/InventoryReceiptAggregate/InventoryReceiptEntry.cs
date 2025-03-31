@@ -1,35 +1,34 @@
-﻿namespace SLAPScheduling.Domain.AggregateModels.InventoryReceiptAggregate
+﻿using SLAPScheduling.Domain.AggregateModels.MaterialAggregate.Materials;
+
+namespace SLAPScheduling.Domain.AggregateModels.InventoryReceiptAggregate
 {
     public class InventoryReceiptEntry
     {
-        public string InventoryReceiptEntryId { get; private set; }
-        public string PurchaseOrderNumber { get; private set; }
-        public string MaterialName { get; private set; }
-        public string MaterialCode { get; private set; }
-        public double ImportedQuantity { get; private set; }
-        public string Note { get; private set; }
-        public string InventoryReceiptId { get; private set; }
-        public string LotNumber { get; private set; }
-        public ReceiptLot ReceiptLot { get; private set; }
+        [Key]
+        public string inventoryReceiptEntryId { get; set; }
+
+        public string purchaseOrderNumber { get; set; }
+
+        [ForeignKey("materialId")]
+        public string materialId { get; set; }
+        public Material material { get; set; }
+
+        public string note { get; set; }
+
+        [ForeignKey("lotNumber")]
+        public string lotNumber { get; set; }
+        public ReceiptLot receiptLot { get; set; }
+
+        public string InventoryReceiptId { get; set; }
+        public InventoryReceipt inventoryReceipt { get; set; }
 
         public InventoryReceiptEntry()
         {
         }
 
-        public InventoryReceiptEntry(string inventoryReceiptEntryId, string purchaseOrderNumber, string materialCode, string materialName, string note, string inventoryReceiptId, string lotNumber)
-        {
-            InventoryReceiptEntryId = inventoryReceiptEntryId;
-            PurchaseOrderNumber = purchaseOrderNumber;
-            MaterialCode = materialCode;
-            MaterialName = materialName;
-            Note = note;
-            InventoryReceiptId = inventoryReceiptId;
-            LotNumber = lotNumber;
-        }
-
         public void AddReceiptLot(ReceiptLot receiptLot)
         {
-            ReceiptLot = receiptLot;
+            this.receiptLot = receiptLot;
         }
     }
 }
