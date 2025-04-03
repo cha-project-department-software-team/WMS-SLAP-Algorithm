@@ -1,6 +1,4 @@
-﻿
-
-namespace SLAPScheduling.Infrastructure.Repository.Warehouses
+﻿namespace SLAPScheduling.Infrastructure.Repository.Warehouses
 {
     public class WarehouseRepository : BaseRepository, IWarehouseRepository
     {

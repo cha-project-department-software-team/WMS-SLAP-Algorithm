@@ -1,9 +1,6 @@
-﻿using SLAPScheduling.Domain.AggregateModels.MaterialAggregate.Materials;
-using SLAPScheduling.Domain.AggregateModels.StorageAggregate.Locations;
-
-namespace SLAPScheduling.Domain.AggregateModels.InventoryReceiptAggregate
+﻿namespace SLAPScheduling.Domain.AggregateModels.InventoryReceiptAggregate
 {
-    public class ReceiptSublot
+    public class ReceiptSublot : Entity, IAggregateRoot
     {
         [Key]
         public string receiptSublotId { get; set; }
@@ -20,10 +17,8 @@ namespace SLAPScheduling.Domain.AggregateModels.InventoryReceiptAggregate
         public string receiptLotId { get; set; }
         public ReceiptLot receiptLot { get; set; }
 
-        #region Constructors
         public ReceiptSublot()
         {
-
         }
 
         public ReceiptSublot(string receiptSublotId, double importedQuantity, LotStatus subLotStatus, UnitOfMeasure unitOfMeasure, string locationId, string receiptLotId)
@@ -36,13 +31,17 @@ namespace SLAPScheduling.Domain.AggregateModels.InventoryReceiptAggregate
             this.receiptLotId = receiptLotId;
         }
 
-        //public ReceiptSublot(string receiptSublotId, Material material, Location? location, double importedQuantity)
-        //{
-        //    this.receiptSublotId = receiptSublotId;
-        //    this.material = material;
-        //    this.location = location;
-        //    this.importedQuantity = importedQuantity;
-        //}
+        #region Retrieve Methods    
+
+        public Material? GetMaterial()
+        {
+            if (this.receiptLot != null && this.receiptLot.inventoryReceiptEntry != null)
+            {
+                return this.receiptLot.material;
+            }
+
+            return null;
+        }
 
         #endregion
 
@@ -64,20 +63,20 @@ namespace SLAPScheduling.Domain.AggregateModels.InventoryReceiptAggregate
 
 
         #region Validation Method
-        //private bool? _isValid { get; set; }
+        private bool? _isValid { get; set; }
 
-        ///// <summary>
-        ///// Validate the Receipt Sublot object
-        ///// </summary>
-        ///// <returns></returns>
-        //public bool IsValid()
-        //{
-        //    if (_isValid.HasValue)
-        //        return _isValid.Value;
+        /// <summary>
+        /// Validate the Receipt Sublot object
+        /// </summary>
+        /// <returns></returns>
+        public bool IsValid()
+        {
+            if (_isValid.HasValue)
+                return _isValid.Value;
 
-        //    _isValid = !string.IsNullOrEmpty(this.receiptSublotId) && this.material.IsValid() && Location != null && ImportedQuantity > 0;
-        //    return _isValid.Value;
-        //}
+            _isValid = !string.IsNullOrEmpty(this.receiptSublotId) && this.receiptLot != null && this.receiptLot.inventoryReceiptEntry != null && this.location != null && this.importedQuantity > 0;
+            return _isValid.Value;
+        }
 
         #endregion
     }

@@ -1,14 +1,4 @@
-﻿using SLAPScheduling.Algorithm.Extensions;
-using SLAPScheduling.Domain.AggregateModels.InventoryIssueAggregate;
-using SLAPScheduling.Domain.AggregateModels.InventoryReceiptAggregate;
-using SLAPScheduling.Domain.AggregateModels.MaterialAggregate.MaterialClasses;
-using SLAPScheduling.Domain.AggregateModels.MaterialAggregate.MaterialLots;
-using SLAPScheduling.Domain.Enum;
-using SLAPScheduling.Domain.Seedwork;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-
-namespace SLAPScheduling.Domain.AggregateModels.MaterialAggregate.Materials
+﻿namespace SLAPScheduling.Domain.AggregateModels.MaterialAggregate.Materials
 {
     public class Material : Entity, IAggregateRoot
     {
@@ -19,6 +9,7 @@ namespace SLAPScheduling.Domain.AggregateModels.MaterialAggregate.Materials
         [ForeignKey("materialClassId")]
         public string materialClassId { get; set; }
         public MaterialClass materialClass { get; set; }
+
         public List<MaterialProperty> properties { get; set; }
         public List<MaterialLot> lots { get; set; }
         public List<InventoryReceiptEntry> receiptEntries { get; set; }
@@ -29,7 +20,6 @@ namespace SLAPScheduling.Domain.AggregateModels.MaterialAggregate.Materials
             this.materialId = materialId;
             this.materialName = materialName;
             this.materialClassId = materialClassId;
-            this.properties = new List<MaterialProperty>();
         }
 
         #region Calculate Volume Size

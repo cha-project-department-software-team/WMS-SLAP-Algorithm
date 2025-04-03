@@ -1,9 +1,6 @@
-﻿using SLAPScheduling.Domain.Enum;
-using System.Text.Json.Serialization;
-
-namespace SLAPScheduling.Application.DTOs
+﻿namespace SLAPScheduling.Application.DTOs.MaterialDTOs
 {
-    public class LocationPropertyDTO
+    public class MaterialPropertyDTO
     {
         public string PropertyId { get; set; }
         public string PropertyName { get; set; }
@@ -11,19 +8,15 @@ namespace SLAPScheduling.Application.DTOs
 
         [JsonConverter(typeof(JsonStringEnumConverter))]
         public UnitOfMeasure UnitOfMeasure { get; set; }
-        public string LocationId { get; set; }
+        public string MaterialId { get; set; }
 
-        public LocationPropertyDTO()
-        {
-        }
-
-        public LocationPropertyDTO(string propertyId, string propertyName, string propertyValue, UnitOfMeasure unitOfMeasure, string locationId)
+        public MaterialPropertyDTO(string propertyId, string propertyName, string propertyValue, UnitOfMeasure unitOfMeasure, string materialId)
         {
             PropertyId = propertyId;
             PropertyName = propertyName;
             PropertyValue = propertyValue;
             UnitOfMeasure = unitOfMeasure;
-            LocationId = locationId;
+            MaterialId = materialId;
         }
     }
 }

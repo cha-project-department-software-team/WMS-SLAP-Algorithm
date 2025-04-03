@@ -1,6 +1,4 @@
-﻿using MediatR;
-
-namespace SLAPScheduling.Domain.Seedwork
+﻿namespace SLAPScheduling.Domain.Seedwork
 {
     public abstract class Entity
     {

@@ -1,10 +1,4 @@
-﻿using SLAPScheduling.Domain.AggregateModels.MaterialAggregate.MaterialLots;
-using SLAPScheduling.Domain.Enum;
-using SLAPScheduling.Domain.Seedwork;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-
-namespace SLAPScheduling.Domain.AggregateModels.InventoryIssueAggregate
+﻿namespace SLAPScheduling.Domain.AggregateModels.InventoryIssueAggregate
 {
     public class IssueLot : Entity, IAggregateRoot
     {
@@ -13,10 +7,11 @@ namespace SLAPScheduling.Domain.AggregateModels.InventoryIssueAggregate
 
         public double requestedQuantity { get; set; }
         public List<IssueSublot> issueSublots { get; set; }
+        public Material material { get; set; }
         public LotStatus issueLotStatus { get; set; }
 
         [ForeignKey("materialId")]
-        public string materialLotId { get; set; } 
+        public string materialLotId { get; set; }
         public MaterialLot materialLot { get; set; }
 
         [ForeignKey("inventoryIssueEntryId")]

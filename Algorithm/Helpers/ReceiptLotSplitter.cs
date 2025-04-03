@@ -1,6 +1,4 @@
 ﻿using SLAPScheduling.Domain.AggregateModels.InventoryReceiptAggregate;
-using SLAPScheduling.Domain.AggregateModels.StorageAggregate.Warehouses;
-using SLAPScheduling.Domain.Enum;
 using Material = SLAPScheduling.Domain.AggregateModels.MaterialAggregate.Materials.Material;
 
 namespace SLAPScheduling.Algorithm.Helpers
@@ -28,35 +26,31 @@ namespace SLAPScheduling.Algorithm.Helpers
         /// Split receipt entries to multiple sublots (with empty location) based on the volume size.
         /// </summary>
         /// <returns></returns>
-        //public IEnumerable<ReceiptSublot> GetReceiptSubLots()
-        //{
-        //    foreach (var entry in entries)
-        //    {
-        //        if (materialDictionary.TryGetValue(entry.materialId, out Material? material))
-        //        {
-        //            ReceiptLot receiptLot = new ReceiptLot(receiptLotId: entry.purchaseOrderNumber,
-        //                                                   material: material,
-        //                                                   importedQuantity: entry.receiptLot.ImportedQuantity,
-        //                                                   receiptLotStatus: LotStatus.Approved);
+        public IEnumerable<ReceiptSublot> GetReceiptSubLots()
+        {
+            foreach (var entry in entries)
+            {
+                if (materialDictionary.TryGetValue(entry.materialId, out Material? material))
+                {
+                    ReceiptLot receiptLot = entry.receiptLot;
+                    int quantityPerLocation = CalculateQuantityPerLocation(material);
+                    int subLotCount = CalculateNumberOfSubLot(receiptLot.importedQuantity, quantityPerLocation);
 
-        //            entry.AddReceiptLot(receiptLot);
+                    for (int subLotIndex = 0; subLotIndex < subLotCount; subLotIndex++)
+                    {
+                        var subLotId = $"{entry.purchaseOrderNumber}_{subLotIndex}";
+                        var subLotQuantity = subLotIndex == subLotCount - 1 ? receiptLot.importedQuantity % quantityPerLocation : quantityPerLocation;
 
-        //            int quantityPerLocation = CalculateQuantityPerLocation(receiptLot.Material);
-        //            int subLotCount = CalculateNumberOfSubLot(receiptLot.ImportedQuantity, quantityPerLocation);
-
-        //            for (int subLotIndex = 0; subLotIndex < subLotCount; subLotIndex++)
-        //            {
-        //                var subLotId = $"{entry.purchaseOrderNumber}_{subLotIndex}";
-        //                var subLotQuantity = subLotIndex == subLotCount - 1 ? receiptLot.ImportedQuantity % quantityPerLocation : quantityPerLocation;
-
-        //                yield return new ReceiptSublot(receiptSublotId: subLotId,
-        //                                               material: receiptLot.Material,
-        //                                               location: null,
-        //                                               importedQuantity: subLotQuantity);
-        //            }
-        //        }
-        //    }
-        //}
+                        yield return new ReceiptSublot(receiptSublotId: subLotId,
+                                                       importedQuantity: subLotQuantity,
+                                                       subLotStatus: LotStatus.Pending,
+                                                       unitOfMeasure: UnitOfMeasure.None,
+                                                       locationId: string.Empty,
+                                                       receiptLotId: receiptLot.receiptLotId);
+                    }
+                }
+            }
+        }
 
         /// <summary>
         /// Calculate the locations which 
@@ -74,8 +68,11 @@ namespace SLAPScheduling.Algorithm.Helpers
         /// </summary>
         /// <param name="material"></param>
         /// <returns></returns>
-        private int CalculateQuantityPerLocation(Material material)
+        private int CalculateQuantityPerLocation(Material? material)
         {
+            if (material is null)
+                return 0;
+
             var materialVolume = material.GetVolume();
             return locationVolume > 0 && materialVolume > 0 ? (int)Math.Floor(locationVolume / materialVolume) : 0;
         }

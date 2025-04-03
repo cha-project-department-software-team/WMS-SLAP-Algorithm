@@ -1,9 +1,4 @@
-﻿using SLAPScheduling.Domain.AggregateModels.MaterialAggregate.Materials;
-using SLAPScheduling.Domain.Seedwork;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-
-namespace SLAPScheduling.Domain.AggregateModels.InventoryIssueAggregate
+﻿namespace SLAPScheduling.Domain.AggregateModels.InventoryIssueAggregate
 {
     public class InventoryIssueEntry : Entity, IAggregateRoot
     {
@@ -13,11 +8,8 @@ namespace SLAPScheduling.Domain.AggregateModels.InventoryIssueAggregate
         public string purchaseOrderNumber { get; set; }
         public double requestedQuantity { get; set; }
         public string note { get; set; }
-
-
-        [ForeignKey("materialId")]
         public string materialId { get; set; }
-        public Material material { get; set; }
+        public string materialName { get; set; }
 
         [ForeignKey("issueLotId")]
         public string issueLotId { get; set; }
@@ -27,13 +19,14 @@ namespace SLAPScheduling.Domain.AggregateModels.InventoryIssueAggregate
         public string inventoryIssueId { get; set; }
         public InventoryIssue inventoryIssue { get; set; }
 
-        public InventoryIssueEntry(string inventoryIssueEntryId, string purchaseOrderNumber, double requestedQuantity, string note, string materialId, string issueLotId, string inventoryIssueId)
+        public InventoryIssueEntry(string inventoryIssueEntryId, string purchaseOrderNumber, double requestedQuantity, string note, string materialId, string materialName, string issueLotId, string inventoryIssueId)
         {
             this.inventoryIssueEntryId = inventoryIssueEntryId;
             this.purchaseOrderNumber = purchaseOrderNumber;
             this.requestedQuantity = requestedQuantity;
             this.note = note;
             this.materialId = materialId;
+            this.materialName = materialName;
             this.issueLotId = issueLotId;
             this.inventoryIssueId = inventoryIssueId;
         }

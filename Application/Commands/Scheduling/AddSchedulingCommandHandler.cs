@@ -1,8 +1,4 @@
-﻿using MediatR;
-using SLAPScheduling.Domain.AggregateModels.InventoryReceiptAggregate;
-using SLAPScheduling.Domain.InterfaceRepositories.IScheduling;
-
-namespace SLAPScheduling.Application.Commands.Scheduling
+﻿namespace SLAPScheduling.Application.Commands.Scheduling
 {
     public class AddSchedulingHandler : IRequestHandler<AddSchedulingCommand, List<ReceiptSublot>>
     {

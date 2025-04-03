@@ -1,4 +1,4 @@
-using SLAPScheduling.Infrastructure.Repository.Warehouses;
+using SLAPScheduling.Domain.InterfaceRepositories.IMaterial;
 
 namespace SLAPScheduling
 {
@@ -19,13 +19,14 @@ namespace SLAPScheduling
 
             // Register the AutoMapper services with the assembly
             builder.Services.AddAutoMapper(typeof(ModelToViewModelProfile).Assembly);
-
-            builder.Services.AddMediatR(config =>
-                config.RegisterServicesFromAssemblies(AppDomain.CurrentDomain.GetAssemblies()));
+            builder.Services.AddMediatR(config => config.RegisterServicesFromAssemblies(AppDomain.CurrentDomain.GetAssemblies()));
 
             builder.Services.AddScoped<ISchedulingRepository, SchedulingRepository>();
-            builder.Services.AddScoped<ILocationRepository, LocationRepositpory>();
+            builder.Services.AddScoped<ILocationRepository, LocationRepository>();
             builder.Services.AddScoped<IWarehouseRepository, WarehouseRepository>();
+            builder.Services.AddScoped<IReceiptLotRepository, ReceiptLotRepository>();
+            builder.Services.AddScoped<IMaterialRepository, MaterialRepository>();
+            builder.Services.AddScoped<IMaterialPropertyRepository, MaterialPropertyRepository>();
 
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

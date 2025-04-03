@@ -1,7 +1,4 @@
-﻿using SLAPScheduling.Application.DTOs.WarehouseDTOs;
-using SLAPScheduling.Application.Queries.WarehouseQueries;
-
-namespace SLAPScheduling.Application.Controllers
+﻿namespace SLAPScheduling.Application.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]

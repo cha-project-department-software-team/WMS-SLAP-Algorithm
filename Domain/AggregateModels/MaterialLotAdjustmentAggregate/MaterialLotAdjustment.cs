@@ -1,12 +1,4 @@
-﻿using SLAPScheduling.Domain.AggregateModels.MaterialAggregate.MaterialLots;
-using SLAPScheduling.Domain.AggregateModels.PartyAggregate.People;
-using SLAPScheduling.Domain.AggregateModels.StorageAggregate.Warehouses;
-using SLAPScheduling.Domain.Enum;
-using SLAPScheduling.Domain.Seedwork;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-
-namespace SLAPScheduling.Domain.AggregateModels.MaterialLotAdjustmentAggregate
+﻿namespace SLAPScheduling.Domain.AggregateModels.MaterialLotAdjustmentAggregate
 {
     public class MaterialLotAdjustment : Entity, IAggregateRoot 
     {

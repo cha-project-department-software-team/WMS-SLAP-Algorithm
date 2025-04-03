@@ -1,17 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Storage;
-using SLAPScheduling.Domain.AggregateModels.InventoryIssueAggregate;
-using SLAPScheduling.Domain.AggregateModels.InventoryLogAggregate;
-using SLAPScheduling.Domain.AggregateModels.InventoryReceiptAggregate;
-using SLAPScheduling.Domain.AggregateModels.MaterialAggregate.MaterialClasses;
-using SLAPScheduling.Domain.AggregateModels.MaterialAggregate.MaterialLots;
-using SLAPScheduling.Domain.AggregateModels.MaterialAggregate.Materials;
-using SLAPScheduling.Domain.AggregateModels.MaterialAggregate.MaterialSubLots;
-using SLAPScheduling.Domain.AggregateModels.PartyAggregate.Customers;
-using SLAPScheduling.Domain.AggregateModels.PartyAggregate.People;
-using SLAPScheduling.Domain.AggregateModels.PartyAggregate.Suppliers;
-using SLAPScheduling.Domain.AggregateModels.StorageAggregate.Warehouses;
-
-namespace SLAPScheduling.Infrastructure
+﻿namespace SLAPScheduling.Infrastructure
 {
     public class SLAPDbContext : DbContext, IUnitOfWork
     {
@@ -70,18 +57,44 @@ namespace SLAPScheduling.Infrastructure
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            
+            // party aggregate
+            modelBuilder.ApplyConfiguration(new PersonEntityTypeConfiguration());
+            modelBuilder.ApplyConfiguration(new PersonPropertyEntityTypeConfiguration());
+            modelBuilder.ApplyConfiguration(new CustomerEntityTypeConfiguration());
+            modelBuilder.ApplyConfiguration(new SupplierEntityTypeConfiguration());
 
-            modelBuilder.Entity<IssueLot>()
-                .HasOne(il => il.inventoryIssueEntry)  
-                .WithOne(iie => iie.issueLot)       
-                .HasForeignKey<InventoryIssueEntry>(iie => iie.issueLotId) 
-                .OnDelete(DeleteBehavior.Cascade); 
+            // storage aggregate
+            modelBuilder.ApplyConfiguration(new WarehouseEntityTypeConfiguration());
+            modelBuilder.ApplyConfiguration(new WarehousePropertyEntityTypeConfiguration());
+            modelBuilder.ApplyConfiguration(new LocationEntityTypeConfiguration());
+            modelBuilder.ApplyConfiguration(new LocationPropertyEntityTypeConfiguration());
 
+            // material aggregate
+            modelBuilder.ApplyConfiguration(new MaterialEntityTypeConfiguration());
+            modelBuilder.ApplyConfiguration(new MaterialPropertyEntityTypeConfiguration());
+            modelBuilder.ApplyConfiguration(new MaterialClassEntityTypeConfiguration());
+            modelBuilder.ApplyConfiguration(new MaterialClassPropertyEntityTypeConfiguration());
+            modelBuilder.ApplyConfiguration(new MaterialLotEntityTypeConfiguration());
+            modelBuilder.ApplyConfiguration(new MaterialLotPropertyEntityTypeConfiguration());
+            modelBuilder.ApplyConfiguration(new MaterialSubLotEntityTypeConfiguration());
 
+            // inventory receipt aggregate
+            modelBuilder.ApplyConfiguration(new InventoryReceiptEntityTypeConfiguration());
+            modelBuilder.ApplyConfiguration(new InventoryReceiptEntryEntityTypeConfiguration());
+            modelBuilder.ApplyConfiguration(new ReceiptLotEntityTypeConfiguration());
+            modelBuilder.ApplyConfiguration(new ReceiptSubLotEntityTypeConfiguration());
 
+            // inventory issue aggregate
+            modelBuilder.ApplyConfiguration(new InventoryIssueEntityTypeConfiguration());
+            modelBuilder.ApplyConfiguration(new InventoryIssueEntryEntityTypeConfiguration());
+            modelBuilder.ApplyConfiguration(new IssueLotEntityTypeConfiguration());
+            modelBuilder.ApplyConfiguration(new IssueSubLotEntityTypeConfiguration());
 
+            // inventory Log aggregate
+            modelBuilder.ApplyConfiguration(new InventoryLogEntityTypeConfiguration());
 
+            // material lot adjustment aggregate
+            modelBuilder.ApplyConfiguration(new MaterialLotAdjustmentEntityTypeConfiguration());
 
             base.OnModelCreating(modelBuilder);
         }

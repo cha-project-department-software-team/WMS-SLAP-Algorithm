@@ -1,6 +1,4 @@
-﻿using SLAPScheduling.Application.DTOs;
-
-namespace SLAPScheduling.Application.Controllers
+﻿namespace SLAPScheduling.Application.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -20,7 +18,5 @@ namespace SLAPScheduling.Application.Controllers
 
             return await _mediator.Send(query);
         }
-
-
     }
 }

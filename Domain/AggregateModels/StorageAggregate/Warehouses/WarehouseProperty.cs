@@ -1,9 +1,4 @@
-﻿using SLAPScheduling.Domain.Enum;
-using SLAPScheduling.Domain.Seedwork;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
-
-namespace SLAPScheduling.Domain.AggregateModels.StorageAggregate.Warehouses
+﻿namespace SLAPScheduling.Domain.AggregateModels.StorageAggregate.Warehouses
 {
     public class WarehouseProperty : IAggregateRoot
     {

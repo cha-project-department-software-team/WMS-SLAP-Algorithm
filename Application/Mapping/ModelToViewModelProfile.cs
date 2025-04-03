@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using SLAPScheduling.Application.DTOs;
+using SLAPScheduling.Application.DTOs.LocationDTOs;
 using SLAPScheduling.Application.DTOs.WarehouseDTOs;
 
 namespace SLAPScheduling.Application.Mapping

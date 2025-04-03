@@ -1,9 +1,4 @@
-﻿using SLAPScheduling.Domain.Enum;
-using SLAPScheduling.Domain.Seedwork;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
-
-namespace SLAPScheduling.Domain.AggregateModels.PartyAggregate.People
+﻿namespace SLAPScheduling.Domain.AggregateModels.PartyAggregate.People
 {
     public class PersonProperty : Entity, IAggregateRoot
     {

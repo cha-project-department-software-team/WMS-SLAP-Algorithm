@@ -1,14 +1,12 @@
-﻿using SLAPScheduling.Domain.AggregateModels.MaterialAggregate.Materials;
-using SLAPScheduling.Domain.Seedwork;
-using System.ComponentModel.DataAnnotations;
-
-namespace SLAPScheduling.Domain.AggregateModels.MaterialAggregate.MaterialClasses
+﻿namespace SLAPScheduling.Domain.AggregateModels.MaterialAggregate.MaterialClasses
 {
     public class MaterialClass : Entity, IAggregateRoot
     {
         [Key]
         public string materialClassId { get; set; }
+
         public string className { get; set; }
+
         public List<MaterialClassProperty> properties { get; set; }
         public List<Material> materials { get; set; }
 
@@ -23,5 +21,6 @@ namespace SLAPScheduling.Domain.AggregateModels.MaterialAggregate.MaterialClasse
             this.className = className;
             this.properties = new List<MaterialClassProperty>();
         }
+
     }
 }

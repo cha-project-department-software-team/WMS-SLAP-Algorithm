@@ -2,12 +2,12 @@
 
 namespace SLAPScheduling.Application.Queries.WarehouseQueries
 {
-    public class GetAllWarehousesQueryHandler : IRequestHandler<GetAllWarehousesQuery, IEnumerable<WarehouseDTO>>
+    public class GetAllReceiptLotsQueryHandler : IRequestHandler<GetAllWarehousesQuery, IEnumerable<WarehouseDTO>>
     {
         private readonly IWarehouseRepository _warehouseRepository;
         private readonly IMapper _mapper;
 
-        public GetAllWarehousesQueryHandler(IWarehouseRepository warehouseRepository, IMapper mapper)
+        public GetAllReceiptLotsQueryHandler(IWarehouseRepository warehouseRepository, IMapper mapper)
         {
             _warehouseRepository = warehouseRepository;
             _mapper = mapper;

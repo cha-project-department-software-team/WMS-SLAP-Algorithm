@@ -1,8 +1,4 @@
-﻿using SLAPScheduling.Domain.AggregateModels.InventoryIssueAggregate;
-using SLAPScheduling.Domain.Seedwork;
-using System.ComponentModel.DataAnnotations;
-
-namespace SLAPScheduling.Domain.AggregateModels.PartyAggregate.Customers
+﻿namespace SLAPScheduling.Domain.AggregateModels.PartyAggregate.Customers
 {
     public class Customer : Entity, IAggregateRoot
     {

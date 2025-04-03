@@ -1,4 +1,4 @@
-﻿namespace SLAPScheduling.Application.DTOs
+﻿namespace SLAPScheduling.Application.DTOs.LocationDTOs
 {
     public class LocationDTO
     {

@@ -1,14 +1,10 @@
-﻿using SLAPScheduling.Domain.Enum;
-using SLAPScheduling.Domain.Seedwork;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
-
-namespace SLAPScheduling.Domain.AggregateModels.MaterialAggregate.MaterialLots
+﻿namespace SLAPScheduling.Domain.AggregateModels.MaterialAggregate.MaterialLots
 {
     public class MaterialLotProperty : Entity, IAggregateRoot
     {
         [Key]
         public string propertyId { get; set; }
+
         public string propertyName { get; set; }
         public string propertyValue { get; set; }
 

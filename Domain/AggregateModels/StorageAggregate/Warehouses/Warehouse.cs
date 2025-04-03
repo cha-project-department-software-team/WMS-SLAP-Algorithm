@@ -1,20 +1,12 @@
-﻿using SLAPScheduling.Algorithm.Extensions;
-using SLAPScheduling.Domain.AggregateModels.InventoryIssueAggregate;
-using SLAPScheduling.Domain.AggregateModels.InventoryLogAggregate;
-using SLAPScheduling.Domain.AggregateModels.InventoryReceiptAggregate;
-using SLAPScheduling.Domain.AggregateModels.MaterialLotAdjustmentAggregate;
-using SLAPScheduling.Domain.AggregateModels.Properties;
-using SLAPScheduling.Domain.AggregateModels.StorageAggregate.Locations;
-using SLAPScheduling.Domain.Seedwork;
-using System.ComponentModel.DataAnnotations;
-
-namespace SLAPScheduling.Domain.AggregateModels.StorageAggregate.Warehouses
+﻿namespace SLAPScheduling.Domain.AggregateModels.StorageAggregate.Warehouses
 {
     public class Warehouse : Entity, IAggregateRoot
     {
         [Key]
         public string warehouseId { get; set; }
+
         public string warehouseName { get; set; }
+
         public List<Location> locations { get; set; }
         public List<InventoryReceipt> inventoryReceipts { get; set; }
         public List<InventoryIssue> inventoryIssues { get; set; }

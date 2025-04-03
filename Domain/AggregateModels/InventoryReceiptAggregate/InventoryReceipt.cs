@@ -1,9 +1,4 @@
-﻿using SLAPScheduling.Domain.AggregateModels.PartyAggregate.People;
-using SLAPScheduling.Domain.AggregateModels.PartyAggregate.Suppliers;
-using SLAPScheduling.Domain.Enum;
-using System.Text.Json.Serialization;
-
-namespace SLAPScheduling.Domain.AggregateModels.InventoryReceiptAggregate
+﻿namespace SLAPScheduling.Domain.AggregateModels.InventoryReceiptAggregate
 {
     public class InventoryReceipt : Entity, IAggregateRoot
     {
@@ -27,7 +22,15 @@ namespace SLAPScheduling.Domain.AggregateModels.InventoryReceiptAggregate
 
         public List<InventoryReceiptEntry> entries { get; set; }
 
-
-
+        public InventoryReceipt(string inventoryReceiptId, DateTime receiptDate, ReceiptStatus receiptStatus, string supplierId, string personId, string warehouseId)
+        {
+            this.inventoryReceiptId = inventoryReceiptId;
+            this.receiptDate = receiptDate;
+            this.receiptStatus = receiptStatus;
+            this.supplierId = supplierId;
+            this.personId = personId;
+            this.warehouseId = warehouseId;
+            this.entries = new List<InventoryReceiptEntry>();
+        }
     }
 }

@@ -1,6 +1,4 @@
-﻿using SLAPScheduling.Domain.Seedwork;
-
-namespace SLAPScheduling.Infrastructure.Repository
+﻿namespace SLAPScheduling.Infrastructure.Repository
 {
     public class BaseRepository
     {

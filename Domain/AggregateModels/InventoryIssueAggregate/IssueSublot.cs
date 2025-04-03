@@ -1,9 +1,4 @@
-﻿using SLAPScheduling.Domain.AggregateModels.MaterialAggregate.MaterialSubLots;
-using SLAPScheduling.Domain.Seedwork;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-
-namespace SLAPScheduling.Domain.AggregateModels.InventoryIssueAggregate
+﻿namespace SLAPScheduling.Domain.AggregateModels.InventoryIssueAggregate
 {
     public class IssueSublot : Entity, IAggregateRoot
     {

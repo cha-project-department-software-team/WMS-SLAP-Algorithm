@@ -1,7 +1,4 @@
-﻿using MediatR;
-using SLAPScheduling.Domain.Seedwork;
-
-namespace SLAPScheduling.Infrastructure
+﻿namespace SLAPScheduling.Infrastructure
 {
     public static class MediatorExtension
     {

@@ -1,11 +1,4 @@
-﻿using SLAPScheduling.Domain.AggregateModels.MaterialAggregate.MaterialLots;
-using SLAPScheduling.Domain.AggregateModels.StorageAggregate.Warehouses;
-using SLAPScheduling.Domain.Enum;
-using SLAPScheduling.Domain.Seedwork;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-
-namespace SLAPScheduling.Domain.AggregateModels.InventoryLogAggregate
+﻿namespace SLAPScheduling.Domain.AggregateModels.InventoryLogAggregate
 {
     public class InventoryLog : Entity, IAggregateRoot
     {

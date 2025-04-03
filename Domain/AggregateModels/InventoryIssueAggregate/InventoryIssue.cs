@@ -1,12 +1,4 @@
-﻿using SLAPScheduling.Domain.AggregateModels.PartyAggregate.Customers;
-using SLAPScheduling.Domain.AggregateModels.PartyAggregate.People;
-using SLAPScheduling.Domain.AggregateModels.StorageAggregate.Warehouses;
-using SLAPScheduling.Domain.Enum;
-using SLAPScheduling.Domain.Seedwork;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-
-namespace SLAPScheduling.Domain.AggregateModels.InventoryIssueAggregate
+﻿namespace SLAPScheduling.Domain.AggregateModels.InventoryIssueAggregate
 {
     public class InventoryIssue : Entity, IAggregateRoot
     {

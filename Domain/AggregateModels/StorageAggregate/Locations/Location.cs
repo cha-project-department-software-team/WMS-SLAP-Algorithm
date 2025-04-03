@@ -1,19 +1,9 @@
-﻿using SLAPScheduling.Algorithm.Extensions;
-using SLAPScheduling.Domain.AggregateModels.InventoryReceiptAggregate;
-using SLAPScheduling.Domain.AggregateModels.MaterialAggregate.MaterialSubLots;
-using SLAPScheduling.Domain.AggregateModels.Properties;
-using SLAPScheduling.Domain.AggregateModels.StorageAggregate.Warehouses;
-using SLAPScheduling.Domain.Seedwork;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
-
-namespace SLAPScheduling.Domain.AggregateModels.StorageAggregate.Locations
+﻿namespace SLAPScheduling.Domain.AggregateModels.StorageAggregate.Locations
 {
     public class Location : Entity, IAggregateRoot
     {
         [Key]
         public string locationId { get; set; }
-
         public List<MaterialSubLot> materialSubLots { get; set; }
         public List<ReceiptSublot> receiptSublots { get; set; }
         public List<LocationProperty> properties { get; set; }
@@ -31,26 +21,6 @@ namespace SLAPScheduling.Domain.AggregateModels.StorageAggregate.Locations
             this.locationId = locationId;
             this.warehouseId = warehouseId;
         }
-
-
-
-        #region Constructors
-
-
-        //public Location(string locationId)
-        //{
-        //    if (!string.IsNullOrEmpty(locationId) && TryGetLocationIdentification(out string warehouseId, out int rackIndex, out int rowIndex, out int columnIndex, out int levelIndex))
-        //    {
-        //        this.locationId = locationId;
-        //        this.warehouseId = warehouseId;
-        //        _rackIndex = rackIndex;
-        //        _rowIndex = rowIndex;
-        //        _columnIndex = columnIndex;
-        //        _levelIndex = levelIndex;
-        //    }
-        //}
-
-        #endregion
 
         #region Retrieve Methods
 
@@ -111,7 +81,7 @@ namespace SLAPScheduling.Domain.AggregateModels.StorageAggregate.Locations
                 return this.materialSubLots.Sum(sublot =>
                 {
                     var material = sublot.GetMaterial();
-                    return material != null ? material.GetVolume() * sublot.existingQuantity : 0;
+                    return material != null ? material.GetVolume() * sublot.existingQuality : 0;
                 });
             }
 
@@ -123,13 +93,15 @@ namespace SLAPScheduling.Domain.AggregateModels.StorageAggregate.Locations
         /// </summary>
         /// <param name="receiptSubLot"></param>
         /// <returns></returns>
-        //public double GetStoragePercentage(ReceiptSublot receiptSubLot)
-        //{
-        //    var subLotVolume = receiptSubLot.IsValid() ? receiptSubLot.Material.GetVolume() * receiptSubLot.ImportedQuantity : 0;
+        public double GetStoragePercentage(ReceiptSublot receiptSubLot)
+        {
+            var material = receiptSubLot.GetMaterial();
 
-        //    var locationVolume = GetVolume();
-        //    return locationVolume > 0 ? subLotVolume / locationVolume : 0;
-        //}
+            var subLotVolume = receiptSubLot.IsValid() && material is not null ? material.GetVolume() * receiptSubLot.importedQuantity : 0;
+
+            var locationVolume = GetVolume();
+            return locationVolume > 0 ? subLotVolume / locationVolume : 0;
+        }
 
         #endregion
 

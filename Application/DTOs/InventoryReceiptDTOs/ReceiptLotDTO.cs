@@ -1,7 +1,4 @@
-﻿using SLAPScheduling.Domain.Enum;
-using System.Text.Json.Serialization;
-
-namespace SLAPScheduling.Application.DTOs.InventoryReceiptDTOs
+﻿namespace SLAPScheduling.Application.DTOs.InventoryReceiptDTOs
 {
     public class ReceiptLotDTO
     {
