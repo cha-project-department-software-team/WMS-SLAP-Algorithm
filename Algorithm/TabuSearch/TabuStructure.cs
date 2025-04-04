@@ -1,4 +1,6 @@
-﻿namespace SLAPScheduling.Algorithm.TabuSearch
+﻿using System.Numerics;
+
+namespace SLAPScheduling.Algorithm.TabuSearch
 {
     /// <summary>
     /// Tabu Structure is used for storing all Solutions and their object values in each iteration.
@@ -8,9 +10,38 @@
         private Dictionary<Solution, double> solutionValues { get; set; }
 
         #region Constructor
-        public TabuStructure(IEnumerable<Solution> solutions)
+        public TabuStructure(Solution bestSolution)
         {
-            solutionValues = solutions.ToDictionary(solution => solution, objectValue => 0.0);
+            solutionValues = new Dictionary<Solution, double>(new SolutionComparer());
+
+            var candidateSolutions = GetCandidateSolutions(bestSolution);
+            if (candidateSolutions?.Count() > 0)
+            {
+                foreach (var solution in candidateSolutions)
+                {
+                    if (!solutionValues.ContainsKey(solution))
+                    {
+                        solutionValues.Add(solution, 0.0);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Swap all two neighbor elements in the best solution (from last iteration) to get the list of candidate solutions.
+        /// </summary>
+        /// <param name="currentSolution"></param>
+        /// <returns></returns>
+        private IEnumerable<Solution> GetCandidateSolutions(Solution currentSolution)
+        {
+            for (int i = 0; i < currentSolution.Indices.Count - 1; i++)
+            {
+                Solution? candidateSolution = currentSolution.SwapSolution(currentSolution.Indices[i], currentSolution.Indices[i + 1]);
+                if (candidateSolution != null)
+                {
+                    yield return candidateSolution;
+                }
+            }
         }
 
         #endregion
@@ -21,14 +52,9 @@
         /// Retrieve list Solutions in this Tabu Structure
         /// </summary>
         /// <returns></returns>
-        public List<Solution>? GetSolutions()
+        public List<Solution> GetSolutions()
         {
-            if (solutionValues?.Count > 0)
-            {
-                return solutionValues.Keys.ToList();
-            }
-
-            return null;
+            return solutionValues.Keys.ToList();
         }
 
         /// <summary>
@@ -51,6 +77,18 @@
             return (bestSolution.Key, bestSolution.Value);
         }
 
+        /// <summary>
+        /// Find another solution which is not existing in tabu list.
+        /// </summary>
+        /// <param name="existedSolutions"></param>
+        /// <returns></returns>
+        public (Solution Solution, double ObjectValue) GetOtherBestSolution(TabuList tabuList)
+        {
+            var remainSolutions = solutionValues.Where(x => !tabuList.IsExist(x.Key));
+            var bestSolution = remainSolutions.Aggregate((l, r) => l.Value < r.Value ? l : r);
+            return (bestSolution.Key, bestSolution.Value);
+        }
+
         #endregion
 
         #region Update Object Value for Solution
@@ -69,5 +107,18 @@
         }
 
         #endregion
+    }
+
+    public class SolutionComparer : IEqualityComparer<Solution>
+    {
+        public bool Equals(Solution thisSolution, Solution thatSolution)
+        {
+            return thisSolution.Indices.SequenceEqual(thatSolution.Indices);
+        }
+
+        public int GetHashCode(Solution thisSolution)
+        {
+            return thisSolution.Indices.GetHashCode();
+        }
     }
 }

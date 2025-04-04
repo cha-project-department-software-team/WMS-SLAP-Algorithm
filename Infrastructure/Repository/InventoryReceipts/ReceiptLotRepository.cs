@@ -9,8 +9,8 @@
         public async Task<List<ReceiptLot>> GetAllAsync()
         {
             var receiptLots = await _context.ReceiptLots
-                                            .AsNoTracking()
-                                            .ToListAsync();
+                                    .AsNoTracking()
+                                    .ToListAsync();
 
             return receiptLots;
         }

@@ -1,4 +1,6 @@
-﻿namespace SLAPScheduling.Application.Controllers
+﻿using SLAPScheduling.Application.Queries.Scheduling;
+
+namespace SLAPScheduling.Application.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -11,10 +13,12 @@
             _mediator = mediator;
         }
 
-        [HttpPost]
-        public async Task<List<ReceiptSublot>> Post([FromBody] AddSchedulingCommand command)
-        { 
-            return await _mediator.Send(command);
+        [HttpGet("GetSchedulingResult")]
+        public async Task<IEnumerable<ReceiptSubLotDTO>> GetSchedulingResult(string warehouseId = "TP01", string receiptLotStatus = "Pending")
+        {
+            var query = new SchedulingQuery(warehouseId, receiptLotStatus);
+
+            return await _mediator.Send(query);
         }
     }
 }

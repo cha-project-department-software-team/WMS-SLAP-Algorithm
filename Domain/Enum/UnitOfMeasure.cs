@@ -47,6 +47,8 @@
         Micrometer,
         MeterPerSecond,
         RevolutionsPerMinute,
-        AmpereHour
+        AmpereHour,
+        VND,
+        CubicMeters
     }
 }

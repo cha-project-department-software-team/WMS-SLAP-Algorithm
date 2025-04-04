@@ -9,17 +9,34 @@
         /// <summary>
         /// POST API to implement the scheduling based on the input data.
         /// </summary>
-        /// <param name="inventoryReceipt"></param>
-        /// <param name="warehouse"></param>
-        /// <param name="materials"></param>
+        /// <param name="warehouseId"></param>
+        /// <param name="receiptLotStatus"></param>
         /// <returns></returns>
-        public List<ReceiptSublot> Execute(InventoryReceipt inventoryReceipt, Warehouse warehouse, List<Material> materials)
+        /// <exception cref="Exception"></exception>
+        public async Task<List<ReceiptSublot>> Execute(string warehouseId, string receiptLotStatus)
         {
-            if (inventoryReceipt is null || warehouse is null || materials is null)
-                return new List<ReceiptSublot>();
+            var warehouse = await GetSchedulingWarehouse(warehouseId);
+            if (warehouse is null)
+            {
+                throw new Exception("No result for Warehouse");
+            }
+
+            var receiptLots = await GetReceiptLotsByStatus(receiptLotStatus);
+            if (receiptLots == null || receiptLots.Count == 0)
+            {
+                throw new Exception("No result for Receipt Lots");
+            }
+
+            var materials = await GetAllMaterials();
+            if (materials is null || materials.Count == 0)
+            {
+                throw new Exception("No result for Receipt Lots");
+            }
+
+            MappingMaterialToReceiptLots(materials, ref receiptLots);
 
             var receiptSubLots = new List<ReceiptSublot>();
-            using (var receiptLotSplitter = new ReceiptLotSplitter(inventoryReceipt.entries, materials, warehouse))
+            using (var receiptLotSplitter = new ReceiptLotSplitter(receiptLots, warehouse))
             {
                 // Receipt Sublots do not include the Locations information
                 receiptSubLots = receiptLotSplitter.GetReceiptSubLots().ToList();
@@ -43,6 +60,21 @@
             return receiptSubLots;
         }
 
+        private void MappingMaterialToReceiptLots(List<Material> materials, ref List<ReceiptLot> receiptLots)
+        {
+            var materialDictionary = materials.ToDictionary(x => x.materialId, y => y);
+
+            foreach (var receiptLot in receiptLots)
+            {
+                var receiptEntry = receiptLot.inventoryReceiptEntry;
+                var materialId = receiptEntry is not null ? receiptEntry.materialId : string.Empty;
+                if (materialDictionary.TryGetValue(materialId, out Material? material))
+                {
+                    receiptLot.material = material;
+                }
+            }
+        }
+
         /// <summary>
         /// Assign the Locations to each ReceiptSubLot based on the optimal solution
         /// </summary>
@@ -57,6 +89,41 @@
                     receiptSubLots[i].UpdateLocation(locations[i]);
                 }
             }
+        }
+
+        public async Task<Warehouse> GetSchedulingWarehouse(string warehouseId)
+        {
+            var warehouse = await _context.Warehouses
+                                .Include(s => s.properties)
+                                .Include(s => s.locations)
+                                    .ThenInclude(s => s.properties)
+                                .FirstOrDefaultAsync(x => x.warehouseId == warehouseId);
+
+            return warehouse is not null ? warehouse : throw new Exception($"There is no existing warehouse with warehouseId = {warehouseId}");
+        }
+
+        public async Task<List<ReceiptLot>> GetReceiptLotsByStatus(string lotStatus)
+        {
+            if (!Enum.TryParse<LotStatus>(lotStatus, out var status))
+            {
+                throw new ArgumentException("Invalid status value", nameof(lotStatus));
+            }
+
+            return await _context.ReceiptLots
+                        .Where(x => x.receiptLotStatus == status)
+                        .Include(x => x.inventoryReceiptEntry)
+                        .Include(x => x.receiptSublots)
+                        .ToListAsync();
+        }
+
+        public async Task<List<Material>> GetAllMaterials()
+        {
+            var materials = await _context.Materials
+                                .Include(x => x.properties)
+                                .AsNoTracking()
+                                .ToListAsync();
+
+            return materials;
         }
     }
 }

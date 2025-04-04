@@ -24,8 +24,19 @@
 
         #region Retrieve Methods
 
-        public int GetLevelIndex()
+        public int GetStorageLevel()
         {
+            if (_levelIndex is not null)
+                return _levelIndex.Value;
+
+            if (!string.IsNullOrEmpty(locationId) && TryGetLocationIdentification(out string warehouseId, out int rackIndex, out int rowIndex, out int columnIndex, out int levelIndex))
+            {
+                _rackIndex = rackIndex;
+                _rowIndex = rowIndex;
+                _columnIndex = columnIndex;
+                _levelIndex = levelIndex;
+            }
+
             return _levelIndex ?? 0;
         }
 
@@ -81,7 +92,7 @@
                 return this.materialSubLots.Sum(sublot =>
                 {
                     var material = sublot.GetMaterial();
-                    return material != null ? material.GetVolume() * sublot.existingQuality : 0;
+                    return material != null ? material.GetPacketVolume() * sublot.existingQuality : 0;
                 });
             }
 
@@ -96,11 +107,16 @@
         public double GetStoragePercentage(ReceiptSublot receiptSubLot)
         {
             var material = receiptSubLot.GetMaterial();
+            if (material is not null)
+            {
+                var packetQuantity = material.GetPacketSize() > 0 ? receiptSubLot.importedQuantity / material.GetPacketSize() : 0;
+                var subLotVolume = receiptSubLot is not null && material is not null ? material.GetPacketVolume() * packetQuantity : 0;
 
-            var subLotVolume = receiptSubLot.IsValid() && material is not null ? material.GetVolume() * receiptSubLot.importedQuantity : 0;
+                var locationVolume = GetVolume();
+                return locationVolume > 0 ? subLotVolume / locationVolume : 0;
+            }
 
-            var locationVolume = GetVolume();
-            return locationVolume > 0 ? subLotVolume / locationVolume : 0;
+            return 0;
         }
 
         #endregion
@@ -161,41 +177,20 @@
                     return true;
                 }
             }
-
-            (warehouseId, rackIndex, rowIndex, columnIndex, levelIndex) = (string.Empty, 0, 0, 0, 0);
-            return false;
-        }
-
-        #endregion
-
-        #region Validation Method
-
-        private static bool? _isValid { get; set; }
-
-        /// <summary>
-        /// Check the validation of the Locations object
-        /// </summary>
-        /// <returns></returns>
-        public bool IsValid()
-        {
-            if (_isValid.HasValue)
-                return _isValid.Value;
-
-            _isValid = false;
-            if (!string.IsNullOrEmpty(this.locationId) && this.warehouse != null)
+            else if (locationParts?.Length == 4)
             {
-                if (_rackIndex.HasValue && _rowIndex.HasValue && _columnIndex.HasValue && _levelIndex.HasValue)
+                if (int.TryParse(locationParts[1], out rackIndex) &&
+                    int.TryParse(locationParts[2], out columnIndex) &&
+                    int.TryParse(locationParts[3], out levelIndex))
                 {
-                    _isValid = true;
-                }
-                else if (TryGetLocationIdentification(out string warehouseId, out int rackIndex, out int rowIndex, out int columnIndex, out int levelIndex))
-                {
-                    _rackIndex = rackIndex; _rowIndex = rowIndex; _columnIndex = columnIndex; _levelIndex = levelIndex;
-                    _isValid = this.warehouse.warehouseId == warehouseId;
+                    rowIndex = 1;
+                    warehouseId = locationParts[0];
+                    return true;
                 }
             }
 
-            return _isValid.Value;
+            (warehouseId, rackIndex, rowIndex, columnIndex, levelIndex) = (string.Empty, 0, 0, 0, 0);
+            return false;
         }
 
         #endregion

@@ -1,12 +1,14 @@
-﻿using MediatR;
-using SLAPScheduling.Application.DTOs.InventoryReceiptDTOs;
-
-namespace SLAPScheduling.Application.Queries.Scheduling
+﻿namespace SLAPScheduling.Application.Queries.Scheduling
 {
     public class SchedulingQuery : IRequest<IEnumerable<ReceiptSubLotDTO>>
     {
-        public SchedulingQuery()
+        public string WarehouseId { get; set; }
+        public string ReceiptLotStatus { get; set; }
+
+        public SchedulingQuery(string warehouseId, string receiptLotStatus)
         {
+            WarehouseId = warehouseId;
+            ReceiptLotStatus = receiptLotStatus;
         }
     }
 }

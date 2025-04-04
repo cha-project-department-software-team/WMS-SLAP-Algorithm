@@ -5,7 +5,7 @@ namespace SLAPScheduling.Algorithm.TabuSearch
 {
     public class TabuSearch
     {
-        private static int iterations => 100;
+        private static int iterations => 1000;
         private List<ReceiptSublot> receiptSubLots { get; set; }
         private Dictionary<int, Location> locationDictionary { get; set; }
         private Solution bestSolution { get; set; }
@@ -48,11 +48,10 @@ namespace SLAPScheduling.Algorithm.TabuSearch
             int terminate = 0;
             while (terminate < iterations)
             {
-                var candidateSolutions = GetCandidateSolutions(this.bestSolution);
-                TabuStructure tabuStructure = new TabuStructure(candidateSolutions);
+                TabuStructure tabuStructure = new TabuStructure(this.bestSolution);
 
                 // For each candidate solution, calculate the object value and update the tabu structure
-                foreach (var candidateSolution in candidateSolutions)
+                foreach (var candidateSolution in tabuStructure.GetSolutions())
                 {
                     double objectValue = CalculateObjectValue(candidateSolution);
                     tabuStructure.UpdateObjectValue(candidateSolution, objectValue);
@@ -64,6 +63,17 @@ namespace SLAPScheduling.Algorithm.TabuSearch
                     tabuList.AddSolution(bestSolution);
                     this.bestSolution = bestSolution;
                     this.bestObjectValue = bestObjectValue;
+                }
+                else
+                {
+                    // Best Solution is existed in Tabu List, find another solution.
+                    var (otherBestSolution, otherBestObjectValue) = tabuStructure.GetOtherBestSolution(tabuList);
+                    if (!tabuList.IsExist(otherBestSolution))
+                    {
+                        tabuList.AddSolution(otherBestSolution);
+                        this.bestSolution = otherBestSolution;
+                        this.bestObjectValue = otherBestObjectValue;
+                    }
                 }
 
                 bestObjectValues.Add(this.bestObjectValue);
@@ -84,23 +94,6 @@ namespace SLAPScheduling.Algorithm.TabuSearch
             var sortedLocations = locationDictionary.OrderBy(x => x.Value.GetDistanceToIOPoint());
             var initialIndices = sortedLocations.Select(x => x.Key).ToList();
             return initialIndices?.Count > 0 ? new Solution(initialIndices) : new Solution();
-        }
-
-        /// <summary>
-        /// Swap all two neighbor elements in the best solution (from last iteration) to get the list of candidate solutions.
-        /// </summary>
-        /// <param name="currentSolution"></param>
-        /// <returns></returns>
-        private IEnumerable<Solution> GetCandidateSolutions(Solution currentSolution)
-        {
-            for (int i = 0; i < currentSolution.Indices.Count - 1; i++)
-            {
-                Solution? candidateSolution = currentSolution.SwapSolution(currentSolution.Indices[i], currentSolution.Indices[i + 1]);
-                if (candidateSolution != null)
-                {
-                    yield return candidateSolution;
-                }
-            }
         }
 
         /// <summary>
@@ -137,12 +130,12 @@ namespace SLAPScheduling.Algorithm.TabuSearch
             for (int index = 0; index < currentSolution.Indices.Count; index++)
             {
                 var (location, receiptSubLot) = MapSolutionToSubLot(currentSolution, index);
-                if (location is not null && receiptSubLot is not null && location.IsValid() && receiptSubLot.IsValid())
+                if (location is not null && receiptSubLot is not null)
                 {
                     var material = receiptSubLot.GetMaterial();
                     if (material is not null)
                     {
-                        double penalty = !CheckConstraints(currentSolution) ? double.MaxValue : 0;
+                        double penalty = CheckStorageConstraints(location, receiptSubLot);
                         objectValue += material.GetMovementRatio() * location.GetDistanceToIOPoint() + penalty;
                     }
                 }
@@ -159,9 +152,20 @@ namespace SLAPScheduling.Algorithm.TabuSearch
         /// </summary>
         /// <param name="solution"></param>
         /// <returns></returns>
-        private bool CheckConstraints(Solution solution)
+        private double CheckStorageConstraints(Location location, ReceiptSublot receiptSublot)
         {
-            return !IsNotSatisfyStorageLevel(solution) && !IsOverStorageVolume(solution);
+            double penalty = 0.0;
+            if (IsNotSatisfyStorageLevel(location, receiptSublot))
+            {
+                penalty += 1000;
+            }
+            
+            if (IsOverStorageVolume(location, receiptSublot))
+            {
+                penalty += 2000;
+            }
+
+            return penalty;
         }
 
         /// <summary>
@@ -169,20 +173,16 @@ namespace SLAPScheduling.Algorithm.TabuSearch
         /// </summary>
         /// <param name="solution"></param>
         /// <returns></returns>
-        private bool IsNotSatisfyStorageLevel(Solution solution)
+        private bool IsNotSatisfyStorageLevel(Location location, ReceiptSublot receiptSublot)
         {
-            for (int index = 0; index < solution.Indices.Count; index++)
+            if (location is not null && receiptSublot is not null)
             {
-                var (location, receiptSubLot) = MapSolutionToSubLot(solution, index);
-                if (location is not null && receiptSubLot is not null && location.IsValid() && receiptSubLot.IsValid())
-                {
-                    var material = receiptSubLot.GetMaterial();
-                    if (material is not null && location.GetLevelIndex() > material.GetLimitStorageLevel())
-                        return false;
-                }
+                var material = receiptSublot.GetMaterial();
+                if (material is not null && location.GetStorageLevel() > material.GetLimitStorageLevel())
+                    return true;
             }
 
-            return true;
+            return false;
         }
 
         /// <summary>
@@ -190,18 +190,13 @@ namespace SLAPScheduling.Algorithm.TabuSearch
         /// </summary>
         /// <param name="solution"></param>
         /// <returns></returns>
-        private bool IsOverStorageVolume(Solution solution)
+        private bool IsOverStorageVolume(Location location, ReceiptSublot receiptSublot)
         {
-            var storagePercentage = 0.0;
-            for (int index = 0; index < solution.Indices.Count; index++)
+            if (location is not null && receiptSublot is not null)
             {
-                var (location, receiptSubLot) = MapSolutionToSubLot(solution, index);
-                if (location.IsValid() && receiptSubLot.IsValid())
-                {
-                    storagePercentage += location.GetCurrentStoragePercentage() + location.GetStoragePercentage(receiptSubLot);
-                    if (storagePercentage > 1.0)
-                        return true;
-                }
+                double storagePercentage = location.GetCurrentStoragePercentage() + location.GetStoragePercentage(receiptSublot);
+                if (storagePercentage > 1.0)
+                    return true;
             }
 
             return false;

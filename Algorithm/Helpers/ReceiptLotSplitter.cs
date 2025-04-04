@@ -1,21 +1,18 @@
-﻿using SLAPScheduling.Domain.AggregateModels.InventoryReceiptAggregate;
-using Material = SLAPScheduling.Domain.AggregateModels.MaterialAggregate.Materials.Material;
+﻿using SLAPScheduling.Domain.AggregateModels.MaterialAggregate.Materials;
 
 namespace SLAPScheduling.Algorithm.Helpers
 {
     public class ReceiptLotSplitter : IDisposable
     {
-        private List<InventoryReceiptEntry> entries { get; set; }
-        private Dictionary<string, Material> materialDictionary { get; set; }
+        private List<ReceiptLot> receiptLots { get; set; }
         private double locationVolume { get; set; }
 
         #region Constructor
 
-        public ReceiptLotSplitter(List<InventoryReceiptEntry> entries, List<Material> materials, Warehouse warehouse)
+        public ReceiptLotSplitter(List<ReceiptLot> receiptLots, Warehouse warehouse)
         {
-            this.entries = entries;
-            materialDictionary = materials?.Count > 0 ? materials.ToDictionary(x => x.materialId, y => y) : new Dictionary<string, Material>();
-            locationVolume = warehouse?.locations?.Count > 0 ? warehouse.GetLocationVolume() : 0;
+            this.receiptLots = receiptLots;
+            this.locationVolume = warehouse?.locations?.Count > 0 ? warehouse.GetLocationVolume() : 0;
         }
 
         #endregion
@@ -28,25 +25,30 @@ namespace SLAPScheduling.Algorithm.Helpers
         /// <returns></returns>
         public IEnumerable<ReceiptSublot> GetReceiptSubLots()
         {
-            foreach (var entry in entries)
+            foreach (var receiptLot in this.receiptLots)
             {
-                if (materialDictionary.TryGetValue(entry.materialId, out Material? material))
+                var material = receiptLot.material;
+                if (material is not null)
                 {
-                    ReceiptLot receiptLot = entry.receiptLot;
-                    int quantityPerLocation = CalculateQuantityPerLocation(material);
-                    int subLotCount = CalculateNumberOfSubLot(receiptLot.importedQuantity, quantityPerLocation);
+                    int packetQuantityPerLocation = CalculatePacketQuantityPerLocation(material);
+                    var packetSize = material.GetPacketSize();
+                    int subLotCount = CalculateNumberOfSubLot(receiptLot.importedQuantity, packetSize, packetQuantityPerLocation);
 
                     for (int subLotIndex = 0; subLotIndex < subLotCount; subLotIndex++)
                     {
-                        var subLotId = $"{entry.purchaseOrderNumber}_{subLotIndex}";
+                        var subLotId = $"{receiptLot.receiptLotId}_{subLotIndex}";
+                        var quantityPerLocation = packetSize * packetQuantityPerLocation;
                         var subLotQuantity = subLotIndex == subLotCount - 1 ? receiptLot.importedQuantity % quantityPerLocation : quantityPerLocation;
 
-                        yield return new ReceiptSublot(receiptSublotId: subLotId,
-                                                       importedQuantity: subLotQuantity,
-                                                       subLotStatus: LotStatus.Pending,
-                                                       unitOfMeasure: UnitOfMeasure.None,
-                                                       locationId: string.Empty,
-                                                       receiptLotId: receiptLot.receiptLotId);
+                        var receiptSubLot = new ReceiptSublot(receiptSublotId: subLotId,
+                                                              importedQuantity: subLotQuantity,
+                                                              subLotStatus: LotStatus.Pending,
+                                                              unitOfMeasure: UnitOfMeasure.None,
+                                                              locationId: string.Empty,
+                                                              receiptLotId: receiptLot.receiptLotId);
+
+                        receiptSubLot.UpdateReceiptLot(receiptLot);
+                        yield return receiptSubLot;
                     }
                 }
             }
@@ -56,11 +58,13 @@ namespace SLAPScheduling.Algorithm.Helpers
         /// Calculate the locations which 
         /// </summary>
         /// <param name="lotQuantity"></param>
-        /// <param name="quantityPerLocation"></param>
+        /// <param name="packetQuantityPerLocation"></param>
         /// <returns></returns>
-        private int CalculateNumberOfSubLot(double lotQuantity, int quantityPerLocation)
+        private int CalculateNumberOfSubLot(double lotQuantity, int packetSize, int packetQuantityPerLocation)
         {
-            return quantityPerLocation > 0 ? (int)Math.Ceiling(lotQuantity / quantityPerLocation) : 0;
+            var lotPacketQuantity = Math.Ceiling(lotQuantity / packetSize);
+
+            return packetQuantityPerLocation > 0 ? (int)Math.Ceiling(lotPacketQuantity / packetQuantityPerLocation) : 0;
         }
 
         /// <summary>
@@ -68,13 +72,13 @@ namespace SLAPScheduling.Algorithm.Helpers
         /// </summary>
         /// <param name="material"></param>
         /// <returns></returns>
-        private int CalculateQuantityPerLocation(Material? material)
+        private int CalculatePacketQuantityPerLocation(Material? material)
         {
             if (material is null)
                 return 0;
 
-            var materialVolume = material.GetVolume();
-            return locationVolume > 0 && materialVolume > 0 ? (int)Math.Floor(locationVolume / materialVolume) : 0;
+            var materialPacketVolume = material.GetPacketVolume();
+            return locationVolume > 0 && materialPacketVolume > 0 ? (int)Math.Floor(locationVolume / materialPacketVolume) : 0;
         }
 
         #endregion

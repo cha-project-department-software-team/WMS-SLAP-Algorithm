@@ -35,7 +35,7 @@
 
         public Material? GetMaterial()
         {
-            if (this.receiptLot != null && this.receiptLot.inventoryReceiptEntry != null)
+            if (this.receiptLot is not null)
             {
                 return this.receiptLot.material;
             }
@@ -53,29 +53,23 @@
         /// <param name="location"></param>
         public void UpdateLocation(Location location)
         {
-            if (location.IsValid())
+            if (location is not null)
             {
+                this.locationId = location.locationId;
                 this.location = location;
             }
         }
 
-        #endregion
-
-
-        #region Validation Method
-        private bool? _isValid { get; set; }
-
         /// <summary>
-        /// Validate the Receipt Sublot object
+        /// Update the object for Receipt Lot
         /// </summary>
-        /// <returns></returns>
-        public bool IsValid()
+        /// <param name="receiptLot"></param>
+        public void UpdateReceiptLot(ReceiptLot receiptLot)
         {
-            if (_isValid.HasValue)
-                return _isValid.Value;
-
-            _isValid = !string.IsNullOrEmpty(this.receiptSublotId) && this.receiptLot != null && this.receiptLot.inventoryReceiptEntry != null && this.location != null && this.importedQuantity > 0;
-            return _isValid.Value;
+            if (receiptLot is not null)
+            {
+                this.receiptLot = receiptLot;
+            }
         }
 
         #endregion

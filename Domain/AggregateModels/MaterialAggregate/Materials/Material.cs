@@ -9,7 +9,6 @@
         [ForeignKey("materialClassId")]
         public string materialClassId { get; set; }
         public MaterialClass materialClass { get; set; }
-
         public List<MaterialProperty> properties { get; set; }
         public List<MaterialLot> lots { get; set; }
         public List<InventoryReceiptEntry> receiptEntries { get; set; }
@@ -24,22 +23,57 @@
 
         #region Calculate Volume Size
 
+        private double? _packetVolumeSize;
+
         /// <summary>
-        /// Calculate the Volume of Material as Cubic Meter.
+        /// Calculate the Volume of Material Packet as Cubic Meter.
         /// </summary>
         /// <returns></returns>
-        public double GetVolume()
+        public double GetPacketVolume()
         {
-            double length = this.properties.GetSizeParameter("Length");
-            double width = this.properties.GetSizeParameter("Width");
-            double height = this.properties.GetSizeParameter("Height");
+            if (_packetVolumeSize.HasValue)
+                return _packetVolumeSize.Value;
 
-            return length * width * height;
+            if (this.properties.TryGetPropertyValue("Volume", out string propertyValue, out UnitOfMeasure unit) && double.TryParse(propertyValue, out double volume))
+            {
+                _packetVolumeSize = unit == UnitOfMeasure.CubicMeters ? volume : 0;
+            }
+            else
+            {
+                double length = this.properties.GetSizeParameter("Length");
+                double width = this.properties.GetSizeParameter("Width");
+                double height = this.properties.GetSizeParameter("Height");
+
+                _packetVolumeSize = length * width * height;
+            }
+
+            return _packetVolumeSize ?? 0;
+        }
+
+        private int? _packetSize;
+
+        /// <summary>
+        /// Retrieve the number of material in each package.
+        /// </summary>
+        /// <returns></returns>
+        public int GetPacketSize()
+        {
+            if (_packetSize.HasValue)
+                return _packetSize.Value;
+
+            if (this.properties.TryGetPropertyValue("PacketSize", out string propertyValue, out UnitOfMeasure unit))
+            {
+                _packetSize = int.TryParse(propertyValue, out int packetSize) ? packetSize : 0;
+            }
+
+            return _packetSize ?? 0;
         }
 
         #endregion
 
         #region Retrieve Allow Storage Level 
+
+        private int? _storageLevel;
 
         /// <summary>
         /// Retrieve the allow storage level from Material Properties
@@ -47,17 +81,22 @@
         /// <returns></returns>
         public int GetLimitStorageLevel()
         {
-            if (this.properties.TryGetPropertyValue("Storage Level", out string level, out UnitOfMeasure none))
+            if (_storageLevel.HasValue)
+                return _storageLevel.Value;
+
+            if (this.properties.TryGetPropertyValue("StorageLevel", out string level, out UnitOfMeasure none))
             {
-                return int.TryParse(level, out int storageLevel) ? storageLevel : 0;
+                _storageLevel = int.TryParse(level, out int storageLevel) ? storageLevel : 0;
             }
 
-            return 0;
+            return _storageLevel ?? 0;
         }
 
         #endregion
 
         #region Calculate the movement ratio of a product
+
+        private double? _movementRatio;
 
         /// <summary>
         /// Calculate the movement ratio of a product.
@@ -65,12 +104,18 @@
         /// <returns></returns>
         public double GetMovementRatio()
         {
+            if (_movementRatio.HasValue)
+                return _movementRatio.Value;
+
             var numberOfOrdersInMonth = GetNumberOfOrdersInAMonth();
             var numberOfStorageLocations = GetNumberOfStorageLocations();
-
-            return numberOfOrdersInMonth / numberOfStorageLocations;
+            if (numberOfStorageLocations > 0)
+            {
+                _movementRatio = numberOfOrdersInMonth / numberOfStorageLocations;
+            }
+           
+            return _movementRatio ?? 0;
         }
-
 
         /// <summary>
         /// Tp means the number of issue orders for this product in a month (order/ month).
@@ -98,24 +143,6 @@
             }
 
             return 0;
-        }
-
-        #endregion
-
-        #region Validation Method
-        private bool? _isValid { get; set; }
-
-        /// <summary>
-        /// Validate the Material object
-        /// </summary>
-        /// <returns></returns>
-        public bool IsValid()
-        {
-            if (_isValid.HasValue)
-                return _isValid.Value;
-
-            _isValid = !string.IsNullOrEmpty(materialId) && !string.IsNullOrEmpty(materialName) && !string.IsNullOrEmpty(materialClassId);
-            return _isValid.Value;
         }
 
         #endregion

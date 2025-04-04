@@ -1,9 +1,4 @@
-﻿using AutoMapper;
-using MediatR;
-using SLAPScheduling.Application.DTOs.InventoryReceiptDTOs;
-using SLAPScheduling.Domain.InterfaceRepositories.IScheduling;
-
-namespace SLAPScheduling.Application.Queries.Scheduling
+﻿namespace SLAPScheduling.Application.Queries.Scheduling
 {
     public class SchedulingQueryHandler : IRequestHandler<SchedulingQuery, IEnumerable<ReceiptSubLotDTO>>
     {
@@ -18,20 +13,20 @@ namespace SLAPScheduling.Application.Queries.Scheduling
 
         public async Task<IEnumerable<ReceiptSubLotDTO>> Handle(SchedulingQuery request, CancellationToken cancellationToken)
         {
-            var receiptSubLots = _schedulingRepository.Execute(null, null, null);
+            var receiptSubLots = await _schedulingRepository.Execute(request.WarehouseId, request.ReceiptLotStatus);
             if (receiptSubLots == null || receiptSubLots.Count == 0)
             {
-                throw new Exception("No result for Storage Locations Assignement Problem");
+                throw new Exception("No result for Storage Locations Assignment Problem");
             }
 
-            var receipSubLotDTOs = new List<ReceiptSubLotDTO>();
+            var receiptSubLotDTOs = new List<ReceiptSubLotDTO>();
             foreach (var receiptSubLot in receiptSubLots)
             {
                 var receiptSubLotDTO = _mapper.Map<ReceiptSubLotDTO>(receiptSubLot);
-                receipSubLotDTOs.Add(receiptSubLotDTO);
+                receiptSubLotDTOs.Add(receiptSubLotDTO);
             }
 
-            return new List<ReceiptSubLotDTO>();
+            return receiptSubLotDTOs;
         }
     }
 }

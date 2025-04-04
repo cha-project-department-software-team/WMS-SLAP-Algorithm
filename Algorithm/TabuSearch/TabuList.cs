@@ -95,7 +95,7 @@ namespace SLAPScheduling.Algorithm.TabuSearch
         /// <returns></returns>
         public bool IsExist(Solution solution)
         {
-            return Solutions?.Count > 0 && Solutions.Any(x => x.Equals(solution));
+            return Solutions is not null && Solutions.Any(x => x.Equals(solution));
         }
 
         #endregion
