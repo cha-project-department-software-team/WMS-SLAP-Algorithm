@@ -24,6 +24,22 @@
 
         #region Retrieve Methods
 
+        public int GetRowIndex()
+        {
+            if (_rowIndex is not null)
+                return _rowIndex.Value;
+
+            if (!string.IsNullOrEmpty(locationId) && TryGetLocationIdentification(out string warehouseId, out int rackIndex, out int rowIndex, out int columnIndex, out int levelIndex))
+            {
+                _rackIndex = rackIndex;
+                _rowIndex = rowIndex;
+                _columnIndex = columnIndex;
+                _levelIndex = levelIndex;
+            }
+
+            return _rowIndex ?? 0;
+        }
+
         public int GetStorageLevel()
         {
             if (_levelIndex is not null)
@@ -75,10 +91,10 @@
         {
             var locationVolume = GetVolume();
             if (locationVolume == 0)
-                return 0;
+                return 1.0;
 
             var storageSubLotVolume = GetCurrentSubLotStorageVolume();
-            return storageSubLotVolume < locationVolume ? storageSubLotVolume / locationVolume : 1;
+            return storageSubLotVolume < locationVolume ? storageSubLotVolume / locationVolume : 1.0;
         }
 
         /// <summary>
@@ -92,7 +108,15 @@
                 return this.materialSubLots.Sum(sublot =>
                 {
                     var material = sublot.GetMaterial();
-                    return material != null ? material.GetPacketVolume() * sublot.existingQuality : 0;
+                    if (material is not null)
+                    {
+                        var packetSize = material.GetPacketSize();
+                        var sublotPacketQuantity = Math.Ceiling(sublot.existingQuality / packetSize);
+
+                        return material.GetPacketVolume() * sublotPacketQuantity;
+                    }
+
+                    return 0;
                 });
             }
 

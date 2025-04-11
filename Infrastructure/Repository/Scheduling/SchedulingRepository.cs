@@ -1,4 +1,10 @@
-﻿namespace SLAPScheduling.Infrastructure.Repository.Scheduling
+﻿using Newtonsoft.Json;
+using SLAPScheduling.Algorithm.GeneticAlgorithms;
+using SLAPScheduling.Algorithm.ObjectValue;
+using System.Xml;
+using Formatting = Newtonsoft.Json.Formatting;
+
+namespace SLAPScheduling.Infrastructure.Repository.Scheduling
 {
     public class SchedulingRepository : BaseRepository, ISchedulingRepository
     {
@@ -33,34 +39,106 @@
                 throw new Exception("No result for Receipt Lots");
             }
 
-            MappingMaterialToReceiptLots(materials, ref receiptLots);
+            UpdateMaterialForReceiptLots(materials, ref receiptLots);
 
             var receiptSubLots = new List<ReceiptSublot>();
             using (var receiptLotSplitter = new ReceiptLotSplitter(receiptLots, warehouse))
             {
                 // Receipt Sublots do not include the Locations information
                 receiptSubLots = receiptLotSplitter.GetReceiptSubLots().ToList();
+
+                // Order by descending based on the movement ratio of a product
+                receiptSubLots = receiptSubLots.OrderByDescending(sublot =>
+                {
+                    var material = sublot.GetMaterial();
+                    return material is not null ? material.GetMovementRatio() : 0.0;
+                }).ToList();
             }
 
-            // Order by descending based on the movement ratio of a product
-            receiptSubLots = receiptSubLots.OrderByDescending(sublot =>
+            // Retrieve the available locations (not full) in the warehouse
+            var locations = warehouse.locations;
+            UpdateMaterialForMaterialLots(materials, ref locations);
+
+            var locationInformation = locations.Where(x => x.GetCurrentStoragePercentage() > 0.0).Select(x =>
             {
-                var material = sublot.GetMaterial();
-                return material is not null ? material.GetMovementRatio() : 0.0;
+                var lotNumbers = x.materialSubLots.Select(x => (x.materialLot.lotNumber, x.materialLot.exisitingQuantity)).ToList();
+                return (x.locationId, lotNumbers, x.GetCurrentStoragePercentage());
             }).ToList();
 
-            // Retrieve the available locations (not full) in the warehouse
-            var availableLocations = warehouse.locations.Where(x => x.GetCurrentStoragePercentage() < 1.0);
+            var availableLocations = GetAvailableLocations(locations, receiptLots);
 
             // Find the optimal solution of location assignment for each receipt sublot using Tabu Search algorithm
             TabuSearch tabuSearch = new TabuSearch(receiptSubLots, availableLocations.ToList());
             List<Location> optimalLocations = tabuSearch.Implement();
 
-            UpdateLocationForReceiptSubLot(optimalLocations, ref receiptSubLots);
-            return receiptSubLots;
+            //// Find the optimal solution of location assignment for each receipt sublot using Genetic Algorithm
+            //GeneticAlgorithms GA = new GeneticAlgorithms(receiptSubLots, availableLocations.ToList());
+            //List<Location> optimalLocations = GA.Implement();
+
+            var results = AssignLocationsForReceiptSubLots(optimalLocations, receiptSubLots);
+            return results.Select(x => x.SubLot).ToList();
         }
 
-        private void MappingMaterialToReceiptLots(List<Material> materials, ref List<ReceiptLot> receiptLots)
+        /// <summary>
+        /// Assign the Locations to each ReceiptSubLot based on the optimal solution
+        /// </summary>
+        /// <param name="locations"></param>
+        /// <param name="receiptSubLots"></param>
+        private IEnumerable<(ReceiptSublot SubLot, double StoragePercentage)> AssignLocationsForReceiptSubLots(List<Location> locations, List<ReceiptSublot> receiptSubLots)
+        {
+            if (receiptSubLots?.Count > 0 && locations?.Count > 0)
+            {
+                for (int i = 0; i < receiptSubLots.Count; i++)
+                {
+                    receiptSubLots[i].UpdateLocation(locations[i]);
+                }
+
+                //MergeReceiptSubLotsToLocation(ref receiptSubLots);
+
+                foreach (var receiptSubLot in receiptSubLots)
+                {
+                    var location = receiptSubLot.location;
+                    var storagePercentage = location.GetStoragePercentage(receiptSubLot);
+
+                    yield return (receiptSubLot, storagePercentage);
+                }
+            }
+        }
+
+        private void MergeReceiptSubLotsToLocation(ref List<ReceiptSublot> receiptSubLots)
+        {
+            if (receiptSubLots?.Count > 0)
+            {
+                for (int i = 0; i < receiptSubLots.Count; i++)
+                {
+                    var currentSubLot = receiptSubLots[i];
+                    for (int j = i + 1; j < receiptSubLots.Count; j++)
+                    {
+                        var nextSubLot = receiptSubLots[j];
+
+                        var currentStoragePercentage = currentSubLot.location.GetCurrentStoragePercentage() + currentSubLot.location.GetStoragePercentage(currentSubLot);
+                        var nextStoragePercentage = nextSubLot.location.GetCurrentStoragePercentage() + nextSubLot.location.GetStoragePercentage(nextSubLot);
+
+                        if (currentStoragePercentage + nextStoragePercentage < 1.0)
+                        {
+                            var location = currentSubLot.location.GetDistanceToIOPoint() < nextSubLot.location.GetDistanceToIOPoint() ? currentSubLot.location : nextSubLot.location;
+                            if (location.CheckStorageConstraints(currentSubLot) && location.CheckStorageConstraints(nextSubLot))
+                            {
+                                currentSubLot.UpdateLocation(location);
+                                nextSubLot.UpdateLocation(location);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Assign the Material to each receiptLot from materialId in ReceiptEntry
+        /// </summary>
+        /// <param name="materials"></param>
+        /// <param name="receiptLots"></param>
+        private void UpdateMaterialForReceiptLots(List<Material> materials, ref List<ReceiptLot> receiptLots)
         {
             var materialDictionary = materials.ToDictionary(x => x.materialId, y => y);
 
@@ -76,19 +154,47 @@
         }
 
         /// <summary>
-        /// Assign the Locations to each ReceiptSubLot based on the optimal solution
+        /// Assign the Material to each receiptLot from materialId in ReceiptEntry
         /// </summary>
-        /// <param name="locations"></param>
-        /// <param name="receiptSubLots"></param>
-        private void UpdateLocationForReceiptSubLot(List<Location> locations, ref List<ReceiptSublot> receiptSubLots)
+        /// <param name="materials"></param>
+        /// <param name="receiptLots"></param>
+        private void UpdateMaterialForMaterialLots(List<Material> materials, ref List<Location> locations)
         {
-            if (receiptSubLots?.Count > 0 && locations?.Count > 0)
+            var materialDictionary = materials.ToDictionary(x => x.materialId, y => y);
+
+            foreach (var location in locations)
             {
-                for (int i = 0; i < receiptSubLots.Count; i++)
+                var materialSublots = location.materialSubLots;
+                if (materialSublots?.Count > 0)
                 {
-                    receiptSubLots[i].UpdateLocation(locations[i]);
+                    foreach (var materialSublot in materialSublots)
+                    {
+                        var materialLot = materialSublot.materialLot;
+                        var materialId = materialLot is not null ? materialLot.materialId : string.Empty;
+                        if (materialLot is not null && materialDictionary.TryGetValue(materialId, out Material? material))
+                        {
+                            materialLot.material = material;
+                        }
+                    }
                 }
             }
+        }
+
+        /// <summary>
+        /// Filter the locations which is not full and has the storage level is lower than max acceptable level of receipt material
+        /// </summary>
+        /// <param name="locations"></param>
+        /// <param name="receiptLots"></param>
+        /// <returns></returns>
+        private IEnumerable<Location> GetAvailableLocations(List<Location> locations, List<ReceiptLot> receiptLots)
+        {
+            var maxAcceptableLevel = receiptLots.Max(lot =>
+            {
+                var material = lot.material;
+                return material is not null ? material.GetLimitStorageLevel() : 0.0;
+            });
+
+            return locations.Where(location => location.GetCurrentStoragePercentage() < 1.0 && location.GetStorageLevel() <= maxAcceptableLevel && location.GetRowIndex() == 1);
         }
 
         public async Task<Warehouse> GetSchedulingWarehouse(string warehouseId)
@@ -99,7 +205,22 @@
                                     .ThenInclude(s => s.properties)
                                 .FirstOrDefaultAsync(x => x.warehouseId == warehouseId);
 
-            return warehouse is not null ? warehouse : throw new Exception($"There is no existing warehouse with warehouseId = {warehouseId}");
+            if (warehouse is not null && warehouse.locations?.Count > 0)
+            {
+                foreach (var location in warehouse.locations)
+                {
+                    var locationId = location.locationId;
+                    var materialSublots = await GetMaterialSubLotsByLocationId(locationId);
+                    if (materialSublots?.Count > 0)
+                    {
+                        location.materialSubLots = materialSublots;
+                    }
+                }
+
+                return warehouse;
+            }
+
+            throw new Exception($"There is no existing warehouse with warehouseId = {warehouseId}");
         }
 
         public async Task<List<ReceiptLot>> GetReceiptLotsByStatus(string lotStatus)
@@ -124,6 +245,13 @@
                                 .ToListAsync();
 
             return materials;
+        }
+
+        public async Task<List<MaterialSubLot>> GetMaterialSubLotsByLocationId(string locationId)
+        {
+            return await _context.MaterialSubLots
+                                 .Include(x => x.materialLot)
+                                 .Where(x => x.locationId == locationId).ToListAsync();
         }
     }
 }
