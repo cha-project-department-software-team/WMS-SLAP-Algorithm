@@ -31,7 +31,7 @@
             if (this.locations?.Count > 0)
             {
                 var location = this.locations.FirstOrDefault();
-                return location != null ? location.GetVolume() : 0;
+                return location is not null ? location.GetVolume() : 0;
             }
 
             return 0;

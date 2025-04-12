@@ -39,16 +39,18 @@ namespace SLAPScheduling.Algorithm.Helpers
                         var subLotId = $"{receiptLot.receiptLotId}_{subLotIndex}";
                         var quantityPerLocation = packetSize * packetQuantityPerLocation;
                         var subLotQuantity = subLotIndex == subLotCount - 1 ? receiptLot.importedQuantity % quantityPerLocation : quantityPerLocation;
-
-                        var receiptSubLot = new ReceiptSublot(receiptSublotId: subLotId,
+                        if (subLotQuantity > 0)
+                        {
+                            var receiptSubLot = new ReceiptSublot(receiptSublotId: subLotId,
                                                               importedQuantity: subLotQuantity,
                                                               subLotStatus: LotStatus.Pending,
                                                               unitOfMeasure: UnitOfMeasure.None,
                                                               locationId: string.Empty,
                                                               receiptLotId: receiptLot.receiptLotId);
 
-                        receiptSubLot.UpdateReceiptLot(receiptLot);
-                        yield return receiptSubLot;
+                            receiptSubLot.UpdateReceiptLot(receiptLot);
+                            yield return receiptSubLot;
+                        }
                     }
                 }
             }

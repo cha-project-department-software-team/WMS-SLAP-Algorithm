@@ -58,9 +58,60 @@
 
         #endregion
 
+        #region Receipt Sublots
+
+        public List<ReceiptSublot>? GetReceiptSublots()
+        {
+            return this.receiptSublots?.Count > 0 ? this.receiptSublots : null;
+        }
+
+        public void AddReceiptSublot(ReceiptSublot receiptSublot)
+        {
+            try
+            {
+                if (this.receiptSublots is null)
+                    this.receiptSublots = new List<ReceiptSublot>();
+
+                this.receiptSublots.Add(receiptSublot);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
+        }
+
+        public bool RemoveReceiptSubLot(ReceiptSublot receiptSublot)
+        {
+            if (this.receiptSublots?.Count > 0)
+            {
+                var sublotIndex = this.receiptSublots.FindIndex(x => x.Equals(receiptSublot));
+                if (sublotIndex != -1)
+                {
+                    this.receiptSublots.RemoveAt(sublotIndex);
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public double GetReceiptAndMaterialStoragePercentage()
+        {
+            var storingPercent = this.GetCurrentStoragePercentage();
+            if (this.receiptSublots?.Count > 0)
+            {
+                var assignedPercent = this.receiptSublots.Sum(sublot => this.GetStoragePercentage(sublot));    
+                return storingPercent + assignedPercent;
+            }
+
+            return storingPercent;
+        }
+
+        #endregion
+
         #region Calculate Volume Size
 
-        private static double? _locationVolume { get; set; }
+        private double? _locationVolume { get; set; }
 
         /// <summary>
         /// Calculate the Volume of Material as Cubic Meter.
@@ -147,7 +198,7 @@
 
         #region Calculate the Distance to I/O point
 
-        private static double? _distanceToIOPoint { get; set; }
+        private double? _distanceToIOPoint { get; set; }
 
         /// <summary>
         /// Calculate the distance between the location and the I/O point.

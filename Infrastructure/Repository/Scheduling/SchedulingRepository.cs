@@ -75,62 +75,12 @@ namespace SLAPScheduling.Infrastructure.Repository.Scheduling
             //GeneticAlgorithms GA = new GeneticAlgorithms(receiptSubLots, availableLocations.ToList());
             //List<Location> optimalLocations = GA.Implement();
 
-            var results = AssignLocationsForReceiptSubLots(optimalLocations, receiptSubLots);
+            //var results = AssignLocationsForReceiptSubLots(optimalLocations, receiptSubLots);
+            //return results.Select(x => x.SubLot).ToList();
+
+            ReceiptSublotReallocation receiptLotReallocation = new ReceiptSublotReallocation(optimalLocations, receiptSubLots);
+            var results = receiptLotReallocation.Implement();
             return results.Select(x => x.SubLot).ToList();
-        }
-
-        /// <summary>
-        /// Assign the Locations to each ReceiptSubLot based on the optimal solution
-        /// </summary>
-        /// <param name="locations"></param>
-        /// <param name="receiptSubLots"></param>
-        private IEnumerable<(ReceiptSublot SubLot, double StoragePercentage)> AssignLocationsForReceiptSubLots(List<Location> locations, List<ReceiptSublot> receiptSubLots)
-        {
-            if (receiptSubLots?.Count > 0 && locations?.Count > 0)
-            {
-                for (int i = 0; i < receiptSubLots.Count; i++)
-                {
-                    receiptSubLots[i].UpdateLocation(locations[i]);
-                }
-
-                //MergeReceiptSubLotsToLocation(ref receiptSubLots);
-
-                foreach (var receiptSubLot in receiptSubLots)
-                {
-                    var location = receiptSubLot.location;
-                    var storagePercentage = location.GetStoragePercentage(receiptSubLot);
-
-                    yield return (receiptSubLot, storagePercentage);
-                }
-            }
-        }
-
-        private void MergeReceiptSubLotsToLocation(ref List<ReceiptSublot> receiptSubLots)
-        {
-            if (receiptSubLots?.Count > 0)
-            {
-                for (int i = 0; i < receiptSubLots.Count; i++)
-                {
-                    var currentSubLot = receiptSubLots[i];
-                    for (int j = i + 1; j < receiptSubLots.Count; j++)
-                    {
-                        var nextSubLot = receiptSubLots[j];
-
-                        var currentStoragePercentage = currentSubLot.location.GetCurrentStoragePercentage() + currentSubLot.location.GetStoragePercentage(currentSubLot);
-                        var nextStoragePercentage = nextSubLot.location.GetCurrentStoragePercentage() + nextSubLot.location.GetStoragePercentage(nextSubLot);
-
-                        if (currentStoragePercentage + nextStoragePercentage < 1.0)
-                        {
-                            var location = currentSubLot.location.GetDistanceToIOPoint() < nextSubLot.location.GetDistanceToIOPoint() ? currentSubLot.location : nextSubLot.location;
-                            if (location.CheckStorageConstraints(currentSubLot) && location.CheckStorageConstraints(nextSubLot))
-                            {
-                                currentSubLot.UpdateLocation(location);
-                                nextSubLot.UpdateLocation(location);
-                            }
-                        }
-                    }
-                }
-            }
         }
 
         /// <summary>
