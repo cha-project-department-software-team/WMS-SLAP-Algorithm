@@ -1,4 +1,6 @@
+using SLAPScheduling.Domain.InterfaceRepositories.IInventoryIssues;
 using SLAPScheduling.Domain.InterfaceRepositories.IMaterial;
+using SLAPScheduling.Infrastructure.Repository.InventoryIssues;
 
 namespace SLAPScheduling
 {
@@ -21,10 +23,12 @@ namespace SLAPScheduling
             builder.Services.AddAutoMapper(typeof(ModelToViewModelProfile).Assembly);
             builder.Services.AddMediatR(config => config.RegisterServicesFromAssemblies(AppDomain.CurrentDomain.GetAssemblies()));
 
-            builder.Services.AddScoped<ISchedulingRepository, SchedulingRepository>();
+            builder.Services.AddScoped<IReceiptSchedulingRepository, ReceiptSchedulingRepository>();
+            builder.Services.AddScoped<IIssueSchedulingRepository, IssueSchedulingRepository>();
             builder.Services.AddScoped<ILocationRepository, LocationRepository>();
             builder.Services.AddScoped<IWarehouseRepository, WarehouseRepository>();
             builder.Services.AddScoped<IReceiptLotRepository, ReceiptLotRepository>();
+            builder.Services.AddScoped<IIssueLotRepository, IssueLotRepository>();
             builder.Services.AddScoped<IMaterialRepository, MaterialRepository>();
             builder.Services.AddScoped<IMaterialPropertyRepository, MaterialPropertyRepository>();
 

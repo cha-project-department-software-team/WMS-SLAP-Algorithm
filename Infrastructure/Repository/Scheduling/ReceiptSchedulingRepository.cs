@@ -1,19 +1,13 @@
-﻿using Newtonsoft.Json;
-using SLAPScheduling.Algorithm.GeneticAlgorithms;
-using SLAPScheduling.Algorithm.ObjectValue;
-using System.Xml;
-using Formatting = Newtonsoft.Json.Formatting;
-
-namespace SLAPScheduling.Infrastructure.Repository.Scheduling
+﻿namespace SLAPScheduling.Infrastructure.Repository.Scheduling
 {
-    public class SchedulingRepository : BaseRepository, ISchedulingRepository
+    public class ReceiptSchedulingRepository : BaseRepository, IReceiptSchedulingRepository
     {
-        public SchedulingRepository(SLAPDbContext context) : base(context)
+        public ReceiptSchedulingRepository(SLAPDbContext context) : base(context)
         {
         }
 
         /// <summary>
-        /// POST API to implement the scheduling based on the input data.
+        /// Retrieve API to implement the scheduling based on the input data.
         /// </summary>
         /// <param name="warehouseId"></param>
         /// <param name="receiptLotStatus"></param>

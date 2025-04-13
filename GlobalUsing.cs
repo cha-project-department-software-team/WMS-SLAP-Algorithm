@@ -55,3 +55,6 @@ global using SLAPScheduling.Infrastructure.Repository.Warehouses;
 global using System.ComponentModel.DataAnnotations;
 global using System.ComponentModel.DataAnnotations.Schema;
 global using System.Text.Json.Serialization;
+global using SLAPScheduling.Application.DTOs.InventoryIssueDTOs;
+global using SLAPScheduling.Application.Queries.ReceiptScheduling;
+global using SLAPScheduling.Application.Queries.IssueScheduling;

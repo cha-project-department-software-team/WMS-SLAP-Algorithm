@@ -1,6 +1,6 @@
 ﻿namespace SLAPScheduling.Domain.InterfaceRepositories.IScheduling
 {
-    public interface ISchedulingRepository
+    public interface IReceiptSchedulingRepository
     {
         Task<List<ReceiptSublot>> Execute(string warehouseId, string receiptLotStatus);
     }

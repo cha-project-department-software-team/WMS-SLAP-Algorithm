@@ -1,6 +1,4 @@
-﻿using SLAPScheduling.Domain.AggregateModels.MaterialAggregate.Materials;
-
-namespace SLAPScheduling.Algorithm.Helpers
+﻿namespace SLAPScheduling.Algorithm.Helpers
 {
     public class ReceiptLotSplitter : IDisposable
     {
@@ -17,7 +15,7 @@ namespace SLAPScheduling.Algorithm.Helpers
 
         #endregion
 
-        #region Split Receipt Entries to Sublots
+        #region Split Receipt Lots to multiple Receipt Sublots
 
         /// <summary>
         /// Split receipt entries to multiple sublots (with empty location) based on the volume size.

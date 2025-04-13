@@ -26,5 +26,15 @@
             this.sublotId = materialSublotId;
             this.issueLotId = issueLotId;
         }
+
+        public void UpdateMaterialSublot(MaterialSubLot materialSublot)
+        {
+            this.materialSublot = materialSublot;
+        }
+
+        public void UpdateIssueLot(IssueLot issueLot)
+        {
+            this.issueLot = issueLot;
+        }
     }
 }
