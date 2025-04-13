@@ -42,9 +42,7 @@
             }
 
             IssueLotSplitter issueLotSplitter = new IssueLotSplitter(issueLots);
-            var issueSublots = issueLotSplitter.GetIssueSubLots().ToList();
-
-            return issueSublots;
+            return issueLotSplitter.GetIssueSubLots().ToList();
         }
 
         /// <summary>

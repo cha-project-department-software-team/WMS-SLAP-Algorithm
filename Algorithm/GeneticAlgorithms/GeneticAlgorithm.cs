@@ -1,16 +1,11 @@
-﻿using GAF;
-using GAF.Extensions;
-using GAF.Operators;
-using SLAPScheduling.Algorithm.ObjectValue;
-
-namespace SLAPScheduling.Algorithm.GeneticAlgorithms
+﻿namespace SLAPScheduling.Algorithm.GeneticAlgorithms
 {
     public class GeneticAlgorithms
     {
-        private static int terminate => 1000;
+        private static int terminate => 5000;
         private static int maxGeneration => 100;
-        private static int elitism => 15;
-        private static float crossoverProbability => 0.9f;
+        private static int elitism => 20;
+        private static float crossoverProbability => 0.98f;
         private static float mutationProbability => 0.08f;
         private List<ReceiptSublot> receiptSubLots { get; set; }
         private Dictionary<int, Location> locationDictionary { get; set; }

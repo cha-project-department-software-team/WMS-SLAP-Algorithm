@@ -60,6 +60,7 @@
             }).ToList();
 
             var availableLocations = GetAvailableLocations(locations, receiptLots);
+            ConstraintsChecking.SetPenaltyCoefficientValues(availableLocations);
 
             // Find the optimal solution of location assignment for each receipt sublot using Tabu Search algorithm
             TabuSearch tabuSearch = new TabuSearch(receiptSubLots, availableLocations.ToList());
@@ -69,11 +70,8 @@
             //GeneticAlgorithms GA = new GeneticAlgorithms(receiptSubLots, availableLocations.ToList());
             //List<Location> optimalLocations = GA.Implement();
 
-            //var results = AssignLocationsForReceiptSubLots(optimalLocations, receiptSubLots);
-            //return results.Select(x => x.SubLot).ToList();
-
             ReceiptSublotReallocation receiptLotReallocation = new ReceiptSublotReallocation(optimalLocations, receiptSubLots);
-            var results = receiptLotReallocation.Implement();
+            var results = receiptLotReallocation.Reallocate();
             return results.Select(x => x.SubLot).ToList();
         }
 

@@ -21,13 +21,13 @@ namespace SLAPScheduling.Algorithm.Helpers
         /// Implement the logic of allocating receipt sublots
         /// </summary>
         /// <returns></returns>
-        public List<(ReceiptSublot SubLot, double StoragePercentage)> Implement()
+        public List<(ReceiptSublot SubLot, double StoragePercentage)> Reallocate()
         {
             var results = new List<(ReceiptSublot SubLot, double StoragePercentage)>();
             if (this.allocatedLocations is not null)
             {
                 var orderedLocations = this.allocatedLocations.OrderByDescending(x => x.GetDistanceToIOPoint()).ToList();
-                ReallocateReceiptSublots(ref orderedLocations);
+                ReallocateLocationsForReceiptSublots(ref orderedLocations);
 
                 foreach (var location in orderedLocations)
                 {
@@ -51,7 +51,7 @@ namespace SLAPScheduling.Algorithm.Helpers
         /// Re-allocate the location of receipt sublots
         /// </summary>
         /// <param name="locations"></param>
-        private void ReallocateReceiptSublots(ref List<Location> locations)
+        private void ReallocateLocationsForReceiptSublots(ref List<Location> locations)
         {
             var locationCount = locations.Count;
             for (int i = locationCount - 1; i >= 0; i--)

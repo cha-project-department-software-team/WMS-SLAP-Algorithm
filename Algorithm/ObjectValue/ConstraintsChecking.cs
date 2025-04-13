@@ -2,7 +2,19 @@
 {
     public static class ConstraintsChecking
     {
+        private static double levelCoefficient { get; set; }
+        private static double storageCoefficient { get; set; }
+
         #region Constraints Checking
+        /// <summary>
+        /// Choose the values of penalty coefficient from list of locations
+        /// </summary>
+        /// <param name="locations"></param>
+        public static void SetPenaltyCoefficientValues(IEnumerable<Location> locations)
+        {
+            levelCoefficient = locations.Max(x => x.GetDistanceToIOPoint());
+            storageCoefficient = locations.Sum(x => x.GetDistanceToIOPoint());
+        }
 
         /// <summary>
         /// Calculate the penalty value based on the checking the storage constraints
@@ -12,18 +24,10 @@
         /// <returns></returns>
         public static double CalculatePenaltyValue(this Location location, ReceiptSublot receiptSublot)
         {
-            double penalty = 0.0;
-            if (IsNotSatisfyStorageLevel(location, receiptSublot))
-            {
-                penalty += 1000;
-            }
+            double overStorageLevel = CheckSatisfyStorageLevel(location, receiptSublot);
+            double overStoragePercentage = CheckOverStorageVolume(location, receiptSublot);
 
-            if (IsOverStorageVolume(location, receiptSublot))
-            {
-                penalty += 2000;
-            }
-
-            return penalty;
+            return levelCoefficient * Math.Max(0, overStorageLevel) + storageCoefficient * Math.Max(0, overStoragePercentage);
         }
 
         /// <summary>
@@ -34,7 +38,7 @@
         /// <returns></returns>
         public static bool CheckStorageConstraints(this Location location, ReceiptSublot receiptSublot)
         {
-            return !IsNotSatisfyStorageLevel(location, receiptSublot) && !IsOverStorageVolume(location, receiptSublot);
+            return CheckSatisfyStorageLevel(location, receiptSublot) + CheckOverStorageVolume(location, receiptSublot) > 0.0;
         }
 
         /// <summary>
@@ -42,16 +46,19 @@
         /// </summary>
         /// <param name="solution"></param>
         /// <returns></returns>
-        private static bool IsNotSatisfyStorageLevel(Location location, ReceiptSublot receiptSublot)
+        public static int CheckSatisfyStorageLevel(Location location, ReceiptSublot receiptSublot)
         {
+            int overStorageLevel = 0;
             if (location is not null && receiptSublot is not null)
             {
                 var material = receiptSublot.GetMaterial();
                 if (material is not null && location.GetStorageLevel() > material.GetLimitStorageLevel())
-                    return true;
+                {
+                    overStorageLevel = location.GetStorageLevel() - material.GetLimitStorageLevel();
+                }
             }
 
-            return false;
+            return overStorageLevel;
         }
 
         /// <summary>
@@ -59,8 +66,9 @@
         /// </summary>
         /// <param name="solution"></param>
         /// <returns></returns>
-        private static bool IsOverStorageVolume(Location location, ReceiptSublot receiptSublot)
+        public static double CheckOverStorageVolume(Location location, ReceiptSublot receiptSublot)
         {
+            double overStoragePercentage = 0;
             if (location is not null && receiptSublot is not null)
             {
                 double currentLocationStorage = location.GetCurrentStoragePercentage();
@@ -68,10 +76,12 @@
 
                 double storagePercentage = currentLocationStorage + subLotStorage;
                 if (storagePercentage > 1.0)
-                    return true;
+                {
+                    overStoragePercentage = storagePercentage - 1.0;
+                }
             }
 
-            return false;
+            return overStoragePercentage;
         }
 
         #endregion
