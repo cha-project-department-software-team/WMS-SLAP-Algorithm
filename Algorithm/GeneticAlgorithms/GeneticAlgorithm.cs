@@ -1,25 +1,31 @@
-﻿namespace SLAPScheduling.Algorithm.GeneticAlgorithms
+﻿using Newtonsoft.Json;
+using System.Diagnostics;
+
+namespace SLAPScheduling.Algorithm.GeneticAlgorithms
 {
     public class GeneticAlgorithms
     {
-        private static int terminate => 5000;
+        private static int terminate => 1000;
         private static int maxGeneration => 100;
-        private static int elitism => 20;
-        private static float crossoverProbability => 0.98f;
-        private static float mutationProbability => 0.08f;
+        private static int elitism => 15;
+        private static float crossoverProbability => 0.95f;
+        private static float mutationProbability => 0.05f;
         private List<ReceiptSublot> receiptSubLots { get; set; }
         private Dictionary<int, Location> locationDictionary { get; set; }
         private Solution bestSolution { get; set; }
         private double bestObjectValue { get; set; }
         private List<double> bestObjectValues { get; set; }
+        private List<(double Time, double ObjectValue)> changeBestObjectValues { get; set; }
         private int numberOfReceiptSubLots { get; set; }
-
+        private Stopwatch sw { get; set; }
 
         public GeneticAlgorithms(List<ReceiptSublot> receiptSubLots, List<Location> availableLocations)
         {
             this.bestObjectValues = new List<double>();
+            this.changeBestObjectValues = new List<(double Time, double ObjectValue)>();
             this.bestSolution = new Solution();
             this.numberOfReceiptSubLots = receiptSubLots.Count;
+            this.sw = new Stopwatch();
 
             this.receiptSubLots = new List<ReceiptSublot>();
             this.locationDictionary = new Dictionary<int, Location>();
@@ -35,6 +41,8 @@
 
         public List<Location> Implement()
         {
+            this.sw.Start();
+
             int populationSize = this.locationDictionary.Count;
             Population population = CreateChromosomes(maxGeneration, populationSize);
 
@@ -54,6 +62,14 @@
             ga.Operators.Add(mutate);
 
             ga.Run(Terminate);
+
+            this.sw.Stop();
+
+            //using (TextWriter writer = File.CreateText(@"C:\Users\AnhTu\Master Subjects\Luan van Thac si\Document\SchedulingResult.json"))
+            //{
+            //    var serializer = new JsonSerializer();
+            //    serializer.Serialize(writer, changeBestObjectValues);
+            //}
 
             var optimalLocations = bestSolution.GetLocations(locationDictionary);
             return optimalLocations?.Count() > 0 ? optimalLocations.ToList() : new List<Location>();
@@ -88,6 +104,8 @@
             this.bestSolution = bestChromosome.GetSolution();
             this.bestObjectValue = this.bestSolution.CalculateObjectValue(receiptSubLots, locationDictionary);
             this.bestObjectValues.Add(this.bestObjectValue);
+
+            this.changeBestObjectValues.Add((this.sw.Elapsed.TotalSeconds, this.bestObjectValue));
         }
 
         private void GA_OnGenerationComplete(object sender, GaEventArgs e)
@@ -96,6 +114,8 @@
             this.bestSolution = bestChromosome.GetSolution();
             this.bestObjectValue = this.bestSolution.CalculateObjectValue(receiptSubLots, locationDictionary);
             this.bestObjectValues.Add(this.bestObjectValue);
+
+            this.changeBestObjectValues.Add((this.sw.Elapsed.TotalSeconds, this.bestObjectValue));
         }
 
         public double CalculateFitness(Chromosome chromosome)

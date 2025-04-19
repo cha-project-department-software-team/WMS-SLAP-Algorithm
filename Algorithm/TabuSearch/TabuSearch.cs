@@ -1,5 +1,9 @@
-﻿using SLAPScheduling.Algorithm.ObjectValue;
+﻿using Newtonsoft.Json;
+using SLAPScheduling.Algorithm.ObjectValue;
 using System.Data;
+using System.Diagnostics;
+using System.Text.Json;
+using JsonSerializer = Newtonsoft.Json.JsonSerializer;
 
 namespace SLAPScheduling.Algorithm.TabuSearch
 {
@@ -11,6 +15,7 @@ namespace SLAPScheduling.Algorithm.TabuSearch
         private Solution bestSolution { get; set; }
         private double bestObjectValue { get; set; }
         private List<double> bestObjectValues { get; set; }
+        private List<(double Time, double ObjectValue)> changeBestObjectValues { get; set; }
         private TabuList tabuList { get; set; }
         private int numberOfReceiptSubLots { get; set; }
 
@@ -20,6 +25,7 @@ namespace SLAPScheduling.Algorithm.TabuSearch
             bestSolution = new Solution();
             tabuList = new TabuList();
             bestObjectValues = new List<double>();
+            changeBestObjectValues = new List<(double, double)>();
 
             this.receiptSubLots = new List<ReceiptSublot>();
             locationDictionary = new Dictionary<int, Location>();
@@ -44,6 +50,8 @@ namespace SLAPScheduling.Algorithm.TabuSearch
         /// </summary>
         public List<Location> Implement()
         {
+            Stopwatch sw = Stopwatch.StartNew();
+
             bestSolution = InitialSolution();
             bestObjectValue = bestSolution.CalculateObjectValue(receiptSubLots, locationDictionary);
 
@@ -79,8 +87,18 @@ namespace SLAPScheduling.Algorithm.TabuSearch
                 }
 
                 bestObjectValues.Add(this.bestObjectValue);
+                changeBestObjectValues.Add((sw.Elapsed.TotalSeconds, this.bestObjectValue));
+
                 terminate++;
             }
+
+            sw.Stop();
+
+            //using (TextWriter writer = File.CreateText(@"C:\Users\AnhTu\Master Subjects\Luan van Thac si\Document\SchedulingResult.json"))
+            //{
+            //    var serializer = new JsonSerializer();
+            //    serializer.Serialize(writer, changeBestObjectValues);
+            //}
 
             var optimalLocations = bestSolution.GetLocations(locationDictionary);
             return optimalLocations?.Count() > 0 ? optimalLocations.ToList() : new List<Location>();

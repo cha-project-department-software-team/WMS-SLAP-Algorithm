@@ -1,9 +1,21 @@
 ﻿using GAF;
+using SLAPScheduling.Algorithm.DifferentialEvolutions;
 
 namespace SLAPScheduling.Algorithm.Extensions
 {
     public static class SolutionExt
     {
+        public static Solution GetSolution(this Individual individual)
+        {
+            if (individual is not null && individual.Elements?.Count > 0)
+            {
+                var indices = individual.Elements.Select(x => (int)x).ToList();
+                return new Solution(indices);
+            }
+
+            return new Solution();
+        }
+
         public static Solution GetSolution(this Chromosome? chromosome)
         {
             if (chromosome is not null && chromosome.Genes?.Count > 0)

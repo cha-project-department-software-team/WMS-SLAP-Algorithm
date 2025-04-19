@@ -1,4 +1,6 @@
-﻿namespace SLAPScheduling.Infrastructure.Repository.Scheduling
+﻿using SLAPScheduling.Algorithm.DifferentialEvolutions;
+
+namespace SLAPScheduling.Infrastructure.Repository.Scheduling
 {
     public class ReceiptSchedulingRepository : BaseRepository, IReceiptSchedulingRepository
     {
@@ -62,18 +64,51 @@
             var availableLocations = GetAvailableLocations(locations, receiptLots);
             ConstraintsChecking.SetPenaltyCoefficientValues(availableLocations);
 
-            // Find the optimal solution of location assignment for each receipt sublot using Tabu Search algorithm
-            TabuSearch tabuSearch = new TabuSearch(receiptSubLots, availableLocations.ToList());
-            List<Location> optimalLocations = tabuSearch.Implement();
+            //// Find the optimal solution of location assignment for each receipt sublot using Tabu Search algorithm
+            //TabuSearch tabuSearch = new TabuSearch(receiptSubLots, availableLocations.ToList());
+            //List<Location> optimalLocations = tabuSearch.Implement();
 
             //// Find the optimal solution of location assignment for each receipt sublot using Genetic Algorithm
             //GeneticAlgorithms GA = new GeneticAlgorithms(receiptSubLots, availableLocations.ToList());
             //List<Location> optimalLocations = GA.Implement();
 
-            ReceiptSublotReallocation receiptLotReallocation = new ReceiptSublotReallocation(optimalLocations, receiptSubLots);
-            var results = receiptLotReallocation.Reallocate();
+            // Find the optimal solution of location assignment for each receipt sublot using Differential Evolution
+            DESolver DESolver = new DESolver();
+            List<Location> optimalLocations = DESolver.Implement(receiptSubLots, availableLocations.ToList());
+
+            //ReceiptSublotReallocation receiptLotReallocation = new ReceiptSublotReallocation(optimalLocations, receiptSubLots);
+            //var results = receiptLotReallocation.Reallocate();
+
+            var results = AssignLocationsForReceiptSubLots(optimalLocations, receiptSubLots);
             return results.Select(x => x.SubLot).ToList();
         }
+
+        /// <summary>
+        /// Assign the Locations to each ReceiptSubLot based on the optimal solution
+        /// </summary>
+        /// <param name="locations"></param>
+        /// <param name="receiptSubLots"></param>
+        private IEnumerable<(ReceiptSublot SubLot, double StoragePercentage)> AssignLocationsForReceiptSubLots(List<Location> locations, List<ReceiptSublot> receiptSubLots)
+        {
+            if (receiptSubLots?.Count > 0 && locations?.Count > 0)
+            {
+                for (int i = 0; i < receiptSubLots.Count; i++)
+                {
+                    receiptSubLots[i].UpdateLocation(locations[i]);
+                }
+
+                //MergeReceiptSubLotsToLocation(ref receiptSubLots);
+
+                foreach (var receiptSubLot in receiptSubLots)
+                {
+                    var location = receiptSubLot.location;
+                    var storagePercentage = location.GetStoragePercentage(receiptSubLot);
+
+                    yield return (receiptSubLot, storagePercentage);
+                }
+            }
+        }
+
 
         /// <summary>
         /// Assign the Material to each receiptLot from materialId in ReceiptEntry
