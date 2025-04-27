@@ -4,7 +4,6 @@
     {
         [Key]
         public string receiptSublotId { get; set; }
-
         public double importedQuantity { get; set; }
         public LotStatus subLotStatus { get; set; }
         public UnitOfMeasure unitOfMeasure { get; set; }

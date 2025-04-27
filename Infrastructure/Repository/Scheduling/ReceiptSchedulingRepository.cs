@@ -64,17 +64,17 @@ namespace SLAPScheduling.Infrastructure.Repository.Scheduling
             var availableLocations = GetAvailableLocations(locations, receiptLots);
             ConstraintsChecking.SetPenaltyCoefficientValues(availableLocations);
 
-            //// Find the optimal solution of location assignment for each receipt sublot using Tabu Search algorithm
-            //TabuSearch tabuSearch = new TabuSearch(receiptSubLots, availableLocations.ToList());
-            //List<Location> optimalLocations = tabuSearch.Implement();
+            // Find the optimal solution of location assignment for each receipt sublot using Tabu Search algorithm
+            TabuSearch tabuSearch = new TabuSearch(receiptSubLots, availableLocations.ToList());
+            List<Location> optimalLocations = tabuSearch.Implement();
 
             //// Find the optimal solution of location assignment for each receipt sublot using Genetic Algorithm
             //GeneticAlgorithms GA = new GeneticAlgorithms(receiptSubLots, availableLocations.ToList());
             //List<Location> optimalLocations = GA.Implement();
 
-            // Find the optimal solution of location assignment for each receipt sublot using Differential Evolution
-            DESolver DESolver = new DESolver();
-            List<Location> optimalLocations = DESolver.Implement(receiptSubLots, availableLocations.ToList());
+            //// Find the optimal solution of location assignment for each receipt sublot using Differential Evolution
+            //DESolver DESolver = new DESolver();
+            //List<Location> optimalLocations = DESolver.Implement(receiptSubLots, availableLocations.ToList());
 
             //ReceiptSublotReallocation receiptLotReallocation = new ReceiptSublotReallocation(optimalLocations, receiptSubLots);
             //var results = receiptLotReallocation.Reallocate();
@@ -171,7 +171,7 @@ namespace SLAPScheduling.Infrastructure.Repository.Scheduling
                 return material is not null ? material.GetLimitStorageLevel() : 0.0;
             });
 
-            return locations.Where(location => location.GetCurrentStoragePercentage() < 1.0 && location.GetStorageLevel() <= maxAcceptableLevel && location.GetRowIndex() == 1);
+            return locations.Where(location => location.GetCurrentStoragePercentage() < 1.0 && location.GetStorageLevel() <= maxAcceptableLevel);
         }
 
         public async Task<Warehouse> GetSchedulingWarehouse(string warehouseId)
