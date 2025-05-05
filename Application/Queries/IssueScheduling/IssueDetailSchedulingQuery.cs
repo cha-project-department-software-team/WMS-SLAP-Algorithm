@@ -2,11 +2,11 @@
 
 namespace SLAPScheduling.Application.Queries.IssueScheduling
 {
-    public class IssueSchedulingQuery : IRequest<IEnumerable<LocationIDTO>>
+    public class IssueDetailSchedulingQuery : IRequest<IEnumerable<IssueSubLotDetailIDTO>>
     {
         public string WarehouseId { get; set; }
 
-        public IssueSchedulingQuery(string warehouseId)
+        public IssueDetailSchedulingQuery(string warehouseId)
         {
             WarehouseId = warehouseId;
         }

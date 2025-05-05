@@ -5,7 +5,7 @@ using SLAPScheduling.Application.Exceptions;
 
 namespace SLAPScheduling.Application.Queries.IssueScheduling
 {
-    public class IssueSchedulingQueryHandler : IRequestHandler<IssueSchedulingQuery, IEnumerable<LocationIDTO>>
+    public class IssueLayoutSchedulingQueryHandler : IRequestHandler<IssueLayoutSchedulingQuery, IEnumerable<LocationIDTO>>
     {
 
         private readonly IWarehouseRepository _warehouseRepository;
@@ -13,7 +13,7 @@ namespace SLAPScheduling.Application.Queries.IssueScheduling
         private readonly IIssueSchedulingRepository _schedulingRepository;
         private readonly IMapper _mapper;
 
-        public IssueSchedulingQueryHandler(IWarehouseRepository warehouseRepository, ILocationRepository locationRepository, IIssueSchedulingRepository schedulingRepository, IMapper mapper)
+        public IssueLayoutSchedulingQueryHandler(IWarehouseRepository warehouseRepository, ILocationRepository locationRepository, IIssueSchedulingRepository schedulingRepository, IMapper mapper)
         {
             _warehouseRepository = warehouseRepository;
             _locationRepository = locationRepository;
@@ -21,7 +21,7 @@ namespace SLAPScheduling.Application.Queries.IssueScheduling
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<LocationIDTO>> Handle(IssueSchedulingQuery request, CancellationToken cancellationToken)
+        public async Task<IEnumerable<LocationIDTO>> Handle(IssueLayoutSchedulingQuery request, CancellationToken cancellationToken)
         {
             var warehouse = await _warehouseRepository.GetWarehouseByIdAsync(request.WarehouseId);
             if (warehouse is null)
@@ -50,11 +50,11 @@ namespace SLAPScheduling.Application.Queries.IssueScheduling
                                                                                                       lotNumber: x.lotNumber)).ToList(); 
                 }
 
-                var issueSubLotIDTOs = new List<IssueSubLotIDTO>();
+                var issueSubLotIDTOs = new List<IssueSubLotLayoutIDTO>();
                 var sublots = sublotResults.Where(x => x.SubLot.GetLocationId().Equals(location.locationId, StringComparison.OrdinalIgnoreCase));
                 if (sublots?.Count() > 0)
                 {
-                    issueSubLotIDTOs = sublots.Select(x => new IssueSubLotIDTO(issueSublotId: x.SubLot.issueSublotId,
+                    issueSubLotIDTOs = sublots.Select(x => new IssueSubLotLayoutIDTO(issueSublotId: x.SubLot.issueSublotId,
                                                                                lotNumber: x.SubLot.issueLotId,
                                                                                requestedQuantity: x.SubLot.requestedQuantity,
                                                                                locationId: x.SubLot.GetLocationId(),

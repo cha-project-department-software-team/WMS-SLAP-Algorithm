@@ -52,6 +52,36 @@
             return null;
         }
 
+        public string GetMaterialId()
+        {
+            if (this.issueLot is not null)
+            {
+                return this.issueLot.material.materialId;
+            }
+
+            return string.Empty;
+        }
+
+        public string GetMaterialName()
+        {
+            if (this.issueLot is not null)
+            {
+                return this.issueLot.material.materialName;
+            }
+
+            return string.Empty;
+        }
+
+        public string GetLotNumber()
+        {
+            if (this.materialSublot is not null && !string.IsNullOrEmpty(this.materialSublot.lotNumber))
+            {
+                return this.materialSublot.lotNumber;
+            }
+
+            return string.Empty;
+        }
+
         public string GetLocationId()
         {
             if (this.materialSublot is not null)

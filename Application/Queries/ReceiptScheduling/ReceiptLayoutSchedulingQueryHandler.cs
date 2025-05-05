@@ -1,18 +1,16 @@
 ﻿using SLAPScheduling.Application.DTOs.ReceiptResults;
 using SLAPScheduling.Application.Exceptions;
-using SLAPScheduling.Domain.AggregateModels.InventoryReceiptAggregate;
-using System.Net.WebSockets;
 
 namespace SLAPScheduling.Application.Queries.ReceiptScheduling
 {
-    public class ReceiptSchedulingQueryHandler : IRequestHandler<ReceiptSchedulingQuery, IEnumerable<LocationRDTO>>
+    public class ReceiptLayoutSchedulingQueryHandler : IRequestHandler<ReceiptLayoutSchedulingQuery, IEnumerable<LocationRDTO>>
     {
         private readonly IWarehouseRepository _warehouseRepository;
         private readonly ILocationRepository _locationRepository;
         private readonly IReceiptSchedulingRepository _schedulingRepository;
         private readonly IMapper _mapper;
 
-        public ReceiptSchedulingQueryHandler(IWarehouseRepository warehouseRepository, ILocationRepository locationRepository, IReceiptSchedulingRepository schedulingRepository, IMapper mapper)
+        public ReceiptLayoutSchedulingQueryHandler(IWarehouseRepository warehouseRepository, ILocationRepository locationRepository, IReceiptSchedulingRepository schedulingRepository, IMapper mapper)
         {
             _warehouseRepository = warehouseRepository;
             _locationRepository = locationRepository;
@@ -20,7 +18,7 @@ namespace SLAPScheduling.Application.Queries.ReceiptScheduling
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<LocationRDTO>> Handle(ReceiptSchedulingQuery request, CancellationToken cancellationToken)
+        public async Task<IEnumerable<LocationRDTO>> Handle(ReceiptLayoutSchedulingQuery request, CancellationToken cancellationToken)
         {
             var warehouse = await _warehouseRepository.GetWarehouseByIdAsync(request.WarehouseId);
             if (warehouse is null)
@@ -49,11 +47,11 @@ namespace SLAPScheduling.Application.Queries.ReceiptScheduling
                                                                                                       lotNumber: x.lotNumber)).ToList();
                 }
 
-                var receiptSubLotRDTOs = new List<ReceiptSubLotRDTO>();
+                var receiptSubLotRDTOs = new List<ReceiptSubLotLayoutRDTO>();
                 var sublots = sublotResults.Where(x => x.SubLot.locationId.Equals(location.locationId, StringComparison.OrdinalIgnoreCase));
                 if (sublots?.Count() > 0)
                 {
-                    receiptSubLotRDTOs = sublots.Select(x => new ReceiptSubLotRDTO(receiptSublotId: x.SubLot.receiptSublotId,
+                    receiptSubLotRDTOs = sublots.Select(x => new ReceiptSubLotLayoutRDTO(receiptSublotId: x.SubLot.receiptSublotId,
                                                                                    lotNumber: x.SubLot.receiptLotId,
                                                                                    importedQuantity: x.SubLot.importedQuantity,
                                                                                    locationId: x.SubLot.locationId,

@@ -13,10 +13,18 @@ namespace SLAPScheduling.Application.Controllers
             _mediator = mediator;
         }
 
-        [HttpGet("GetIssueScheduling")]
+        [HttpGet("GetIssueLayoutScheduling")]
         public async Task<IEnumerable<LocationIDTO>> GetReceiptScheduling(string warehouseId = "TP01")
         {
-            var query = new IssueSchedulingQuery(warehouseId);
+            var query = new IssueLayoutSchedulingQuery(warehouseId);
+
+            return await _mediator.Send(query);
+        }
+
+        [HttpGet("GetIssueDetailScheduling")]
+        public async Task<IEnumerable<IssueSubLotDetailIDTO>> GetIssueDetailScheduling(string warehouseId = "TP01")
+        {
+            var query = new IssueDetailSchedulingQuery(warehouseId);
 
             return await _mediator.Send(query);
         }

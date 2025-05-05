@@ -42,6 +42,26 @@
             return null;
         }
 
+        public string GetMaterialId()
+        {
+            if (this.receiptLot is not null)
+            {
+                return this.receiptLot.material.materialId;
+            }
+
+            return string.Empty;
+        }
+
+        public string GetMaterialName()
+        {
+            if (this.receiptLot is not null)
+            {
+                return this.receiptLot.material.materialName;
+            }
+
+            return string.Empty;
+        }
+
         public double GetStoragePercentage(Location location)
         {
             var material = this.GetMaterial();
