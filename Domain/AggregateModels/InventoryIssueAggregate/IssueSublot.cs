@@ -27,6 +27,7 @@
             this.issueLotId = issueLotId;
         }
 
+        #region Update Methods
         public void UpdateMaterialSublot(MaterialSubLot materialSublot)
         {
             this.materialSublot = materialSublot;
@@ -36,5 +37,57 @@
         {
             this.issueLot = issueLot;
         }
+
+        #endregion
+
+        #region Retrieve Methods
+
+        public Material? GetMaterial()
+        {
+            if (this.issueLot is not null)
+            {
+                return this.issueLot.material;
+            }
+
+            return null;
+        }
+
+        public string GetLocationId()
+        {
+            if (this.materialSublot is not null)
+            {
+                return this.materialSublot.locationId;
+            }
+
+            return string.Empty;
+        }
+
+        public Location? GetLocation()
+        {
+            if (this.materialSublot is not null)
+            {
+                return this.materialSublot.location;
+            }
+
+            return null;
+        }
+
+        public double GetStoragePercentage()
+        {
+            var material = this.GetMaterial();
+            var location = this.GetLocation();
+            if (material is not null && location is not null)
+            {
+                var packetQuantity = material.GetPacketSize() > 0 ? this.requestedQuantity / material.GetPacketSize() : 0;
+                var subLotVolume = material is not null ? material.GetPacketVolume() * packetQuantity : 0;
+
+                var locationVolume = location.GetLocationVolume();
+                return locationVolume > 0 ? subLotVolume / locationVolume : 0;
+            }
+
+            return 0;
+        }
+
+        #endregion
     }
 }

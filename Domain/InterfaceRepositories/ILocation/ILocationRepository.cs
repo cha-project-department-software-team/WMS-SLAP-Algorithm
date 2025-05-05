@@ -3,5 +3,6 @@
     public interface ILocationRepository : IRepository<Location>
     {
         Task<List<Location>> GetAllLocations();
+        Task<List<Location>> GetLocationsByWarehouseId(string warehouseId);
     }
 }

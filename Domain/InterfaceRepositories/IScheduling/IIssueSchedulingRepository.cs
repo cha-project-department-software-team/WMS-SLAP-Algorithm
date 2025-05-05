@@ -2,6 +2,6 @@
 {
     public interface IIssueSchedulingRepository
     {
-        Task<List<IssueSublot>> Execute(string warehouseId, string issueLotStatus);
+        Task<List<(IssueSublot SubLot, double StoragePercentage)>> Execute(string warehouseId);
     }
 }

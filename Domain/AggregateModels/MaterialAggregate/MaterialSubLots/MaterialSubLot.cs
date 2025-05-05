@@ -39,6 +39,26 @@
             return this.materialLot?.material;
         }
 
+        public double GetSublotVolume()
+        {
+            var material = this.GetMaterial();
+            if (material is not null)
+            {
+                var packetSize = material.GetPacketSize();
+                var sublotPacketQuantity = Math.Ceiling(this.existingQuality / packetSize);
+
+                return material.GetPacketVolume() * sublotPacketQuantity;
+            }
+
+            return 0;
+        }
+
+        public double GetStoragePercentage(Location location)
+        {
+            var locationVolume = location.GetLocationVolume();
+            return locationVolume > 0 ? this.GetSublotVolume() / locationVolume : 0;
+        }
+
         #endregion
     }
 }

@@ -1,14 +1,14 @@
-﻿namespace SLAPScheduling.Application.Queries.IssueScheduling
+﻿using SLAPScheduling.Application.DTOs.IssueResults;
+
+namespace SLAPScheduling.Application.Queries.IssueScheduling
 {
-    public class IssueSchedulingQuery : IRequest<IEnumerable<IssueSubLotDTO>>
+    public class IssueSchedulingQuery : IRequest<IEnumerable<LocationIDTO>>
     {
         public string WarehouseId { get; set; }
-        public string IssueLotStatus { get; set; }
 
-        public IssueSchedulingQuery(string warehouseId, string issueLotStatus)
+        public IssueSchedulingQuery(string warehouseId)
         {
             WarehouseId = warehouseId;
-            IssueLotStatus = issueLotStatus;
         }
     }
 }

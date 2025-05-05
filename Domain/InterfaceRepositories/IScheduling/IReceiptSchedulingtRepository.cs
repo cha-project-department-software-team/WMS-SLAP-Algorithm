@@ -2,6 +2,6 @@
 {
     public interface IReceiptSchedulingRepository
     {
-        Task<List<ReceiptSublot>> Execute(string warehouseId, string receiptLotStatus);
+        Task<List<(ReceiptSublot SubLot, double StoragePercentage)>> Execute(string warehouseId);
     }
 }

@@ -22,5 +22,15 @@
             var warehouse = await _context.Warehouses.FirstOrDefaultAsync(x => x.warehouseId == warehouseId);
             return warehouse is not null ? warehouse : throw new Exception($"There is no existing warehouse with warehouseId = {warehouseId}");
         }
+
+        public async Task<Warehouse> GetWarehouseByIdAsync(string id)
+        {
+            var warehouse = await _context.Warehouses
+                .Include(x => x.locations)
+                .Include(x => x.properties)
+                .FirstOrDefaultAsync(x => x.warehouseId == id);
+
+            return warehouse;
+        }
     }   
 }

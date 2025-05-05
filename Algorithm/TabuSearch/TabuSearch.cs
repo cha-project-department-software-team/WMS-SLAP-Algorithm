@@ -5,7 +5,7 @@ namespace SLAPScheduling.Algorithm.TabuSearch
 {
     public class TabuSearch
     {
-        private static int iterations => 20000;
+        private static int iterations => 100;
         private List<ReceiptSublot> receiptSubLots { get; set; }
         private Dictionary<int, Location> locationDictionary { get; set; }
         private Solution bestSolution { get; set; }

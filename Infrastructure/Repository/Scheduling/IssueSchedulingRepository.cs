@@ -13,7 +13,7 @@
         /// <param name="issueLotStatus"></param>
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
-        public async Task<List<IssueSublot>> Execute(string warehouseId, string issueLotStatus)
+        public async Task<List<(IssueSublot SubLot, double StoragePercentage)>> Execute(string warehouseId)
         {
             var warehouse = await GetSchedulingWarehouse(warehouseId);
             if (warehouse is null)
@@ -21,7 +21,7 @@
                 throw new Exception("No result for Warehouse");
             }
 
-            var issueLots = await GetIssueLotsByStatus(issueLotStatus);
+            var issueLots = await GetIssueLotsByStatus(LotStatus.Pending);
             if (issueLots is null || issueLots.Count == 0)
             {
                 throw new Exception("No result for Issue Lots");
@@ -38,11 +38,14 @@
             var unavailableIssueLots = GetUnavailableIssueLots(issueLots);
             if (unavailableIssueLots?.Count() > 0)
             {
-                throw new Exception($"The requested quantity is over the existing quantity in issue lots: {string.Join(',', issueLots.Select(x => x.issueLotId).ToList())}");
+                throw new Exception($"The requested quantity is over the existing quantity in material lots: {string.Join(',', issueLots.Select(x => x.materialLotId).ToList())}");
             }
 
+            //var availableIssueLots = .Where(x => !unavailableIssueLots.Any(y => y.Equals(x))).ToList();
             IssueLotSplitter issueLotSplitter = new IssueLotSplitter(issueLots);
-            return issueLotSplitter.GetIssueSubLots().ToList();
+            var issueSublots = issueLotSplitter.GetIssueSubLots();
+
+            return issueSublots.Select(x => (x, x.GetStoragePercentage())).ToList();
         }
 
         /// <summary>
@@ -108,15 +111,10 @@
             throw new Exception($"There is no existing warehouse with warehouseId = {warehouseId}");
         }
 
-        public async Task<List<IssueLot>> GetIssueLotsByStatus(string lotStatus)
+        public async Task<List<IssueLot>> GetIssueLotsByStatus(LotStatus lotStatus)
         {
-            if (!Enum.TryParse<LotStatus>(lotStatus, out var status))
-            {
-                throw new ArgumentException("Invalid status value", nameof(lotStatus));
-            }
-
             return await _context.IssueLots
-                        .Where(x => x.issueLotStatus == status)
+                        .Where(x => x.issueLotStatus == lotStatus)
                         .Include(x => x.materialLot)
                         .Include(x => x.inventoryIssueEntry)
                         .Include(x => x.issueSublots)

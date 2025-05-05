@@ -12,10 +12,9 @@ namespace SLAPScheduling.Infrastructure.Repository.Scheduling
         /// Retrieve API to implement the scheduling based on the input data.
         /// </summary>
         /// <param name="warehouseId"></param>
-        /// <param name="receiptLotStatus"></param>
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
-        public async Task<List<ReceiptSublot>> Execute(string warehouseId, string receiptLotStatus)
+        public async Task<List<(ReceiptSublot SubLot, double StoragePercentage)>> Execute(string warehouseId)
         {
             var warehouse = await GetSchedulingWarehouse(warehouseId);
             if (warehouse is null)
@@ -23,7 +22,7 @@ namespace SLAPScheduling.Infrastructure.Repository.Scheduling
                 throw new Exception("No result for Warehouse");
             }
 
-            var receiptLots = await GetReceiptLotsByStatus(receiptLotStatus);
+            var receiptLots = await GetReceiptLotsByStatus(LotStatus.Pending);
             if (receiptLots == null || receiptLots.Count == 0)
             {
                 throw new Exception("No result for Receipt Lots");
@@ -80,7 +79,7 @@ namespace SLAPScheduling.Infrastructure.Repository.Scheduling
             var results = receiptLotReallocation.Reallocate();
 
             //var results = AssignLocationsForReceiptSubLots(optimalLocations, receiptSubLots);
-            return results.Select(x => x.SubLot).ToList();
+            return results;
         }
 
         /// <summary>
@@ -102,7 +101,7 @@ namespace SLAPScheduling.Infrastructure.Repository.Scheduling
                 foreach (var receiptSubLot in receiptSubLots)
                 {
                     var location = receiptSubLot.location;
-                    var storagePercentage = location.GetStoragePercentage(receiptSubLot);
+                    var storagePercentage = receiptSubLot.GetStoragePercentage(location);
 
                     yield return (receiptSubLot, storagePercentage);
                 }
@@ -200,15 +199,10 @@ namespace SLAPScheduling.Infrastructure.Repository.Scheduling
             throw new Exception($"There is no existing warehouse with warehouseId = {warehouseId}");
         }
 
-        public async Task<List<ReceiptLot>> GetReceiptLotsByStatus(string lotStatus)
+        public async Task<List<ReceiptLot>> GetReceiptLotsByStatus(LotStatus lotStatus)
         {
-            if (!Enum.TryParse<LotStatus>(lotStatus, out var status))
-            {
-                throw new ArgumentException("Invalid status value", nameof(lotStatus));
-            }
-
             return await _context.ReceiptLots
-                        .Where(x => x.receiptLotStatus == status)
+                        .Where(x => x.receiptLotStatus == lotStatus)
                         .Include(x => x.inventoryReceiptEntry)
                         .Include(x => x.receiptSublots)
                         .ToListAsync();

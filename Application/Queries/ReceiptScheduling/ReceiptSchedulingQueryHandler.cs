@@ -1,32 +1,72 @@
-﻿namespace SLAPScheduling.Application.Queries.ReceiptScheduling
+﻿using SLAPScheduling.Application.DTOs.ReceiptResults;
+using SLAPScheduling.Application.Exceptions;
+using SLAPScheduling.Domain.AggregateModels.InventoryReceiptAggregate;
+using System.Net.WebSockets;
+
+namespace SLAPScheduling.Application.Queries.ReceiptScheduling
 {
-    public class ReceiptSchedulingQueryHandler : IRequestHandler<ReceiptSchedulingQuery, IEnumerable<ReceiptSubLotDTO>>
+    public class ReceiptSchedulingQueryHandler : IRequestHandler<ReceiptSchedulingQuery, IEnumerable<LocationRDTO>>
     {
+        private readonly IWarehouseRepository _warehouseRepository;
+        private readonly ILocationRepository _locationRepository;
         private readonly IReceiptSchedulingRepository _schedulingRepository;
         private readonly IMapper _mapper;
 
-        public ReceiptSchedulingQueryHandler(IReceiptSchedulingRepository schedulingRepository, IMapper mapper)
+        public ReceiptSchedulingQueryHandler(IWarehouseRepository warehouseRepository, ILocationRepository locationRepository, IReceiptSchedulingRepository schedulingRepository, IMapper mapper)
         {
+            _warehouseRepository = warehouseRepository;
+            _locationRepository = locationRepository;
             _schedulingRepository = schedulingRepository;
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<ReceiptSubLotDTO>> Handle(ReceiptSchedulingQuery request, CancellationToken cancellationToken)
+        public async Task<IEnumerable<LocationRDTO>> Handle(ReceiptSchedulingQuery request, CancellationToken cancellationToken)
         {
-            var receiptSubLots = await _schedulingRepository.Execute(request.WarehouseId, request.ReceiptLotStatus);
-            if (receiptSubLots is null || receiptSubLots.Count == 0)
+            var warehouse = await _warehouseRepository.GetWarehouseByIdAsync(request.WarehouseId);
+            if (warehouse is null)
+                throw new EntityNotFoundException(nameof(Warehouse), request.WarehouseId);
+
+            var locations = await _locationRepository.GetLocationsByWarehouseId(request.WarehouseId);
+            if (locations is null || locations.Count == 0)
+                throw new EntityNotFoundException(nameof(Location), request.WarehouseId);
+
+            var sublotResults = await _schedulingRepository.Execute(request.WarehouseId);
+            if (sublotResults is null || sublotResults.Count == 0)
             {
                 throw new Exception("No result for Storage Locations Assignment Problem");
             }
 
-            var receiptSubLotDTOs = new List<ReceiptSubLotDTO>();
-            foreach (var receiptSubLot in receiptSubLots)
+            var locationRDTOs = new List<LocationRDTO>();
+            foreach (var location in locations)
             {
-                var receiptSubLotDTO = _mapper.Map<ReceiptSubLotDTO>(receiptSubLot);
-                receiptSubLotDTOs.Add(receiptSubLotDTO);
+                var materialSubLotRDTOs = new List<MaterialSubLotRDTO>();
+                if (location.materialSubLots?.Count > 0)
+                {
+                    materialSubLotRDTOs = location.materialSubLots.Select(x => new MaterialSubLotRDTO(subLotId: x.subLotId,
+                                                                                                      existingQuantity: x.existingQuality,
+                                                                                                      storagePercentage: x.GetStoragePercentage(location),
+                                                                                                      locationId: location.locationId,
+                                                                                                      lotNumber: x.lotNumber)).ToList();
+                }
+
+                var receiptSubLotRDTOs = new List<ReceiptSubLotRDTO>();
+                var sublots = sublotResults.Where(x => x.SubLot.locationId.Equals(location.locationId, StringComparison.OrdinalIgnoreCase));
+                if (sublots?.Count() > 0)
+                {
+                    receiptSubLotRDTOs = sublots.Select(x => new ReceiptSubLotRDTO(receiptSublotId: x.SubLot.receiptSublotId,
+                                                                                   lotNumber: x.SubLot.receiptLotId,
+                                                                                   importedQuantity: x.SubLot.importedQuantity,
+                                                                                   locationId: x.SubLot.locationId,
+                                                                                   storagePercentage: x.StoragePercentage)).ToList();
+                }
+                          
+                var locationRDTO = new LocationRDTO(locationId: location.locationId,
+                                                    materialSubLots: materialSubLotRDTOs,
+                                                    receiptSubLots: receiptSubLotRDTOs);   
+                locationRDTOs.Add(locationRDTO);
             }
 
-            return receiptSubLotDTOs;
+            return locationRDTOs;
         }
     }
 }

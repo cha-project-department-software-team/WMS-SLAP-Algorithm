@@ -1,4 +1,6 @@
-﻿namespace SLAPScheduling.Application.Controllers
+﻿using SLAPScheduling.Application.DTOs.ReceiptResults;
+
+namespace SLAPScheduling.Application.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
@@ -12,9 +14,9 @@
         }
 
         [HttpGet("GetReceiptScheduling")]
-        public async Task<IEnumerable<ReceiptSubLotDTO>> GetReceiptScheduling(string warehouseId = "TP01", string receiptLotStatus = "Pending")
+        public async Task<IEnumerable<LocationRDTO>> GetReceiptScheduling(string warehouseId = "TP01")
         {
-            var query = new ReceiptSchedulingQuery(warehouseId, receiptLotStatus);
+            var query = new ReceiptSchedulingQuery(warehouseId);
 
             return await _mediator.Send(query);
         }

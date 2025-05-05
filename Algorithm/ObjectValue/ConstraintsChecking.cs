@@ -72,7 +72,7 @@
             if (location is not null && receiptSublot is not null)
             {
                 double currentLocationStorage = location.GetCurrentStoragePercentage();
-                double subLotStorage = location.GetStoragePercentage(receiptSublot);
+                double subLotStorage = receiptSublot.GetStoragePercentage(location);
 
                 double storagePercentage = currentLocationStorage + subLotStorage;
                 if (storagePercentage > 1.0)

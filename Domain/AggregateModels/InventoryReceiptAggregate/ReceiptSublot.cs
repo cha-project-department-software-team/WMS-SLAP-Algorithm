@@ -42,6 +42,21 @@
             return null;
         }
 
+        public double GetStoragePercentage(Location location)
+        {
+            var material = this.GetMaterial();
+            if (material is not null && location is not null)
+            {
+                var packetQuantity = material.GetPacketSize() > 0 ? this.importedQuantity / material.GetPacketSize() : 0;
+                var subLotVolume = material is not null ? material.GetPacketVolume() * packetQuantity : 0;
+
+                var locationVolume = location.GetLocationVolume();
+                return locationVolume > 0 ? subLotVolume / locationVolume : 0;
+            }
+
+            return 0;
+        }
+
         #endregion
 
         #region Update Location

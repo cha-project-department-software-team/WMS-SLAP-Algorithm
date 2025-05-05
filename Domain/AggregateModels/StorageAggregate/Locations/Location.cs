@@ -100,7 +100,7 @@
             var storingPercent = this.GetCurrentStoragePercentage();
             if (this.receiptSublots?.Count > 0)
             {
-                var assignedPercent = this.receiptSublots.Sum(sublot => this.GetStoragePercentage(sublot));    
+                var assignedPercent = this.receiptSublots.Sum(sublot => sublot.GetStoragePercentage(this));    
                 return storingPercent + assignedPercent;
             }
 
@@ -117,7 +117,7 @@
         /// Calculate the Volume of Material as Cubic Meter.
         /// </summary>
         /// <returns></returns>
-        public double GetVolume()
+        public double GetLocationVolume()
         {
             if (_locationVolume.HasValue)
                 return _locationVolume.Value;
@@ -140,7 +140,7 @@
         /// <returns></returns>
         public double GetCurrentStoragePercentage()
         {
-            var locationVolume = GetVolume();
+            var locationVolume = GetLocationVolume();
             if (locationVolume == 0)
                 return 1.0;
 
@@ -156,39 +156,7 @@
         {
             if (this.materialSubLots?.Count > 0)
             {
-                return this.materialSubLots.Sum(sublot =>
-                {
-                    var material = sublot.GetMaterial();
-                    if (material is not null)
-                    {
-                        var packetSize = material.GetPacketSize();
-                        var sublotPacketQuantity = Math.Ceiling(sublot.existingQuality / packetSize);
-
-                        return material.GetPacketVolume() * sublotPacketQuantity;
-                    }
-
-                    return 0;
-                });
-            }
-
-            return 0;
-        }
-
-        /// <summary>
-        /// Calculate the storage percentage of receipt sublot in the location.
-        /// </summary>
-        /// <param name="receiptSubLot"></param>
-        /// <returns></returns>
-        public double GetStoragePercentage(ReceiptSublot receiptSubLot)
-        {
-            var material = receiptSubLot.GetMaterial();
-            if (material is not null)
-            {
-                var packetQuantity = material.GetPacketSize() > 0 ? receiptSubLot.importedQuantity / material.GetPacketSize() : 0;
-                var subLotVolume = receiptSubLot is not null && material is not null ? material.GetPacketVolume() * packetQuantity : 0;
-
-                var locationVolume = GetVolume();
-                return locationVolume > 0 ? subLotVolume / locationVolume : 0;
+                return this.materialSubLots.Sum(sublot => sublot.GetSublotVolume());
             }
 
             return 0;

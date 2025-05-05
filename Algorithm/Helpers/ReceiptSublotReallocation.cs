@@ -35,7 +35,7 @@
                     foreach (var receiptSublot in location.receiptSublots)
                     {
                         receiptSublot.UpdateLocation(location);
-                        var storagePercentage = location.GetStoragePercentage(receiptSublot);
+                        var storagePercentage = receiptSublot.GetStoragePercentage(location);
 
                         results.Add((receiptSublot, storagePercentage));
                     }
@@ -77,10 +77,10 @@
             var receiptSublots = nextLocation.GetReceiptSublots();
             if (receiptSublots?.Count > 0)
             {
-                var currentStorage = location.GetReceiptAndMaterialStoragePercentage() + suitableSublots.Sum(sublot => location.GetStoragePercentage(sublot));
+                var currentStorage = location.GetReceiptAndMaterialStoragePercentage() + suitableSublots.Sum(sublot => sublot.GetStoragePercentage(location));
                 foreach (var receiptSublot in receiptSublots)
                 {
-                    var sublotStorage = location.GetStoragePercentage(receiptSublot);
+                    var sublotStorage = receiptSublot.GetStoragePercentage(location);
                     if (currentStorage + sublotStorage < 1.0 && location.CheckStorageConstraints(receiptSublot))
                     {
                         suitableSublots.Add(receiptSublot);

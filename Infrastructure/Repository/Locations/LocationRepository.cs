@@ -14,7 +14,14 @@
                 .ToListAsync();
 
             return locations;
+        }
 
+        public async Task<List<Location>> GetLocationsByWarehouseId(string warehouseId)
+        {
+            return await _context.Locations
+                .Include(x => x.properties)
+                .Include(x => x.materialSubLots)
+                .Where(x => x.warehouseId == warehouseId).ToListAsync();
         }
     }
 }
