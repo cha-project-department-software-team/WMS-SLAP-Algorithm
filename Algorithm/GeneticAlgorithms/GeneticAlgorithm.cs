@@ -5,8 +5,8 @@ namespace SLAPScheduling.Algorithm.GeneticAlgorithms
 {
     public class GeneticAlgorithms
     {
-        private static int terminate => 1000;
-        private static int maxGeneration => 100;
+        private static int terminate => 20000;
+        private static int maxGeneration => 300;
         private static int elitism => 15;
         private static float crossoverProbability => 0.95f;
         private static float mutationProbability => 0.05f;
@@ -15,16 +15,21 @@ namespace SLAPScheduling.Algorithm.GeneticAlgorithms
         private Solution bestSolution { get; set; }
         private double bestObjectValue { get; set; }
         private List<double> bestObjectValues { get; set; }
-        private List<(double Time, double ObjectValue)> changeBestObjectValues { get; set; }
+        private List<(double Time, double ObjectValue)> timeChangeObjectValues { get; set; }
+        private List<(int SolutionCount, double ObjectValue)> solutionChangeObjectValues { get; set; }
         private int numberOfReceiptSubLots { get; set; }
+        private int numberOfEvaluatedSolutions { get; set; }
         private Stopwatch sw { get; set; }
 
+        #region Constructor
         public GeneticAlgorithms(List<ReceiptSublot> receiptSubLots, List<Location> availableLocations)
         {
             this.bestObjectValues = new List<double>();
-            this.changeBestObjectValues = new List<(double Time, double ObjectValue)>();
+            this.timeChangeObjectValues = new List<(double Time, double ObjectValue)>();
+            this.solutionChangeObjectValues = new List<(int SolutionCount, double ObjectValue)>();
             this.bestSolution = new Solution();
             this.numberOfReceiptSubLots = receiptSubLots.Count;
+            this.numberOfEvaluatedSolutions = 0;
             this.sw = new Stopwatch();
 
             this.receiptSubLots = new List<ReceiptSublot>();
@@ -39,6 +44,9 @@ namespace SLAPScheduling.Algorithm.GeneticAlgorithms
             }
         }
 
+        #endregion
+
+        #region Implementation
         public List<Location> Implement()
         {
             this.sw.Start();
@@ -65,11 +73,11 @@ namespace SLAPScheduling.Algorithm.GeneticAlgorithms
 
             this.sw.Stop();
 
-            //using (TextWriter writer = File.CreateText(@"C:\Users\AnhTu\Master Subjects\Luan van Thac si\Document\SchedulingResult.json"))
-            //{
-            //    var serializer = new JsonSerializer();
-            //    serializer.Serialize(writer, changeBestObjectValues);
-            //}
+            using (TextWriter writer = File.CreateText(@"C:\Users\AnhTu\Master Subjects\Luan van Thac si\Document\SchedulingResult.json"))
+            {
+                var serializer = new JsonSerializer();
+                serializer.Serialize(writer, timeChangeObjectValues);
+            }
 
             var optimalLocations = bestSolution.GetLocations(locationDictionary);
             return optimalLocations?.Count() > 0 ? optimalLocations.ToList() : new List<Location>();
@@ -105,7 +113,8 @@ namespace SLAPScheduling.Algorithm.GeneticAlgorithms
             this.bestObjectValue = this.bestSolution.CalculateObjectValue(receiptSubLots, locationDictionary);
             this.bestObjectValues.Add(this.bestObjectValue);
 
-            this.changeBestObjectValues.Add((this.sw.Elapsed.TotalSeconds, this.bestObjectValue));
+            this.timeChangeObjectValues.Add((this.sw.Elapsed.TotalSeconds, this.bestObjectValue));
+            this.solutionChangeObjectValues.Add((this.numberOfEvaluatedSolutions, this.bestObjectValue));
         }
 
         private void GA_OnGenerationComplete(object sender, GaEventArgs e)
@@ -115,16 +124,20 @@ namespace SLAPScheduling.Algorithm.GeneticAlgorithms
             this.bestObjectValue = this.bestSolution.CalculateObjectValue(receiptSubLots, locationDictionary);
             this.bestObjectValues.Add(this.bestObjectValue);
 
-            this.changeBestObjectValues.Add((this.sw.Elapsed.TotalSeconds, this.bestObjectValue));
+            this.timeChangeObjectValues.Add((this.sw.Elapsed.TotalSeconds, this.bestObjectValue));
+            this.solutionChangeObjectValues.Add((this.numberOfEvaluatedSolutions, this.bestObjectValue));
         }
 
         public double CalculateFitness(Chromosome chromosome)
         {
+            this.numberOfEvaluatedSolutions += 1;
+
             var solution = chromosome.GetSolution();
             double objectValue = solution.CalculateObjectValue(receiptSubLots, locationDictionary);
             double fitness = 1 - objectValue / (numberOfReceiptSubLots * 1000);
             return fitness;
         }
 
+        #endregion
     }
 }

@@ -15,6 +15,7 @@ namespace SLAPScheduling.Algorithm.DifferentialEvolutions
         #endregion
 
         #region Events
+        public event EventHandler OnSolutionComplete;
         public event EventHandler OnGenerationComplete;
         public event EventHandler OnRunComplete;
         #endregion
@@ -96,6 +97,8 @@ namespace SLAPScheduling.Algorithm.DifferentialEvolutions
                     {
                         newGeneration.Add(original);
                     }
+
+                    OnSolutionComplete.Invoke(1, new EventArgs());
                 }
 
                 // switch populations

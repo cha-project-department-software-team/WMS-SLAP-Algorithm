@@ -10,6 +10,8 @@ namespace SLAPScheduling.Algorithm.Utilities
             {
                 case UnitOfMeasure.Meter:
                     return 1;
+                case UnitOfMeasure.MET:
+                    return 1;
                 case UnitOfMeasure.Centimeter:
                     return 0.01;
                 case UnitOfMeasure.Millimeter:

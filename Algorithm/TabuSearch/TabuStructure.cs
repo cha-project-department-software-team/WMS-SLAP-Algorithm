@@ -19,10 +19,7 @@ namespace SLAPScheduling.Algorithm.TabuSearch
             {
                 foreach (var solution in candidateSolutions)
                 {
-                    if (!solutionValues.ContainsKey(solution))
-                    {
-                        solutionValues.Add(solution, 0.0);
-                    }
+                    solutionValues.TryAdd(solution, 0.0);
                 }
             }
         }
@@ -87,6 +84,11 @@ namespace SLAPScheduling.Algorithm.TabuSearch
             var remainSolutions = solutionValues.Where(x => !tabuList.IsExist(x.Key));
             var bestSolution = remainSolutions.Aggregate((l, r) => l.Value < r.Value ? l : r);
             return (bestSolution.Key, bestSolution.Value);
+        }
+
+        public int GetSolutionCount()
+        {
+            return this.solutionValues is not null ? this.solutionValues.Count : 0;
         }
 
         #endregion

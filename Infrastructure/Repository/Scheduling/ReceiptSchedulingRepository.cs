@@ -55,11 +55,11 @@ namespace SLAPScheduling.Infrastructure.Repository.Scheduling
             var locations = warehouse.locations;
             UpdateMaterialForMaterialLots(materials, ref locations);
 
-            var locationInformation = locations.Where(x => x.GetCurrentStoragePercentage() > 0.0).Select(x =>
-            {
-                var lotNumbers = x.materialSubLots.Select(x => (x.materialLot.lotNumber, x.materialLot.exisitingQuantity)).ToList();
-                return (x.locationId, lotNumbers, x.GetCurrentStoragePercentage());
-            }).ToList();
+            //var locationInformation = locations.Where(x => x.GetCurrentStoragePercentage() > 0.0).Select(x =>
+            //{
+            //    var lotNumbers = x.materialSubLots.Select(x => (x.materialLot.lotNumber, x.materialLot.exisitingQuantity)).ToList();
+            //    return (x.locationId, lotNumbers, x.GetCurrentStoragePercentage());
+            //}).ToList();
 
             var availableLocations = GetAvailableLocations(locations, receiptLots);
             ConstraintsChecking.SetPenaltyCoefficientValues(availableLocations);
@@ -76,10 +76,10 @@ namespace SLAPScheduling.Infrastructure.Repository.Scheduling
             //DESolver DESolver = new DESolver();
             //List<Location> optimalLocations = DESolver.Implement(receiptSubLots, availableLocations.ToList());
 
-            //ReceiptSublotReallocation receiptLotReallocation = new ReceiptSublotReallocation(optimalLocations, receiptSubLots);
-            //var results = receiptLotReallocation.Reallocate();
+            ReceiptSublotReallocation receiptLotReallocation = new ReceiptSublotReallocation(optimalLocations, receiptSubLots);
+            var results = receiptLotReallocation.Reallocate();
 
-            var results = AssignLocationsForReceiptSubLots(optimalLocations, receiptSubLots);
+            //var results = AssignLocationsForReceiptSubLots(optimalLocations, receiptSubLots);
             return results.Select(x => x.SubLot).ToList();
         }
 

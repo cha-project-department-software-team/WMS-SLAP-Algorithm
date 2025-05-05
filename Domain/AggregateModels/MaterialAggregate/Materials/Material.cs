@@ -34,7 +34,7 @@
             if (_packetVolumeSize.HasValue)
                 return _packetVolumeSize.Value;
 
-            if (this.properties.TryGetPropertyValue("Volume", out string propertyValue, out UnitOfMeasure unit) && double.TryParse(propertyValue, out double volume))
+            if (this.properties.TryGetPropertyValue("VolumePacket", out string propertyValue, out UnitOfMeasure unit) && double.TryParse(propertyValue, out double volume))
             {
                 _packetVolumeSize = unit == UnitOfMeasure.CubicMeters ? volume : 0;
             }

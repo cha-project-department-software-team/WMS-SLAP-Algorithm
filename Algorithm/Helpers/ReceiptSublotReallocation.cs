@@ -1,6 +1,4 @@
-﻿using SLAPScheduling.Algorithm.ObjectValue;
-
-namespace SLAPScheduling.Algorithm.Helpers
+﻿namespace SLAPScheduling.Algorithm.Helpers
 {
     public class ReceiptSublotReallocation
     {
@@ -72,12 +70,6 @@ namespace SLAPScheduling.Algorithm.Helpers
             }
         }
 
-        /// <summary>
-        /// Get 
-        /// </summary>
-        /// <param name="location"></param>
-        /// <param name="receiptSublots"></param>
-        /// <returns></returns>
         private List<ReceiptSublot> GetSuitableReceiptSublots(Location location, Location nextLocation)
         {
             var suitableSublots = new List<ReceiptSublot>();
