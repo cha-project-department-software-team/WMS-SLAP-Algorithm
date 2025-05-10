@@ -75,11 +75,11 @@ namespace SLAPScheduling.Infrastructure.Repository.Scheduling
             //DESolver DESolver = new DESolver();
             //List<Location> optimalLocations = DESolver.Implement(receiptSubLots, availableLocations.ToList());
 
-            ReceiptSublotReallocation receiptLotReallocation = new ReceiptSublotReallocation(optimalLocations, receiptSubLots);
-            var results = receiptLotReallocation.Reallocate();
+            ReceiptSublotReallocation receiptLotReallocation = new ReceiptSublotReallocation();
+            var results = receiptLotReallocation.Reallocate(optimalLocations, receiptSubLots);
 
             //var results = AssignLocationsForReceiptSubLots(optimalLocations, receiptSubLots);
-            return results;
+            return results.ToList();
         }
 
         /// <summary>
@@ -95,8 +95,6 @@ namespace SLAPScheduling.Infrastructure.Repository.Scheduling
                 {
                     receiptSubLots[i].UpdateLocation(locations[i]);
                 }
-
-                //MergeReceiptSubLotsToLocation(ref receiptSubLots);
 
                 foreach (var receiptSubLot in receiptSubLots)
                 {
@@ -170,7 +168,7 @@ namespace SLAPScheduling.Infrastructure.Repository.Scheduling
                 return material is not null ? material.GetLimitStorageLevel() : 0.0;
             });
 
-            return locations.Where(location => location.GetCurrentStoragePercentage() < 1.0 && location.GetStorageLevel() <= maxAcceptableLevel);
+            return locations.Where(location => location.GetCurrentStoragePercentage() < 1.0 && location.GetStorageLevel() <= maxAcceptableLevel && location.GetRowIndex() == 1);
         }
 
         public async Task<Warehouse> GetSchedulingWarehouse(string warehouseId)

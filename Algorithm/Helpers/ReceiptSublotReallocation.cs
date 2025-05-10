@@ -4,91 +4,111 @@
     {
         private List<Location> allocatedLocations { get; set; }
 
-        public ReceiptSublotReallocation(List<Location> locations, List<ReceiptSublot> receiptSublots)
+        public ReceiptSublotReallocation()
         {
             this.allocatedLocations = new List<Location>();
-            for (int i = 0; i < receiptSublots.Count; i++)
-            {
-                // Update Receipt Sublot to location
-                locations[i].AddReceiptSublot(receiptSublots[i]);
-                this.allocatedLocations.Add(locations[i]);
-            }
         }
 
         /// <summary>
         /// Implement the logic of allocating receipt sublots
         /// </summary>
         /// <returns></returns>
-        public List<(ReceiptSublot SubLot, double StoragePercentage)> Reallocate()
+        public List<(ReceiptSublot SubLot, double StoragePercentage)>? Reallocate(List<Location> locations, List<ReceiptSublot> receiptSublots)
         {
-            var results = new List<(ReceiptSublot SubLot, double StoragePercentage)>();
-            if (this.allocatedLocations is not null)
+            var assignedLocations = AssignReceiptSubLotsForLocations(locations, receiptSublots);
+            this.allocatedLocations = assignedLocations.OrderBy(location => location.GetDistanceToIOPoint()).ToList();
+            for (int index = 0; index < this.allocatedLocations.Count; index++)
             {
-                var orderedLocations = this.allocatedLocations.OrderByDescending(x => x.GetDistanceToIOPoint()).ToList();
-                ReallocateLocationsForReceiptSublots(ref orderedLocations);
-
-                foreach (var location in orderedLocations)
+                var location = this.allocatedLocations[index];
+                var storagePercent = location.GetReceiptAndMaterialStoragePercentage();
+                if (storagePercent <= 0.5f)
                 {
-                    if (location.receiptSublots is null || location.receiptSublots.Count == 0)
-                        continue;
-
-                    foreach (var receiptSublot in location.receiptSublots)
+                    var subLots = location.GetReceiptSublots();
+                    if (subLots?.Count > 0)
                     {
-                        receiptSublot.UpdateLocation(location);
-                        var storagePercentage = receiptSublot.GetStoragePercentage(location);
-
-                        results.Add((receiptSublot, storagePercentage));
-                    }
-                }
-            }
-
-            return results;
-        }
-
-        /// <summary>
-        /// Re-allocate the location of receipt sublots
-        /// </summary>
-        /// <param name="locations"></param>
-        private void ReallocateLocationsForReceiptSublots(ref List<Location> locations)
-        {
-            var locationCount = locations.Count;
-            for (int i = locationCount - 1; i >= 0; i--)
-            {
-                var location = locations[i];
-                for (int j = i - 1; j >= 0; j--)
-                {
-                    var nextLocation = locations[j];
-                    var suitableSublots = GetSuitableReceiptSublots(location, nextLocation);
-                    foreach (var suitableSublot in suitableSublots)
-                    {
-                        if (nextLocation.RemoveReceiptSubLot(suitableSublot))
+                        var addedSubLots = new List<ReceiptSublot>();
+                        for (int replaceIndex = 0; replaceIndex < index; replaceIndex++)
                         {
-                            location.AddReceiptSublot(suitableSublot);
+                            var replaceLocation = this.allocatedLocations[replaceIndex];
+                            if (TryAddReceiptSublots(subLots, replaceLocation, out addedSubLots))
+                            {
+                                ReallocateReceiptSublots(addedSubLots, location, replaceLocation);
+                                break;
+                            }
                         }
                     }
                 }
             }
+
+            return GetReallocateResult();
         }
 
-        private List<ReceiptSublot> GetSuitableReceiptSublots(Location location, Location nextLocation)
+        private List<Location> AssignReceiptSubLotsForLocations(List<Location> locations, List<ReceiptSublot> receiptSublots)
         {
-            var suitableSublots = new List<ReceiptSublot>();
-
-            var receiptSublots = nextLocation.GetReceiptSublots();
-            if (receiptSublots?.Count > 0)
+            var assignedLocations = new List<Location>();
+            for (int i = 0; i < receiptSublots.Count; i++)
             {
-                var currentStorage = location.GetReceiptAndMaterialStoragePercentage() + suitableSublots.Sum(sublot => sublot.GetStoragePercentage(location));
-                foreach (var receiptSublot in receiptSublots)
+                // Update Receipt Sublot to location
+                locations[i].AddReceiptSublot(receiptSublots[i]);
+                assignedLocations.Add(locations[i]);
+            }
+
+            return assignedLocations;
+        }
+
+        private bool TryAddReceiptSublots(List<ReceiptSublot> subLots, Location replaceLocation, out List<ReceiptSublot> addedSublots)
+        {
+            addedSublots = new List<ReceiptSublot>();
+            foreach (var sublot in subLots)
+            {
+                var assignedStoragePercent = replaceLocation.GetReceiptAndMaterialStoragePercentage() 
+                                           + sublot.GetStoragePercentage(replaceLocation) 
+                                           + addedSublots.Sum(x => x.GetStoragePercentage(replaceLocation));
+
+                if (assignedStoragePercent < 1.0f)
                 {
-                    var sublotStorage = receiptSublot.GetStoragePercentage(location);
-                    if (currentStorage + sublotStorage < 1.0 && location.CheckStorageConstraints(receiptSublot))
+                    if (!replaceLocation.IsStorageConstraintsViolated(sublot))
                     {
-                        suitableSublots.Add(receiptSublot);
+                        addedSublots.Add(sublot);
                     }
                 }
             }
 
-            return suitableSublots;
+            return addedSublots?.Count > 0;
+        }
+
+        private void ReallocateReceiptSublots(List<ReceiptSublot> receiptSublots, Location fromLocation, Location toLocation)
+        {
+            if (receiptSublots?.Count > 0)
+            {
+                foreach (var sublot in receiptSublots)
+                {
+                    if (fromLocation.RemoveReceiptSubLot(sublot))
+                    {
+                        toLocation.AddReceiptSublot(sublot);
+                    }
+                }
+            }
+        }
+
+        private List<(ReceiptSublot SubLot, double StoragePercentage)> GetReallocateResult()
+        {
+            var results = new List<(ReceiptSublot SubLot, double StoragePercentage)>();
+            foreach (var location in this.allocatedLocations)
+            {
+                if (location.receiptSublots is null || location.receiptSublots.Count == 0)
+                    continue;
+
+                foreach (var receiptSublot in location.receiptSublots)
+                {
+                    receiptSublot.UpdateLocation(location);
+                    var storagePercentage = receiptSublot.GetStoragePercentage(location);
+
+                    results.Add((receiptSublot, storagePercentage));
+                }
+            }
+
+            return results;
         }
     }
 }

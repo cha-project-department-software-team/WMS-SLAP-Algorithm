@@ -67,17 +67,10 @@
 
         public void AddReceiptSublot(ReceiptSublot receiptSublot)
         {
-            try
-            {
-                if (this.receiptSublots is null)
-                    this.receiptSublots = new List<ReceiptSublot>();
+            if (this.receiptSublots is null)
+                this.receiptSublots = new List<ReceiptSublot>();
 
-                this.receiptSublots.Add(receiptSublot);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex);
-            }
+            this.receiptSublots.Add(receiptSublot);
         }
 
         public bool RemoveReceiptSubLot(ReceiptSublot receiptSublot)

@@ -36,7 +36,7 @@
         /// <param name="location"></param>
         /// <param name="receiptSublot"></param>
         /// <returns></returns>
-        public static bool CheckStorageConstraints(this Location location, ReceiptSublot receiptSublot)
+        public static bool IsStorageConstraintsViolated(this Location location, ReceiptSublot receiptSublot)
         {
             return CheckSatisfyStorageLevel(location, receiptSublot) + CheckOverStorageVolume(location, receiptSublot) > 0.0;
         }

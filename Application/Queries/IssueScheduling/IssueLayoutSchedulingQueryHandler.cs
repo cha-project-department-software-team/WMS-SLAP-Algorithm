@@ -55,10 +55,10 @@ namespace SLAPScheduling.Application.Queries.IssueScheduling
                 if (sublots?.Count() > 0)
                 {
                     issueSubLotIDTOs = sublots.Select(x => new IssueSubLotLayoutIDTO(issueSublotId: x.SubLot.issueSublotId,
-                                                                               lotNumber: x.SubLot.issueLotId,
-                                                                               requestedQuantity: x.SubLot.requestedQuantity,
-                                                                               locationId: x.SubLot.GetLocationId(),
-                                                                               storagePercentage: x.StoragePercentage)).ToList();
+                                                                                     lotNumber: x.SubLot.materialSublot.lotNumber,
+                                                                                     requestedQuantity: x.SubLot.requestedQuantity,
+                                                                                     locationId: x.SubLot.GetLocationId(),
+                                                                                     storagePercentage: x.StoragePercentage)).ToList();
                 }
 
                 var locationIDTO = new LocationIDTO(locationId: location.locationId,
