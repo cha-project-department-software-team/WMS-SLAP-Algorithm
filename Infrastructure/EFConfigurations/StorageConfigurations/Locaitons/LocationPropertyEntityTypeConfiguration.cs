@@ -14,6 +14,13 @@
                 .IsRequired()
                 .HasMaxLength(50);
 
+            builder.Property(s => s.unitOfMeasure)
+                   .HasConversion(
+                       v => v.ToString(),
+                       v => (UnitOfMeasure)Enum.Parse(typeof(UnitOfMeasure), v))
+                   .HasMaxLength(50)
+                   .IsRequired();
+
             builder.HasOne(b => b.location)
                 .WithMany(b => b.properties)
                 .HasForeignKey(b => b.locationId)
