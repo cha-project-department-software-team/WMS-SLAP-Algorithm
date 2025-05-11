@@ -1,7 +1,4 @@
 ﻿using SLAPScheduling.Application.DTOs.IssueResults;
-using SLAPScheduling.Application.DTOs.LocationDTOs;
-using SLAPScheduling.Application.DTOs.ReceiptResults;
-using SLAPScheduling.Application.Exceptions;
 
 namespace SLAPScheduling.Application.Queries.IssueScheduling
 {
@@ -25,12 +22,13 @@ namespace SLAPScheduling.Application.Queries.IssueScheduling
             }
 
             var issueSubLotDetailRDTOs = sublotResults.Select(x => new IssueSubLotDetailIDTO(issueSublotId: x.SubLot.issueSublotId,
-                                                                                                 materialId: x.SubLot.GetMaterialId(),
-                                                                                                 materialName: x.SubLot.GetMaterialName(),
-                                                                                                 requestedQuantity: x.SubLot.requestedQuantity,
-                                                                                                 storagePercentage: x.StoragePercentage,
-                                                                                                 locationId: x.SubLot.GetLocationId(),
-                                                                                                 lotNumber: x.SubLot.GetLotNumber()));
+                                                                                             materialId: x.SubLot.GetMaterialId(),
+                                                                                             materialName: x.SubLot.GetMaterialName(),
+                                                                                             requestedQuantity: x.SubLot.requestedQuantity,
+                                                                                             storagePercentage: x.StoragePercentage,
+                                                                                             locationId: x.SubLot.GetLocationId(),
+                                                                                             materialSubLotId: x.SubLot.sublotId,
+                                                                                             lotNumber: x.SubLot.GetLotNumber()));
             return issueSubLotDetailRDTOs;
         }
     }

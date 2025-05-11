@@ -10,7 +10,6 @@
         /// Retrieve API to implement the scheduling based on the input data.
         /// </summary>
         /// <param name="warehouseId"></param>
-        /// <param name="issueLotStatus"></param>
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
         public async Task<List<(IssueSublot SubLot, double StoragePercentage)>> Execute(string warehouseId)
