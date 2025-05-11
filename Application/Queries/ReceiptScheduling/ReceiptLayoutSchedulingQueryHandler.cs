@@ -29,7 +29,7 @@ namespace SLAPScheduling.Application.Queries.ReceiptScheduling
                 throw new EntityNotFoundException(nameof(Location), request.WarehouseId);
 
             var sublotResults = await _schedulingRepository.Execute(request.WarehouseId);
-            if (sublotResults is null || sublotResults.Count == 0)
+            if (sublotResults is null)
             {
                 throw new Exception("No result for Storage Locations Assignment Problem");
             }
