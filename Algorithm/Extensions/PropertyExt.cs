@@ -1,8 +1,4 @@
 ﻿using SLAPScheduling.Algorithm.Utilities;
-using SLAPScheduling.Domain.AggregateModels.MaterialAggregate.Materials;
-using SLAPScheduling.Domain.AggregateModels.StorageAggregate.Locations;
-using SLAPScheduling.Domain.AggregateModels.StorageAggregate.Warehouses;
-using SLAPScheduling.Domain.Enum;
 
 namespace SLAPScheduling.Algorithm.Extensions
 {
@@ -17,7 +13,7 @@ namespace SLAPScheduling.Algorithm.Extensions
         /// <returns></returns>
         public static double GetSizeParameter(this List<WarehouseProperty> properties, string propertyName = "Length")
         {
-            if (properties.TryGetPropertyValue(propertyName, out string propertyValue, out UnitOfMeasure unitOfMeasure))
+            if (properties?.Count > 0 && properties.TryGetPropertyValue(propertyName, out string propertyValue, out UnitOfMeasure unitOfMeasure))
             {
                 return double.TryParse(propertyValue, out double sizeValue) ? sizeValue * Utility.GetMeterMultiplier(unitOfMeasure) : 0;
             }
@@ -32,7 +28,7 @@ namespace SLAPScheduling.Algorithm.Extensions
         /// <returns></returns>
         public static bool TryGetPropertyValue(this List<WarehouseProperty> properties, string propertyName, out string propertyValue, out UnitOfMeasure unitOfMeasure)
         {
-            if (!string.IsNullOrEmpty(propertyName))
+            if (properties?.Count > 0 && !string.IsNullOrEmpty(propertyName))
             {
                 var property = properties.FirstOrDefault(p => p.propertyName == propertyName);
                 if (property != null)
@@ -59,7 +55,7 @@ namespace SLAPScheduling.Algorithm.Extensions
         /// <returns></returns>
         public static double GetSizeParameter(this List<LocationProperty> properties, string propertyName = "Length")
         {
-            if (properties.TryGetPropertyValue(propertyName, out string propertyValue, out UnitOfMeasure unitOfMeasure))
+            if (properties?.Count > 0 && properties.TryGetPropertyValue(propertyName, out string propertyValue, out UnitOfMeasure unitOfMeasure))
             {
                 return double.TryParse(propertyValue, out double sizeValue) ? sizeValue * Utility.GetMeterMultiplier(unitOfMeasure) : 0;
             }
@@ -74,7 +70,7 @@ namespace SLAPScheduling.Algorithm.Extensions
         /// <returns></returns>
         public static bool TryGetPropertyValue(this List<LocationProperty> properties, string propertyName, out string propertyValue, out UnitOfMeasure unitOfMeasure)
         {
-            if (!string.IsNullOrEmpty(propertyName))
+            if (!string.IsNullOrEmpty(propertyName) && properties?.Count > 0)
             {
                 var property = properties.FirstOrDefault(p => p.propertyName == propertyName);
                 if (property != null)
@@ -101,7 +97,7 @@ namespace SLAPScheduling.Algorithm.Extensions
         /// <returns></returns>
         public static double GetSizeParameter(this List<MaterialProperty> properties, string propertyName = "Length")
         {
-            if (properties.TryGetPropertyValue(propertyName, out string propertyValue, out UnitOfMeasure unitOfMeasure))
+            if (properties?.Count > 0 && properties.TryGetPropertyValue(propertyName, out string propertyValue, out UnitOfMeasure unitOfMeasure))
             {
                 return double.TryParse(propertyValue, out double sizeValue) ? sizeValue * Utility.GetMeterMultiplier(unitOfMeasure) : 0;
             }
@@ -116,7 +112,7 @@ namespace SLAPScheduling.Algorithm.Extensions
         /// <returns></returns>
         public static bool TryGetPropertyValue(this List<MaterialProperty> properties, string propertyName, out string propertyValue, out UnitOfMeasure unitOfMeasure)
         {
-            if (!string.IsNullOrEmpty(propertyName))
+            if (!string.IsNullOrEmpty(propertyName) && properties?.Count > 0)
             {
                 var property = properties.FirstOrDefault(p => p.propertyName == propertyName);
                 if (property != null)

@@ -4,7 +4,6 @@
     {
         [Key]
         public string lotNumber { get; set; }
-
         public LotStatus lotStatus { get; set; }
 
         [ForeignKey("materialId")]

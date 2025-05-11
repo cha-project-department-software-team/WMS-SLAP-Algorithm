@@ -22,7 +22,7 @@ namespace SLAPScheduling.Infrastructure.Repository.Scheduling
                 throw new Exception("No result for Warehouse");
             }
 
-            var receiptLots = await GetReceiptLotsByStatus(LotStatus.Pending);
+            var receiptLots = await GetReceiptLotsByStatus(warehouseId, LotStatus.Pending);
             if (receiptLots == null || receiptLots.Count == 0)
             {
                 throw new Exception("No result for Receipt Lots");
@@ -176,34 +176,27 @@ namespace SLAPScheduling.Infrastructure.Repository.Scheduling
             var warehouse = await _context.Warehouses
                                 .Include(s => s.properties)
                                 .Include(s => s.locations)
+                                    .ThenInclude(s => s.materialSubLots)
+                                        .ThenInclude(s => s.materialLot)
+                                .Include(s => s.locations)
                                     .ThenInclude(s => s.properties)
                                 .FirstOrDefaultAsync(x => x.warehouseId == warehouseId);
 
             if (warehouse is not null && warehouse.locations?.Count > 0)
             {
-                foreach (var location in warehouse.locations)
-                {
-                    var locationId = location.locationId;
-                    var materialSublots = await GetMaterialSubLotsByLocationId(locationId);
-                    if (materialSublots?.Count > 0)
-                    {
-                        location.materialSubLots = materialSublots;
-                    }
-                }
-
                 return warehouse;
             }
 
             throw new Exception($"There is no existing warehouse with warehouseId = {warehouseId}");
         }
 
-        public async Task<List<ReceiptLot>> GetReceiptLotsByStatus(LotStatus lotStatus)
+        public async Task<List<ReceiptLot>> GetReceiptLotsByStatus(string warehouseId, LotStatus lotStatus)
         {
             return await _context.ReceiptLots
-                        .Where(x => x.receiptLotStatus == lotStatus)
-                        .Include(x => x.inventoryReceiptEntry)
-                        .Include(x => x.receiptSublots)
-                        .ToListAsync();
+                                .Include(x => x.inventoryReceiptEntry)
+                                    .ThenInclude(x => x.inventoryReceipt)
+                                .Where(x => x.receiptLotStatus == lotStatus && x.inventoryReceiptEntry.inventoryReceipt.warehouseId == warehouseId)
+                                .ToListAsync();
         }
 
         public async Task<List<Material>> GetAllMaterials()
@@ -219,8 +212,9 @@ namespace SLAPScheduling.Infrastructure.Repository.Scheduling
         public async Task<List<MaterialSubLot>> GetMaterialSubLotsByLocationId(string locationId)
         {
             return await _context.MaterialSubLots
+                                 .Where(x => x.locationId == locationId)
                                  .Include(x => x.materialLot)
-                                 .Where(x => x.locationId == locationId).ToListAsync();
+                                 .ToListAsync();
         }
     }
 }

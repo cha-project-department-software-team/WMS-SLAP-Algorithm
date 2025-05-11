@@ -21,7 +21,7 @@
                 throw new Exception("No result for Warehouse");
             }
 
-            var issueLots = await GetIssueLotsByStatus(LotStatus.Pending);
+            var issueLots = await GetIssueLotsByStatus(warehouseId, LotStatus.Pending);
             if (issueLots is null || issueLots.Count == 0)
             {
                 throw new Exception("No result for Issue Lots");
@@ -38,7 +38,7 @@
             var unavailableIssueLots = GetUnavailableIssueLots(issueLots);
             if (unavailableIssueLots?.Count() > 0)
             {
-                throw new Exception($"The requested quantity is over the existing quantity in material lots: {string.Join(',', issueLots.Select(x => x.materialLotId).ToList())}");
+                throw new Exception($"The requested quantity is over the existing quantity in material lots: {string.Join(',', unavailableIssueLots.Select(x => x.materialLotId).ToList())}");
             }
 
             //var availableIssueLots = .Where(x => !unavailableIssueLots.Any(y => y.Equals(x))).ToList();
@@ -90,20 +90,23 @@
             var warehouse = await _context.Warehouses
                                 .Include(s => s.properties)
                                 .Include(s => s.locations)
+                                    .ThenInclude(s => s.materialSubLots)
+                                        .ThenInclude(s => s.materialLot)
+                                .Include(s => s.locations)
                                     .ThenInclude(s => s.properties)
                                 .FirstOrDefaultAsync(x => x.warehouseId == warehouseId);
 
             if (warehouse is not null && warehouse.locations?.Count > 0)
             {
-                foreach (var location in warehouse.locations)
-                {
-                    var locationId = location.locationId;
-                    var materialSublots = await GetMaterialSubLotsByLocationId(locationId);
-                    if (materialSublots?.Count > 0)
-                    {
-                        location.materialSubLots = materialSublots;
-                    }
-                }
+                //foreach (var location in warehouse.locations)
+                //{
+                //    var locationId = location.locationId;
+                //    var materialSublots = await GetMaterialSubLotsByLocationId(locationId);
+                //    if (materialSublots?.Count > 0)
+                //    {
+                //        location.materialSubLots = materialSublots;
+                //    }
+                //}
 
                 return warehouse;
             }
@@ -111,14 +114,14 @@
             throw new Exception($"There is no existing warehouse with warehouseId = {warehouseId}");
         }
 
-        public async Task<List<IssueLot>> GetIssueLotsByStatus(LotStatus lotStatus)
+        public async Task<List<IssueLot>> GetIssueLotsByStatus(string warehouseId, LotStatus lotStatus)
         {
             return await _context.IssueLots
-                        .Where(x => x.issueLotStatus == lotStatus)
-                        .Include(x => x.materialLot)
-                        .Include(x => x.inventoryIssueEntry)
-                        .Include(x => x.issueSublots)
-                        .ToListAsync();
+                                 .Include(x => x.materialLot)
+                                 .Include(x => x.inventoryIssueEntry)
+                                     .ThenInclude(x => x.inventoryIssue)
+                                 .Where(x => x.issueLotStatus == lotStatus && x.inventoryIssueEntry.inventoryIssue.warehouseId == warehouseId)
+                                 .ToListAsync();
         }
 
         public async Task<List<Material>> GetAllMaterials()
