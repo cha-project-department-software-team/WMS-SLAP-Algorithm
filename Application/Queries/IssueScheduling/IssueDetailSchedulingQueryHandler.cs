@@ -28,7 +28,8 @@ namespace SLAPScheduling.Application.Queries.IssueScheduling
                                                                                              storagePercentage: x.StoragePercentage,
                                                                                              locationId: x.SubLot.GetLocationId(),
                                                                                              materialSubLotId: x.SubLot.sublotId,
-                                                                                             lotNumber: x.SubLot.GetLotNumber()));
+                                                                                             lotNumber: x.SubLot.GetLotNumber(),
+                                                                                             issueLotId: x.SubLot.GetIssueLotId()));
             return issueSubLotDetailRDTOs;
         }
     }
