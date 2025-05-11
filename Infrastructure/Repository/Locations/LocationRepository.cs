@@ -21,6 +21,9 @@
             return await _context.Locations
                 .Include(x => x.properties)
                 .Include(x => x.materialSubLots)
+                    .ThenInclude(x => x.materialLot)
+                        .ThenInclude(x => x.material)
+                            .ThenInclude(x => x.properties)
                 .Where(x => x.warehouseId == warehouseId).ToListAsync();
         }
     }
