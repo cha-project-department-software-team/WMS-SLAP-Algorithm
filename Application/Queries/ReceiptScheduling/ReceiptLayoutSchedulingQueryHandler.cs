@@ -40,22 +40,31 @@ namespace SLAPScheduling.Application.Queries.ReceiptScheduling
                 var materialSubLotRDTOs = new List<MaterialSubLotRDTO>();
                 if (location.materialSubLots?.Count > 0)
                 {
-                    materialSubLotRDTOs = location.materialSubLots.Select(x => new MaterialSubLotRDTO(subLotId: x.subLotId,
-                                                                                                      existingQuantity: x.existingQuality,
-                                                                                                      storagePercentage: x.GetStoragePercentage(location),
-                                                                                                      locationId: location.locationId,
-                                                                                                      lotNumber: x.lotNumber)).ToList();
+                    materialSubLotRDTOs = location.materialSubLots.Select(x =>
+                    {
+                        var storagePercent = x.GetStoragePercentage(location);
+                        var materialSublotRDTO = new MaterialSubLotRDTO(subLotId: x.subLotId,
+                                                                        existingQuantity: x.existingQuality,
+                                                                        storagePercentage: storagePercent <= 1.0f ? storagePercent : 1.0f,
+                                                                        locationId: location.locationId,
+                                                                        lotNumber: x.lotNumber);
+                        return materialSublotRDTO;
+                    }).ToList();
                 }
 
                 var receiptSubLotRDTOs = new List<ReceiptSubLotLayoutRDTO>();
                 var sublots = sublotResults.Where(x => x.SubLot.locationId.Equals(location.locationId, StringComparison.OrdinalIgnoreCase));
                 if (sublots?.Count() > 0)
                 {
-                    receiptSubLotRDTOs = sublots.Select(x => new ReceiptSubLotLayoutRDTO(receiptSublotId: x.SubLot.receiptSublotId,
-                                                                                   lotNumber: x.SubLot.receiptLotId,
-                                                                                   importedQuantity: x.SubLot.importedQuantity,
-                                                                                   locationId: x.SubLot.locationId,
-                                                                                   storagePercentage: x.StoragePercentage)).ToList();
+                    receiptSubLotRDTOs = sublots.Select(x =>
+                    {
+                        var receiptSubLotRDTO = new ReceiptSubLotLayoutRDTO(receiptSublotId: x.SubLot.receiptSublotId,
+                                                                            lotNumber: x.SubLot.receiptLotId,
+                                                                            importedQuantity: x.SubLot.importedQuantity,
+                                                                            locationId: x.SubLot.locationId,
+                                                                            storagePercentage: x.StoragePercentage <= 1.0f ? x.StoragePercentage : 1.0f);
+                        return receiptSubLotRDTO;
+                    }).ToList();
                 }
                           
                 var locationRDTO = new LocationRDTO(locationId: location.locationId,

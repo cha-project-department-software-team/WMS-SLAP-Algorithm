@@ -25,7 +25,7 @@ namespace SLAPScheduling.Application.Queries.IssueScheduling
                                                                                              materialId: x.SubLot.GetMaterialId(),
                                                                                              materialName: x.SubLot.GetMaterialName(),
                                                                                              requestedQuantity: x.SubLot.requestedQuantity,
-                                                                                             storagePercentage: x.StoragePercentage,
+                                                                                             storagePercentage: x.StoragePercentage <= 1.0f ? x.StoragePercentage : 1.0f,
                                                                                              locationId: x.SubLot.GetLocationId(),
                                                                                              materialSubLotId: x.SubLot.sublotId,
                                                                                              lotNumber: x.SubLot.GetLotNumber(),

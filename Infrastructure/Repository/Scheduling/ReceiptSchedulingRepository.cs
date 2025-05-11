@@ -57,10 +57,10 @@ namespace SLAPScheduling.Infrastructure.Repository.Scheduling
 
             //List<(string LocationId, string LotNumber, double ExistingQuantity, double StoragePercent)> locationInformation = locations.Where(x => x.GetCurrentStoragePercentage() > 0.0).Select(x =>
             //{
-            //    var sublot = x.materialSubLots.Select(x => (x.materialLot.lotNumber, x.materialLot.exisitingQuantity)).First();
+            //    var sublot = x.materialSubLots.Select(x => (x.materialLot.lotNumber, x.existingQuality)).First();
             //    var storagePercent = x.GetCurrentStoragePercentage() * 100;
 
-            //    return (x.locationId, sublot.lotNumber, sublot.exisitingQuantity, storagePercent);
+            //    return (x.locationId, sublot.lotNumber, sublot.existingQuality, storagePercent);
             //}).ToList();
 
             //Utility.WriteJson(locationInformation, @"C:\Users\AnhTu\Master Subjects\Luan van Thac si\Document\Excel\locationInformation.json");
@@ -107,6 +107,20 @@ namespace SLAPScheduling.Infrastructure.Repository.Scheduling
 
             ReceiptSublotReallocation receiptLotReallocation = new ReceiptSublotReallocation();
             var results = receiptLotReallocation.Reallocate(optimalLocations, receiptSubLots);
+
+            //var resultInformation = results.Select(x =>
+            //{
+            //    var locationId = x.SubLot.locationId;
+            //    var lotNumber = x.SubLot.receiptLot.receiptLotId;
+            //    var materialName = x.SubLot.GetMaterialName();
+            //    var materialId = x.SubLot.GetMaterialId();
+            //    var importQuantity = x.SubLot.importedQuantity;
+            //    var storagePercentage = x.StoragePercentage;
+
+            //    return (locationId, lotNumber, materialName, materialId, importQuantity, storagePercentage);
+            //}).ToList();
+
+            //Utility.WriteJson(resultInformation, @"C:\Users\AnhTu\Master Subjects\Luan van Thac si\Document\Excel\resultInformation.json");
 
             //var results = AssignLocationsForReceiptSubLots(optimalLocations, receiptSubLots);
             return results.ToList();

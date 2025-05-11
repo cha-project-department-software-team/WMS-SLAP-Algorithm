@@ -43,22 +43,31 @@ namespace SLAPScheduling.Application.Queries.IssueScheduling
                 var materialSubLotIDTOs = new List<MaterialSubLotIDTO>();
                 if (location.materialSubLots?.Count > 0)
                 {
-                    materialSubLotIDTOs = location.materialSubLots.Select(x => new MaterialSubLotIDTO(subLotId: x.subLotId,
-                                                                                                      existingQuantity: x.existingQuality,
-                                                                                                      storagePercentage: x.GetStoragePercentage(location),
-                                                                                                      locationId: location.locationId,
-                                                                                                      lotNumber: x.lotNumber)).ToList(); 
+                    materialSubLotIDTOs = location.materialSubLots.Select(x =>
+                    {
+                        var storagePercent = x.GetStoragePercentage(location);
+                        var materialSubLotIDTO = new MaterialSubLotIDTO(subLotId: x.subLotId,
+                                                                        existingQuantity: x.existingQuality,
+                                                                        storagePercentage: storagePercent <= 1.0f ? storagePercent : 1.0f,
+                                                                        locationId: location.locationId,
+                                                                        lotNumber: x.lotNumber);
+                        return materialSubLotIDTO;
+                    }).ToList(); 
                 }
 
                 var issueSubLotIDTOs = new List<IssueSubLotLayoutIDTO>();
                 var sublots = sublotResults.Where(x => x.SubLot.GetLocationId().Equals(location.locationId, StringComparison.OrdinalIgnoreCase));
                 if (sublots?.Count() > 0)
                 {
-                    issueSubLotIDTOs = sublots.Select(x => new IssueSubLotLayoutIDTO(issueSublotId: x.SubLot.issueSublotId,
-                                                                                     lotNumber: x.SubLot.materialSublot.lotNumber,
-                                                                                     requestedQuantity: x.SubLot.requestedQuantity,
-                                                                                     locationId: x.SubLot.GetLocationId(),
-                                                                                     storagePercentage: x.StoragePercentage)).ToList();
+                    issueSubLotIDTOs = sublots.Select(x =>
+                    {
+                        var issueSubLotIDTO = new IssueSubLotLayoutIDTO(issueSublotId: x.SubLot.issueSublotId,
+                                                                        lotNumber: x.SubLot.materialSublot.lotNumber,
+                                                                        requestedQuantity: x.SubLot.requestedQuantity,
+                                                                        locationId: x.SubLot.GetLocationId(),
+                                                                        storagePercentage: x.StoragePercentage <= 1.0f ? x.StoragePercentage : 1.0f);
+                        return issueSubLotIDTO;
+                    }).ToList();
                 }
 
                 var locationIDTO = new LocationIDTO(locationId: location.locationId,

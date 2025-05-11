@@ -36,19 +36,26 @@
                     {
                         var subLotId = $"{receiptLot.receiptLotId}_{subLotIndex}";
                         var quantityPerLocation = packetSize * packetQuantityPerLocation;
-                        var subLotQuantity = subLotIndex == subLotCount - 1 && receiptLot.importedQuantity > quantityPerLocation ? receiptLot.importedQuantity % quantityPerLocation : quantityPerLocation;
-                        if (subLotQuantity > 0)
+
+                        double subLotQuantity = 0;
+                        if (subLotIndex == subLotCount - 1)
                         {
-                            var receiptSubLot = new ReceiptSublot(receiptSublotId: subLotId,
+                            subLotQuantity = receiptLot.importedQuantity != quantityPerLocation ? receiptLot.importedQuantity % quantityPerLocation : quantityPerLocation;
+                        }
+                        else
+                        {
+                            subLotQuantity = quantityPerLocation;
+                        }
+
+                        var receiptSubLot = new ReceiptSublot(receiptSublotId: subLotId,
                                                               importedQuantity: subLotQuantity,
                                                               subLotStatus: LotStatus.Pending,
                                                               unitOfMeasure: UnitOfMeasure.None,
                                                               locationId: string.Empty,
                                                               receiptLotId: receiptLot.receiptLotId);
 
-                            receiptSubLot.UpdateReceiptLot(receiptLot);
-                            yield return receiptSubLot;
-                        }
+                        receiptSubLot.UpdateReceiptLot(receiptLot);
+                        yield return receiptSubLot;
                     }
                 }
             }
