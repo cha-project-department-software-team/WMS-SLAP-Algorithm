@@ -122,8 +122,8 @@ namespace SLAPScheduling.Infrastructure.Repository.Scheduling
 
             //Utility.WriteJson(resultInformation, @"C:\Users\AnhTu\Master Subjects\Luan van Thac si\Document\Excel\resultInformation.json");
 
-            var results = AssignLocationsForReceiptSubLots(optimalLocations, receiptSubLots);
-            return results.ToList();
+            //var results = AssignLocationsForReceiptSubLots(optimalLocations, receiptSubLots);
+            return new List<(ReceiptSublot SubLot, double StoragePercentage)>();
         }
 
         /// <summary>
