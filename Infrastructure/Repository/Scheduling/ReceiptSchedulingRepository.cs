@@ -105,8 +105,8 @@ namespace SLAPScheduling.Infrastructure.Repository.Scheduling
             //DESolver DESolver = new DESolver();
             //List<Location> optimalLocations = DESolver.Implement(receiptSubLots, availableLocations.ToList());
 
-            //ReceiptSublotReallocation receiptLotReallocation = new ReceiptSublotReallocation();
-            //var results = receiptLotReallocation.Reallocate(optimalLocations, receiptSubLots);
+            ReceiptSublotReallocation receiptLotReallocation = new ReceiptSublotReallocation();
+            var results = receiptLotReallocation.Reallocate(optimalLocations, receiptSubLots);
 
             //var resultInformation = results.Select(x =>
             //{
@@ -123,7 +123,7 @@ namespace SLAPScheduling.Infrastructure.Repository.Scheduling
             //Utility.WriteJson(resultInformation, @"C:\Users\AnhTu\Master Subjects\Luan van Thac si\Document\Excel\resultInformation.json");
 
             //var results = AssignLocationsForReceiptSubLots(optimalLocations, receiptSubLots);
-            return new List<(ReceiptSublot SubLot, double StoragePercentage)>();
+            return results.ToList();
         }
 
         /// <summary>
