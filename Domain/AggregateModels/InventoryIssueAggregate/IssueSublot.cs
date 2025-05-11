@@ -82,6 +82,16 @@
             return string.Empty;
         }
 
+        public string GetIssueLotId()
+        {
+            if (this.issueLot is not null && !string.IsNullOrEmpty(this.issueLot.issueLotId))
+            {
+                return this.issueLot.issueLotId;
+            }
+
+            return string.Empty;
+        }
+
         public string GetLocationId()
         {
             if (this.materialSublot is not null)

@@ -10,12 +10,13 @@
         public string LocationId { get; set; }
         public string MaterialSubLotId { get; set; }
         public string LotNumber { get; set; }
+        public string IssueLotId { get; set; }
 
         public IssueSubLotDetailIDTO()
         {
         }
 
-        public IssueSubLotDetailIDTO(string issueSublotId, string materialId, string materialName, double requestedQuantity, double storagePercentage, string locationId, string materialSubLotId, string lotNumber)
+        public IssueSubLotDetailIDTO(string issueSublotId, string materialId, string materialName, double requestedQuantity, double storagePercentage, string locationId, string materialSubLotId, string lotNumber, string issueLotId)
         {
             IssueSublotId = issueSublotId;
             MaterialId = materialId;
@@ -25,6 +26,7 @@
             LocationId = locationId;
             MaterialSubLotId = materialSubLotId;
             LotNumber = lotNumber;
+            IssueLotId = issueLotId;
         }
     }
 }
