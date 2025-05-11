@@ -168,7 +168,7 @@ namespace SLAPScheduling.Infrastructure.Repository.Scheduling
                 return material is not null ? material.GetLimitStorageLevel() : 0.0;
             });
 
-            return locations.Where(location => location.GetCurrentStoragePercentage() < 1.0 && location.GetStorageLevel() <= maxAcceptableLevel && location.GetRowIndex() == 1);
+            return locations.Where(location => location.GetCurrentStoragePercentage() < 1.0 && location.GetStorageLevel() <= maxAcceptableLevel);
         }
 
         public async Task<Warehouse> GetSchedulingWarehouse(string warehouseId)
