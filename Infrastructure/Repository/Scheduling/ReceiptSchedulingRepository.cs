@@ -115,9 +115,9 @@ namespace SLAPScheduling.Infrastructure.Repository.Scheduling
             //    var materialName = x.SubLot.GetMaterialName();
             //    var materialId = x.SubLot.GetMaterialId();
             //    var importQuantity = x.SubLot.importedQuantity;
-            //    var storagePercentage = x.StoragePercentage;
+            //    var storagePercentage = x.StoragePercentage * 100;
 
-            //    return (locationId, lotNumber, materialName, materialId, importQuantity, storagePercentage);
+            //    return (locationId, lotNumber, materialId, importQuantity, storagePercentage);
             //}).ToList();
 
             //Utility.WriteJson(resultInformation, @"C:\Users\AnhTu\Master Subjects\Luan van Thac si\Document\Excel\resultInformation.json");
