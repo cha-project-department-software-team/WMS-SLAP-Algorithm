@@ -1,4 +1,5 @@
-﻿using SLAPScheduling.Domain.Enum;
+﻿using Newtonsoft.Json;
+using SLAPScheduling.Domain.Enum;
 
 namespace SLAPScheduling.Algorithm.Utilities
 {
@@ -20,6 +21,15 @@ namespace SLAPScheduling.Algorithm.Utilities
                     return 0.0254;
                 default:
                     return 0;
+            }
+        }
+
+        public static void WriteJson(object obj, string jsonPath)
+        {
+            using (TextWriter writer = File.CreateText(jsonPath))
+            {
+                var serializer = new JsonSerializer();
+                serializer.Serialize(writer, obj);
             }
         }
     }

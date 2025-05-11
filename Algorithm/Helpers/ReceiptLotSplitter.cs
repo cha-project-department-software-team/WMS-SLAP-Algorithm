@@ -36,7 +36,7 @@
                     {
                         var subLotId = $"{receiptLot.receiptLotId}_{subLotIndex}";
                         var quantityPerLocation = packetSize * packetQuantityPerLocation;
-                        var subLotQuantity = subLotIndex == subLotCount - 1 ? receiptLot.importedQuantity % quantityPerLocation : quantityPerLocation;
+                        var subLotQuantity = subLotIndex == subLotCount - 1 && receiptLot.importedQuantity > quantityPerLocation ? receiptLot.importedQuantity % quantityPerLocation : quantityPerLocation;
                         if (subLotQuantity > 0)
                         {
                             var receiptSubLot = new ReceiptSublot(receiptSublotId: subLotId,

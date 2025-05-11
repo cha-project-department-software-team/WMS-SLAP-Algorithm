@@ -1,4 +1,5 @@
 ﻿using SLAPScheduling.Algorithm.DifferentialEvolutions;
+using SLAPScheduling.Algorithm.Utilities;
 
 namespace SLAPScheduling.Infrastructure.Repository.Scheduling
 {
@@ -54,11 +55,40 @@ namespace SLAPScheduling.Infrastructure.Repository.Scheduling
             var locations = warehouse.locations;
             UpdateMaterialForMaterialLots(materials, ref locations);
 
-            //var locationInformation = locations.Where(x => x.GetCurrentStoragePercentage() > 0.0).Select(x =>
+            //List<(string LocationId, string LotNumber, double ExistingQuantity, double StoragePercent)> locationInformation = locations.Where(x => x.GetCurrentStoragePercentage() > 0.0).Select(x =>
             //{
-            //    var lotNumbers = x.materialSubLots.Select(x => (x.materialLot.lotNumber, x.materialLot.exisitingQuantity)).ToList();
-            //    return (x.locationId, lotNumbers, x.GetCurrentStoragePercentage());
+            //    var sublot = x.materialSubLots.Select(x => (x.materialLot.lotNumber, x.materialLot.exisitingQuantity)).First();
+            //    var storagePercent = x.GetCurrentStoragePercentage() * 100;
+
+            //    return (x.locationId, sublot.lotNumber, sublot.exisitingQuantity, storagePercent);
             //}).ToList();
+
+            //Utility.WriteJson(locationInformation, @"C:\Users\AnhTu\Master Subjects\Luan van Thac si\Document\Excel\locationInformation.json");
+
+            //var receiptLotInformation = receiptLots.Select(x =>
+            //{
+            //    var materialId = x.inventoryReceiptEntry.materialId;
+            //    var importedQuantity = x.importedQuantity;
+            //    return (x.receiptLotId, materialId, importedQuantity);
+            //}).ToList();
+
+            //Utility.WriteJson(receiptLotInformation, @"C:\Users\AnhTu\Master Subjects\Luan van Thac si\Document\Excel\receiptLotInformation.json");
+
+            //var materialInformation = receiptLots.Select(x =>
+            //{
+            //    var material = x.material;
+            //    var materialId = material.materialId;
+            //    var packetSize = material.GetPacketSize();
+            //    var packetVolume = material.GetPacketVolume();
+            //    var storageLevel = material.GetLimitStorageLevel();
+
+            //    Random rnd = new Random();
+            //    var movementRatio = rnd.Next(6);
+
+            //    return (materialId, packetSize, packetVolume, storageLevel, movementRatio);
+            //}).ToList();
+
+            //Utility.WriteJson(materialInformation, @"C:\Users\AnhTu\Master Subjects\Luan van Thac si\Document\Excel\materialInformation.json");
 
             var availableLocations = GetAvailableLocations(locations, receiptLots);
             ConstraintsChecking.SetPenaltyCoefficientValues(availableLocations);
