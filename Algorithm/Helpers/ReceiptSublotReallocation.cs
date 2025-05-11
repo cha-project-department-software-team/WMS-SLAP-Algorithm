@@ -13,9 +13,9 @@
         /// Implement the logic of allocating receipt sublots
         /// </summary>
         /// <returns></returns>
-        public List<(ReceiptSublot SubLot, double StoragePercentage)>? Reallocate(List<Location> locations, List<ReceiptSublot> receiptSublots)
+        public List<(ReceiptSublot SubLot, double StoragePercentage)>? Reallocate(List<Location> resultLocations, List<ReceiptSublot> receiptSublots)
         {
-            var assignedLocations = AssignReceiptSubLotsForLocations(locations, receiptSublots);
+            var assignedLocations = AssignReceiptSubLotsForLocations(resultLocations, receiptSublots);
             this.allocatedLocations = assignedLocations.OrderBy(location => location.GetDistanceToIOPoint()).ToList();
             for (int index = 0; index < this.allocatedLocations.Count; index++)
             {
@@ -43,14 +43,18 @@
             return GetReallocateResult();
         }
 
-        private List<Location> AssignReceiptSubLotsForLocations(List<Location> locations, List<ReceiptSublot> receiptSublots)
+        private List<Location> AssignReceiptSubLotsForLocations(List<Location> resultLocations, List<ReceiptSublot> receiptSublots)
         {
             var assignedLocations = new List<Location>();
-            for (int i = 0; i < receiptSublots.Count; i++)
+            for (int i = 0; i < resultLocations.Count; i++)
             {
                 // Update Receipt Sublot to location
-                locations[i].AddReceiptSublot(receiptSublots[i]);
-                assignedLocations.Add(locations[i]);
+                if (i < receiptSublots.Count - 1)
+                {
+                    resultLocations[i].AddReceiptSublot(receiptSublots[i]);
+                }
+                
+                assignedLocations.Add(resultLocations[i]);
             }
 
             return assignedLocations;
