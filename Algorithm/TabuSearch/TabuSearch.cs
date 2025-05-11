@@ -129,7 +129,7 @@ namespace SLAPScheduling.Algorithm.TabuSearch
                                     .Select(group => new
                                     {
                                         Index = group.Key,
-                                        SortedLocations = group.OrderBy(loc => loc.Value.GetCurrentStoragePercentage()).ToList()
+                                        SortedLocations = group.OrderBy(loc => loc.Value.GetDistanceToIOPoint()).ToList()
                                     }).ToList();
 
             var initialIndices = groupedLocations.SelectMany(x => x.SortedLocations.Select(x => x.Key)).ToList();

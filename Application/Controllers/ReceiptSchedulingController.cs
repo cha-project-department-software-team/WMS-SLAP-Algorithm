@@ -14,7 +14,7 @@ namespace SLAPScheduling.Application.Controllers
         }
 
         [HttpGet("GetReceiptLayoutScheduling")]
-        public async Task<IEnumerable<LocationRDTO>> GetReceiptLayoutScheduling(string warehouseId = "TP01")
+        public async Task<IEnumerable<LocationRDTO>> GetReceiptLayoutScheduling(string warehouseId = "BB01")
         {
             var query = new ReceiptLayoutSchedulingQuery(warehouseId);
 
@@ -22,7 +22,7 @@ namespace SLAPScheduling.Application.Controllers
         }
 
         [HttpGet("GetReceiptDetailScheduling")]
-        public async Task<IEnumerable<ReceiptSubLotDetailRDTO>> GetReceiptDetailScheduling(string warehouseId = "TP01")
+        public async Task<IEnumerable<ReceiptSubLotDetailRDTO>> GetReceiptDetailScheduling(string warehouseId = "BB01")
         {
             var query = new ReceiptDetailSchedulingQuery(warehouseId);
 
