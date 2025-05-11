@@ -21,7 +21,7 @@
             {
                 var location = this.allocatedLocations[index];
                 var storagePercent = location.GetReceiptAndMaterialStoragePercentage();
-                if (storagePercent <= 0.5f)
+                if (storagePercent <= 0.7f)
                 {
                     var subLots = location.GetReceiptSublots();
                     if (subLots?.Count > 0)
