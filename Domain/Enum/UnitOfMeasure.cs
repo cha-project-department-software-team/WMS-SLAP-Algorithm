@@ -68,6 +68,7 @@
         SQM,
         KIT,
         CHAI,
-        PCS
+        PCS,
+        YARD
     }
 }
