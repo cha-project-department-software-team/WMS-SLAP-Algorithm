@@ -14,7 +14,7 @@ namespace SLAPScheduling.Application.Controllers
         }
 
         [HttpGet("GetIssueLayoutScheduling")]
-        public async Task<IEnumerable<LocationIDTO>> GetReceiptScheduling(string warehouseId = "TP01")
+        public async Task<IEnumerable<LocationIDTO>> GetReceiptScheduling(string warehouseId = "BB01")
         {
             var query = new IssueLayoutSchedulingQuery(warehouseId);
 
@@ -22,7 +22,7 @@ namespace SLAPScheduling.Application.Controllers
         }
 
         [HttpGet("GetIssueDetailScheduling")]
-        public async Task<IEnumerable<IssueSubLotDetailIDTO>> GetIssueDetailScheduling(string warehouseId = "TP01")
+        public async Task<IEnumerable<IssueSubLotDetailIDTO>> GetIssueDetailScheduling(string warehouseId = "BB01")
         {
             var query = new IssueDetailSchedulingQuery(warehouseId);
 

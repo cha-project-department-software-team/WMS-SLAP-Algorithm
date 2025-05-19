@@ -49,7 +49,7 @@
             for (int i = 0; i < resultLocations.Count; i++)
             {
                 // Update Receipt Sublot to location
-                if (i < receiptSublots.Count - 1)
+                if (i < receiptSublots.Count)
                 {
                     resultLocations[i].AddReceiptSublot(receiptSublots[i]);
                 }

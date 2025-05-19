@@ -59,6 +59,24 @@
             return this.properties?.Count > 0 ? this.properties.GetSizeParameter("RackWidth") : 0;
         }
 
+        /// <summary>
+        /// Retrieve the distance from Origin point to I/O point in X-axis
+        /// </summary>
+        /// <returns></returns>
+        public double GetXDistance()
+        {
+            return this.properties?.Count > 0 ? this.properties.GetSizeParameter("Dx") : 0;
+        }
+
+        /// <summary>
+        /// Retrieve the distance from Origin point to I/O point in Y-axis
+        /// </summary>
+        /// <returns></returns>
+        public double GetYDistance()
+        {
+            return this.properties?.Count > 0 ? this.properties.GetSizeParameter("Dy") : 0;
+        }
+
         #endregion
     }
 }

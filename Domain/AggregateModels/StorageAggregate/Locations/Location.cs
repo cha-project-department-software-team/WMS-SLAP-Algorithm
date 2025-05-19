@@ -1,4 +1,6 @@
-﻿namespace SLAPScheduling.Domain.AggregateModels.StorageAggregate.Locations
+﻿using SLAPScheduling.Algorithm.Utilities;
+
+namespace SLAPScheduling.Domain.AggregateModels.StorageAggregate.Locations
 {
     public class Location : Entity, IAggregateRoot
     {
@@ -24,6 +26,10 @@
 
         #region Retrieve Methods
 
+        /// <summary>
+        /// Retrieve the row index of location.
+        /// </summary>
+        /// <returns></returns>
         public int GetRowIndex()
         {
             if (_rowIndex is not null)
@@ -40,6 +46,10 @@
             return _rowIndex ?? 0;
         }
 
+        /// <summary>
+        /// Retrive the level index of location.
+        /// </summary>
+        /// <returns></returns>
         public int GetStorageLevel()
         {
             if (_levelIndex is not null)
@@ -59,12 +69,19 @@
         #endregion
 
         #region Receipt Sublots
-
+        /// <summary>
+        /// Retrieve all receipt sublots
+        /// </summary>
+        /// <returns></returns>
         public List<ReceiptSublot>? GetReceiptSublots()
         {
             return this.receiptSublots?.Count > 0 ? this.receiptSublots : null;
         }
 
+        /// <summary>
+        /// Append one more receipt sublot.
+        /// </summary>
+        /// <param name="receiptSublot"></param>
         public void AddReceiptSublot(ReceiptSublot receiptSublot)
         {
             if (this.receiptSublots is null)
@@ -73,6 +90,11 @@
             this.receiptSublots.Add(receiptSublot);
         }
 
+        /// <summary>
+        /// Remove the receipt sublot from assigned sublots
+        /// </summary>
+        /// <param name="receiptSublot"></param>
+        /// <returns></returns>
         public bool RemoveReceiptSubLot(ReceiptSublot receiptSublot)
         {
             if (this.receiptSublots?.Count > 0)
@@ -88,6 +110,10 @@
             return false;
         }
 
+        /// <summary>
+        /// Retrieve the total (storing + assigned) storage percentage of location
+        /// </summary>
+        /// <returns></returns>
         public double GetReceiptAndMaterialStoragePercentage()
         {
             var storingPercent = this.GetCurrentStoragePercentage();
@@ -115,12 +141,57 @@
             if (_locationVolume.HasValue)
                 return _locationVolume.Value;
 
-            double length = this.properties.GetSizeParameter("Length");
-            double width = this.properties.GetSizeParameter("Width");
-            double height = this.properties.GetSizeParameter("Height");
+            double length = this.GetLocationLength();
+            double width = this.GetLocationWidth();
+            double height = this.GetLocationHeight();
 
             _locationVolume = length * width * height;
             return _locationVolume.Value;
+        }
+
+        /// <summary>
+        /// Retrieve the value as Meter of Length.
+        /// </summary>
+        /// <param name="propertyName"></param>
+        /// <returns></returns>
+        public double GetLocationLength()
+        {
+            if (this.properties?.Count > 0 && this.properties.TryGetPropertyValue("Length", out string propertyValue, out UnitOfMeasure unitOfMeasure))
+            {
+                return double.TryParse(propertyValue, out double sizeValue) ? sizeValue * Utility.GetMeterMultiplier(unitOfMeasure) : 0;
+            }
+
+            return 0;
+        }
+
+        /// <summary>
+        /// Retrieve the value as Meter of Width.
+        /// </summary>
+        /// <param name="propertyName"></param>
+        /// <returns></returns>
+        public double GetLocationWidth()
+        {
+            if (this.properties?.Count > 0 && this.properties.TryGetPropertyValue("Width", out string propertyValue, out UnitOfMeasure unitOfMeasure))
+            {
+                return double.TryParse(propertyValue, out double sizeValue) ? sizeValue * Utility.GetMeterMultiplier(unitOfMeasure) : 0;
+            }
+
+            return 0;
+        }
+
+        /// <summary>
+        /// Retrieve the value as Meter of Height.
+        /// </summary>
+        /// <param name="propertyName"></param>
+        /// <returns></returns>
+        public double GetLocationHeight()
+        {
+            if (this.properties?.Count > 0 && this.properties.TryGetPropertyValue("Height", out string propertyValue, out UnitOfMeasure unitOfMeasure))
+            {
+                return double.TryParse(propertyValue, out double sizeValue) ? sizeValue * Utility.GetMeterMultiplier(unitOfMeasure) : 0;
+            }
+
+            return 0;
         }
 
         #endregion
@@ -170,32 +241,42 @@
             if (_distanceToIOPoint.HasValue)
                 return _distanceToIOPoint.Value;
 
-            if (TryGetLocationIdentification(out string warehouseId, out int rackIndex, out int rowIndex, out int columnIndex, out int levelIndex))
+            if (this.TryGetLocationIdentification(out string warehouseId, out int R, out int J, out int I, out int K))
             {
-                var aisleWidth = this.warehouse.GetAisleWidth();
-                var rackWidth = this.warehouse.GetRackWidth();
+                var Wa = this.warehouse.GetAisleWidth();
+                var Wr = this.warehouse.GetRackWidth();
 
-                var locationLength = this.properties.GetSizeParameter("Length");
-                var locationHeight = this.properties.GetSizeParameter("Height");
+                var Dx = this.warehouse.GetXDistance();
+                var Dy = this.warehouse.GetYDistance();
 
-                var xDistance = (columnIndex - 0.5) * locationLength;
-                var yDistance = 0.5 * rowIndex * aisleWidth + (rowIndex - 1) * (rackWidth + 0.5 * aisleWidth) + (rackWidth + aisleWidth) * (rackIndex - 1);
-                var zDistance = locationHeight * (levelIndex - 1);
+                var Ls = this.GetLocationLength();
+                var H = this.GetLocationHeight();
 
-                _distanceToIOPoint = xDistance + yDistance + zDistance;
+                var X = Dx + (I - 0.5) * Ls;
+                var Y = Dy + 0.5 * J * Wa + (J - 1) * (Wr + 0.5 * Wa) + (Wr + Wa) * (R - 1);
+                var Z = H * (K - 1);
+
+                _distanceToIOPoint = X + Y + Z;
                 return _distanceToIOPoint.Value;
             }
 
             return 0;
         }
 
+        /// <summary>
+        /// Parse the indices of rack, row, column and level by the naming format of locationId.
+        /// </summary>
+        /// <param name="warehouseId"></param>
+        /// <param name="rackIndex"></param>
+        /// <param name="rowIndex"></param>
+        /// <param name="columnIndex"></param>
+        /// <param name="levelIndex"></param>
+        /// <returns></returns>
         public bool TryGetLocationIdentification(out string warehouseId, out int rackIndex, out int rowIndex, out int columnIndex, out int levelIndex)
         {
-
             warehouseId = string.Empty;
             rackIndex = rowIndex = columnIndex = levelIndex = 0;
 
-            // Kiểm tra xem locationId có bị null không
             if (string.IsNullOrWhiteSpace(this.locationId))
             {
                 return false;

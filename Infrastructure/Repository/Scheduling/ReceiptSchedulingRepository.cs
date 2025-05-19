@@ -1,13 +1,12 @@
-﻿using SLAPScheduling.Algorithm.DifferentialEvolutions;
-using SLAPScheduling.Algorithm.Utilities;
-
-namespace SLAPScheduling.Infrastructure.Repository.Scheduling
+﻿namespace SLAPScheduling.Infrastructure.Repository.Scheduling
 {
     public class ReceiptSchedulingRepository : BaseRepository, IReceiptSchedulingRepository
     {
         public ReceiptSchedulingRepository(SLAPDbContext context) : base(context)
         {
         }
+
+        #region Main Execution 
 
         /// <summary>
         /// Retrieve API to implement the scheduling based on the input data.
@@ -32,64 +31,32 @@ namespace SLAPScheduling.Infrastructure.Repository.Scheduling
             var materials = await GetAllMaterials();
             if (materials is null || materials.Count == 0)
             {
-                throw new Exception("No result for Receipt Lots");
+                throw new Exception("No result for Materials");
             }
 
             UpdateMaterialForReceiptLots(materials, ref receiptLots);
 
+            // Split receipt lots to multiple receipt sublots based on location volume.
             var receiptSubLots = new List<ReceiptSublot>();
             using (var receiptLotSplitter = new ReceiptLotSplitter(receiptLots, warehouse))
             {
-                // Receipt Sublots do not include the Locations information
+                // Currently, Receipt Sublots do not include the Locations information
                 receiptSubLots = receiptLotSplitter.GetReceiptSubLots().ToList();
-
-                // Order by descending based on the movement ratio of a product
-                receiptSubLots = receiptSubLots.OrderByDescending(sublot =>
-                {
-                    var material = sublot.GetMaterial();
-                    return material is not null ? material.GetMovementRatio() : 0.0;
-                }).ToList();
             }
 
-            // Retrieve the available locations (not full) in the warehouse
+            // Order by descending based on the movement ratio of a product
+            UpdateRequiredLocationNumberForMaterials(receiptSubLots);
+            receiptSubLots = receiptSubLots.OrderByDescending(sublot =>
+            {
+                var material = sublot.GetMaterial();
+                return material is not null ? material.GetMovementRatio() : 0.0;
+            }).ToList();
+
+            // Retrieve all locations in the warehouse
             var locations = warehouse.locations;
             UpdateMaterialForMaterialLots(materials, ref locations);
 
-            //List<(string LocationId, string LotNumber, double ExistingQuantity, double StoragePercent)> locationInformation = locations.Where(x => x.GetCurrentStoragePercentage() > 0.0).Select(x =>
-            //{
-            //    var sublot = x.materialSubLots.Select(x => (x.materialLot.lotNumber, x.existingQuality)).First();
-            //    var storagePercent = x.GetCurrentStoragePercentage() * 100;
-
-            //    return (x.locationId, sublot.lotNumber, sublot.existingQuality, storagePercent);
-            //}).ToList();
-
-            //Utility.WriteJson(locationInformation, @"C:\Users\AnhTu\Master Subjects\Luan van Thac si\Document\Excel\locationInformation.json");
-
-            //var receiptLotInformation = receiptLots.Select(x =>
-            //{
-            //    var materialId = x.inventoryReceiptEntry.materialId;
-            //    var importedQuantity = x.importedQuantity;
-            //    return (x.receiptLotId, materialId, importedQuantity);
-            //}).ToList();
-
-            //Utility.WriteJson(receiptLotInformation, @"C:\Users\AnhTu\Master Subjects\Luan van Thac si\Document\Excel\receiptLotInformation.json");
-
-            //var materialInformation = receiptLots.Select(x =>
-            //{
-            //    var material = x.material;
-            //    var materialId = material.materialId;
-            //    var packetSize = material.GetPacketSize();
-            //    var packetVolume = material.GetPacketVolume();
-            //    var storageLevel = material.GetLimitStorageLevel();
-
-            //    Random rnd = new Random();
-            //    var movementRatio = rnd.Next(6);
-
-            //    return (materialId, packetSize, packetVolume, storageLevel, movementRatio);
-            //}).ToList();
-
-            //Utility.WriteJson(materialInformation, @"C:\Users\AnhTu\Master Subjects\Luan van Thac si\Document\Excel\materialInformation.json");
-
+            // Retrieve list of available locations and set the values of penalty coefficients.
             var availableLocations = GetAvailableLocations(locations, receiptLots);
             ConstraintsChecking.SetPenaltyCoefficientValues(availableLocations);
 
@@ -97,59 +64,33 @@ namespace SLAPScheduling.Infrastructure.Repository.Scheduling
             TabuSearch tabuSearch = new TabuSearch(receiptSubLots, availableLocations.ToList());
             List<Location> optimalLocations = tabuSearch.Implement();
 
-            //// Find the optimal solution of location assignment for each receipt sublot using Genetic Algorithm
-            //GeneticAlgorithms GA = new GeneticAlgorithms(receiptSubLots, availableLocations.ToList());
-            //List<Location> optimalLocations = GA.Implement();
-
-            //// Find the optimal solution of location assignment for each receipt sublot using Differential Evolution
-            //DESolver DESolver = new DESolver();
-            //List<Location> optimalLocations = DESolver.Implement(receiptSubLots, availableLocations.ToList());
-
+            // Reallocate for receipt sublots after implementing the SLAP algorithm
             ReceiptSublotReallocation receiptLotReallocation = new ReceiptSublotReallocation();
             var results = receiptLotReallocation.Reallocate(optimalLocations, receiptSubLots);
 
-            //var resultInformation = results.Select(x =>
-            //{
-            //    var locationId = x.SubLot.locationId;
-            //    var lotNumber = x.SubLot.receiptLot.receiptLotId;
-            //    var materialName = x.SubLot.GetMaterialName();
-            //    var materialId = x.SubLot.GetMaterialId();
-            //    var importQuantity = x.SubLot.importedQuantity;
-            //    var storagePercentage = x.StoragePercentage * 100;
-
-            //    return (locationId, lotNumber, materialId, importQuantity, storagePercentage);
-            //}).ToList();
-
-            //Utility.WriteJson(resultInformation, @"C:\Users\AnhTu\Master Subjects\Luan van Thac si\Document\Excel\resultInformation.json");
-
-            //var results = AssignLocationsForReceiptSubLots(optimalLocations, receiptSubLots);
-            return results.ToList();
+            return results ?? new List<(ReceiptSublot SubLot, double StoragePercentage)>();
         }
 
-        /// <summary>
-        /// Assign the Locations to each ReceiptSubLot based on the optimal solution
-        /// </summary>
-        /// <param name="locations"></param>
-        /// <param name="receiptSubLots"></param>
-        private IEnumerable<(ReceiptSublot SubLot, double StoragePercentage)> AssignLocationsForReceiptSubLots(List<Location> locations, List<ReceiptSublot> receiptSubLots)
+        #endregion
+
+        #region Supporting Methods
+
+        private void UpdateRequiredLocationNumberForMaterials(List<ReceiptSublot> receiptSublots)
         {
-            if (receiptSubLots?.Count > 0 && locations?.Count > 0)
+            var sublotGroups = receiptSublots.GroupBy(x => x.receiptLotId);
+            foreach (var group in sublotGroups)
             {
-                for (int i = 0; i < receiptSubLots.Count; i++)
+                int sublotCount = group.Count();
+                foreach (var sublot in group.ToList())
                 {
-                    receiptSubLots[i].UpdateLocation(locations[i]);
-                }
-
-                foreach (var receiptSubLot in receiptSubLots)
-                {
-                    var location = receiptSubLot.location;
-                    var storagePercentage = receiptSubLot.GetStoragePercentage(location);
-
-                    yield return (receiptSubLot, storagePercentage);
-                }
+                    var material = sublot.GetMaterial();
+                    if (material is not null)
+                    {
+                        material.UpdateNumberOfStorageLocations(sublotCount);
+                    }
+                }    
             }
         }
-
 
         /// <summary>
         /// Assign the Material to each receiptLot from materialId in ReceiptEntry
@@ -215,6 +156,10 @@ namespace SLAPScheduling.Infrastructure.Repository.Scheduling
             return locations.Where(location => location.GetCurrentStoragePercentage() < 1.0 && location.GetStorageLevel() <= maxAcceptableLevel);
         }
 
+        #endregion
+
+        #region Retrieve Database
+
         public async Task<Warehouse> GetSchedulingWarehouse(string warehouseId)
         {
             var warehouse = await _context.Warehouses
@@ -253,12 +198,6 @@ namespace SLAPScheduling.Infrastructure.Repository.Scheduling
             return materials;
         }
 
-        public async Task<List<MaterialSubLot>> GetMaterialSubLotsByLocationId(string locationId)
-        {
-            return await _context.MaterialSubLots
-                                 .Where(x => x.locationId == locationId)
-                                 .Include(x => x.materialLot)
-                                 .ToListAsync();
-        }
+        #endregion
     }
 }

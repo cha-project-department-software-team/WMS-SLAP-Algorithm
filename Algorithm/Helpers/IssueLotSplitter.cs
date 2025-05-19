@@ -18,8 +18,9 @@
         /// Create Issue Sublots from Issue Lot and Material Lot
         /// </summary>
         /// <returns></returns>
-        public IEnumerable<IssueSublot> GetIssueSubLots()
+        public List<IssueSublot> GetIssueSubLots()
         {
+            var issueSubLots = new List<IssueSublot>();
             foreach (var issueLot in this.issueLots)
             {
                 var materialLot = issueLot.materialLot;
@@ -46,11 +47,13 @@
                             issueSublot.UpdateMaterialSublot(materialSublot);
                             issueSublot.UpdateIssueLot(issueLot);
 
-                            yield return issueSublot;
+                            issueSubLots.Add(issueSublot);
                         }
                     }
                 }
             }
+
+            return issueSubLots;
         }
 
         #endregion

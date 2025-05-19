@@ -35,13 +35,13 @@
             UpdateMaterialForIssueLots(materials, ref issueLots);
 
             var unavailableIssueLots = GetUnavailableIssueLots(issueLots);
-            if (unavailableIssueLots?.Count() > 0)
-            {
-                throw new Exception($"The requested quantity is over the existing quantity in material lots: {string.Join(',', unavailableIssueLots.Select(x => x.materialLotId).ToList())}");
-            }
+            //if (unavailableIssueLots?.Count() > 0)
+            //{
+            //    throw new Exception($"The requested quantity is over the existing quantity in material lots: {string.Join(',', unavailableIssueLots.Select(x => x.materialLotId).ToList())}");
+            //}
 
-            //var availableIssueLots = .Where(x => !unavailableIssueLots.Any(y => y.Equals(x))).ToList();
-            IssueLotSplitter issueLotSplitter = new IssueLotSplitter(issueLots);
+            var availableIssueLots = issueLots.Where(x => !unavailableIssueLots.Any(y => y.Equals(x))).ToList();
+            IssueLotSplitter issueLotSplitter = new IssueLotSplitter(availableIssueLots);
             var issueSublots = issueLotSplitter.GetIssueSubLots();
 
             return issueSublots.Select(x => (x, x.GetStoragePercentage())).ToList();
@@ -97,16 +97,6 @@
 
             if (warehouse is not null && warehouse.locations?.Count > 0)
             {
-                //foreach (var location in warehouse.locations)
-                //{
-                //    var locationId = location.locationId;
-                //    var materialSublots = await GetMaterialSubLotsByLocationId(locationId);
-                //    if (materialSublots?.Count > 0)
-                //    {
-                //        location.materialSubLots = materialSublots;
-                //    }
-                //}
-
                 return warehouse;
             }
 
@@ -117,6 +107,9 @@
         {
             return await _context.IssueLots
                                  .Include(x => x.materialLot)
+                                    .ThenInclude(x => x.subLots)
+                                        .ThenInclude(x => x.location)
+                                            .ThenInclude(x => x.warehouse)
                                  .Include(x => x.inventoryIssueEntry)
                                      .ThenInclude(x => x.inventoryIssue)
                                  .Where(x => x.issueLotStatus == lotStatus && x.inventoryIssueEntry.inventoryIssue.warehouseId == warehouseId)

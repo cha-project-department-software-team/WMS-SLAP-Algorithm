@@ -54,7 +54,7 @@
                 var material = receiptSublot.GetMaterial();
                 if (material is not null && location.GetStorageLevel() > material.GetLimitStorageLevel())
                 {
-                    overStorageLevel = location.GetStorageLevel() - material.GetLimitStorageLevel();
+                    overStorageLevel = Math.Abs(location.GetStorageLevel() - material.GetLimitStorageLevel());
                 }
             }
 
@@ -77,7 +77,7 @@
                 double storagePercentage = currentLocationStorage + subLotStorage;
                 if (storagePercentage > 1.0)
                 {
-                    overStoragePercentage = storagePercentage - 1.0;
+                    overStoragePercentage = Math.Abs(storagePercentage - 1.0);
                 }
             }
 
