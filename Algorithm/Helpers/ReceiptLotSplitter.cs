@@ -40,7 +40,7 @@
                         double subLotQuantity;
                         if (subLotIndex == subLotCount - 1)
                         {
-                            subLotQuantity = receiptLot.importedQuantity != quantityPerLocation ? receiptLot.importedQuantity % quantityPerLocation : quantityPerLocation;
+                            subLotQuantity = receiptLot.importedQuantity - quantityPerLocation * subLotIndex;
                         }
                         else
                         {
