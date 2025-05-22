@@ -1,4 +1,6 @@
-﻿namespace SLAPScheduling.Algorithm.Helpers
+﻿using SLAPScheduling.Domain.AggregateModels.MaterialAggregate.MaterialLots;
+
+namespace SLAPScheduling.Algorithm.Helpers
 {
     public class IssueLotSplitter
     {
@@ -26,20 +28,19 @@
                 var materialLot = issueLot.materialLot;
                 var requestedQuantity = issueLot.requestedQuantity;
 
-                if (materialLot is not null && materialLot.subLots?.Count > 0 && materialLot.exisitingQuantity >= requestedQuantity)
+                if (materialLot is not null && materialLot.subLots?.Count > 0 && CheckAvailableQuantity(materialLot, issueLot))
                 {
-                    var materialSublots = materialLot.subLots.OrderBy(x => x.location.GetDistanceToIOPoint()).ToList();
+                    var materialSublots = materialLot.subLots.Where(x => x.existingQuality > 0).OrderBy(x => x.location.GetDistanceToIOPoint()).ToList();
                     for (int index = 0; index < materialSublots.Count; index++)
                     {
                         var materialSublot = materialSublots[index];
+                        var sublotQuantity = GetAvailableSubLotQuantity(materialSublot, issueSubLots);
 
-                        var sublotId = $"{issueLot.issueLotId}_{index}";
-                        var sublotQuantity = materialSublot.existingQuality;
                         var issueSublotQuantity = sublotQuantity <= requestedQuantity ? sublotQuantity : requestedQuantity;
                         if (issueSublotQuantity > 0)
                         {
                             requestedQuantity -= issueSublotQuantity;
-                            var issueSublot = new IssueSublot(issueSublotId: sublotId,
+                            var issueSublot = new IssueSublot(issueSublotId: $"{issueLot.issueLotId}_{index}",
                                                               requestedQuantity: issueSublotQuantity,
                                                               materialSublotId: materialSublot.subLotId,
                                                               issueLotId: issueLot.issueLotId);
@@ -54,6 +55,25 @@
             }
 
             return issueSubLots;
+        }
+
+        private bool CheckAvailableQuantity(MaterialLot materialLot, IssueLot issueLot)
+        {
+            var storingQuantity = materialLot.exisitingQuantity;
+
+            var lotNumber = materialLot.lotNumber;
+            var otherRequestQuantity = this.issueLots.Where(x => !x.Equals(issueLot) && x.materialLot.lotNumber.Equals(lotNumber)).Sum(x => x.requestedQuantity);
+            
+            var availableQuantity = storingQuantity - otherRequestQuantity;
+            return availableQuantity >= issueLot.requestedQuantity;
+        }
+
+        private double GetAvailableSubLotQuantity(MaterialSubLot materialSubLot, List<IssueSublot> issueSublots)
+        {
+            var storingQuantity = materialSubLot.existingQuality;
+            var requestedQuantity = issueSublots.Where(x => x.sublotId.Equals(materialSubLot.subLotId)).Sum(x => x.requestedQuantity);
+
+            return storingQuantity - requestedQuantity;
         }
 
         #endregion

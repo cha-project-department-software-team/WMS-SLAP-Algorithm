@@ -26,21 +26,9 @@
                 throw new Exception("No result for Issue Lots");
             }
 
-            var materials = await GetAllMaterials();
-            if (materials is null || materials.Count == 0)
-            {
-                throw new Exception("No result for Materials"); 
-            }
-
-            UpdateMaterialForIssueLots(materials, ref issueLots);
-
             var unavailableIssueLots = GetUnavailableIssueLots(issueLots);
-            //if (unavailableIssueLots?.Count() > 0)
-            //{
-            //    throw new Exception($"The requested quantity is over the existing quantity in material lots: {string.Join(',', unavailableIssueLots.Select(x => x.materialLotId).ToList())}");
-            //}
-
             var availableIssueLots = issueLots.Where(x => !unavailableIssueLots.Any(y => y.Equals(x))).ToList();
+
             IssueLotSplitter issueLotSplitter = new IssueLotSplitter(availableIssueLots);
             var issueSublots = issueLotSplitter.GetIssueSubLots();
 
@@ -60,26 +48,6 @@
                 if (materialLot is not null && issueLot.requestedQuantity > materialLot.exisitingQuantity)
                 {
                     yield return issueLot;
-                }
-            }
-        }
-
-
-        /// <summary>
-        /// Assign the Material to each issueLot from materialId in IssueEntry
-        /// </summary>
-        /// <param name="materials"></param>
-        /// <param name="issueLots"></param>
-        private void UpdateMaterialForIssueLots(List<Material> materials, ref List<IssueLot> issueLots)
-        {
-            var materialDictionary = materials.ToDictionary(x => x.materialId, y => y);
-            foreach (var issueLot in issueLots)
-            {
-                var issueEntry = issueLot.inventoryIssueEntry;
-                var materialId = issueEntry is not null ? issueEntry.materialId : string.Empty;
-                if (materialDictionary.TryGetValue(materialId, out Material? material))
-                {
-                    issueLot.material = material;
                 }
             }
         }
@@ -110,27 +78,13 @@
                                     .ThenInclude(x => x.subLots)
                                         .ThenInclude(x => x.location)
                                             .ThenInclude(x => x.warehouse)
+                                 .Include(x => x.materialLot)
+                                    .ThenInclude(x => x.material)
+                                        .ThenInclude(x => x.properties)
                                  .Include(x => x.inventoryIssueEntry)
                                      .ThenInclude(x => x.inventoryIssue)
                                  .Where(x => x.issueLotStatus == lotStatus && x.inventoryIssueEntry.inventoryIssue.warehouseId == warehouseId)
                                  .ToListAsync();
-        }
-
-        public async Task<List<Material>> GetAllMaterials()
-        {
-            var materials = await _context.Materials
-                                .Include(x => x.properties)
-                                .AsNoTracking()
-                                .ToListAsync();
-
-            return materials;
-        }
-
-        public async Task<List<MaterialSubLot>> GetMaterialSubLotsByLocationId(string locationId)
-        {
-            return await _context.MaterialSubLots
-                                 .Include(x => x.materialLot)
-                                 .Where(x => x.locationId == locationId).ToListAsync();
         }
     }
 }

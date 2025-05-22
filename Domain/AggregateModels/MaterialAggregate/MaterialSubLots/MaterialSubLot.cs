@@ -41,6 +41,9 @@
 
         public double GetSublotVolume()
         {
+            if (this.existingQuality == 0)
+                return 0;
+
             var material = this.GetMaterial();
             if (material is not null)
             {

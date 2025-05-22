@@ -31,8 +31,8 @@ namespace SLAPScheduling.Application.Queries.IssueScheduling
             if (locations is null || locations.Count == 0)
                 throw new EntityNotFoundException(nameof(Location), request.WarehouseId);
 
-            var sublotResults = await _schedulingRepository.Execute(request.WarehouseId);
-            if (sublotResults is null || sublotResults.Count == 0)
+            var issueSublotResults = await _schedulingRepository.Execute(request.WarehouseId);
+            if (issueSublotResults is null || issueSublotResults.Count == 0)
             {
                 throw new Exception("No result for retrieving issue sublots");
             }
@@ -40,26 +40,11 @@ namespace SLAPScheduling.Application.Queries.IssueScheduling
             var locationIDTOs = new List<LocationIDTO>();
             foreach (var location in locations)
             {
-                var materialSubLotIDTOs = new List<MaterialSubLotIDTO>();
-                if (location.materialSubLots?.Count > 0)
-                {
-                    materialSubLotIDTOs = location.materialSubLots.Select(x =>
-                    {
-                        var storagePercent = x.GetStoragePercentage(location);
-                        var materialSubLotIDTO = new MaterialSubLotIDTO(subLotId: x.subLotId,
-                                                                        existingQuantity: x.existingQuality,
-                                                                        storagePercentage: storagePercent <= 1.0f ? storagePercent : 1.0f,
-                                                                        locationId: location.locationId,
-                                                                        lotNumber: x.lotNumber);
-                        return materialSubLotIDTO;
-                    }).ToList(); 
-                }
-
                 var issueSubLotIDTOs = new List<IssueSubLotLayoutIDTO>();
-                var sublots = sublotResults.Where(x => x.SubLot.GetLocationId().Equals(location.locationId, StringComparison.OrdinalIgnoreCase));
-                if (sublots?.Count() > 0)
+                var issueSublots = issueSublotResults.Where(x => x.SubLot.GetLocationId().Equals(location.locationId, StringComparison.OrdinalIgnoreCase));
+                if (issueSublots?.Count() > 0)
                 {
-                    issueSubLotIDTOs = sublots.Select(x =>
+                    issueSubLotIDTOs = issueSublots.Select(x =>
                     {
                         var issueSubLotIDTO = new IssueSubLotLayoutIDTO(issueSublotId: x.SubLot.issueSublotId,
                                                                         lotNumber: x.SubLot.materialSublot.lotNumber,
@@ -68,6 +53,31 @@ namespace SLAPScheduling.Application.Queries.IssueScheduling
                                                                         storagePercentage: x.StoragePercentage <= 1.0f ? x.StoragePercentage : 1.0f);
                         return issueSubLotIDTO;
                     }).ToList();
+                }
+
+                var materialSubLotIDTOs = new List<MaterialSubLotIDTO>();
+                if (location.materialSubLots?.Count > 0)
+                {
+                    foreach (var materialSublot in location.materialSubLots)
+                    {
+                        var lotNumber = materialSublot.lotNumber;
+                        var getIssueSublots = issueSubLotIDTOs?.Count > 0 ? issueSubLotIDTOs.Where(x => x.LotNumber.Equals(lotNumber)).ToList() : null;
+                        if (getIssueSublots?.Count > 0)
+                        {
+                            materialSublot.existingQuality -= getIssueSublots.Sum(x => x.RequestedQuantity);
+                        }
+
+                        if (materialSublot.existingQuality > 0)
+                        {
+                            var storagePercent = materialSublot.GetStoragePercentage(location);
+                            var materialSubLotIDTO = new MaterialSubLotIDTO(subLotId: materialSublot.subLotId,
+                                                                            existingQuantity: materialSublot.existingQuality,
+                                                                            storagePercentage: storagePercent <= 1.0f ? storagePercent : 1.0f,
+                                                                            locationId: location.locationId,
+                                                                            lotNumber: lotNumber);
+                            materialSubLotIDTOs.Add(materialSubLotIDTO);
+                        }
+                    }
                 }
 
                 var locationIDTO = new LocationIDTO(locationId: location.locationId,

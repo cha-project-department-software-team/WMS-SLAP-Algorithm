@@ -44,9 +44,9 @@
 
         public Material? GetMaterial()
         {
-            if (this.issueLot is not null)
+            if (this.issueLot is not null && this.issueLot.materialLot is not null)
             {
-                return this.issueLot.material;
+                return this.issueLot.materialLot.material;
             }
 
             return null;
