@@ -54,9 +54,9 @@
 
         public string GetMaterialId()
         {
-            if (this.issueLot is not null)
+            if (this.issueLot is not null && this.issueLot.materialLot is not null)
             {
-                return this.issueLot.material.materialId;
+                return this.issueLot.materialLot.material.materialId;
             }
 
             return string.Empty;
@@ -64,9 +64,9 @@
 
         public string GetMaterialName()
         {
-            if (this.issueLot is not null)
+            if (this.issueLot is not null && this.issueLot.materialLot is not null)
             {
-                return this.issueLot.material.materialName;
+                return this.issueLot.materialLot.material.materialName;
             }
 
             return string.Empty;
