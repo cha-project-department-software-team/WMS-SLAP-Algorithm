@@ -30,7 +30,7 @@
         {
             if (this.locations?.Count > 0)
             {
-                var location = this.locations.FirstOrDefault();
+                var location = this.locations.FirstOrDefault(x => x.locationId != "Empty");
                 return location is not null ? location.GetLocationVolume() : 0;
             }
 
