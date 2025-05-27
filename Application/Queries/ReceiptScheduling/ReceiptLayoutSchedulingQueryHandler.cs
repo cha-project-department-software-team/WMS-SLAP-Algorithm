@@ -58,11 +58,13 @@ namespace SLAPScheduling.Application.Queries.ReceiptScheduling
                 {
                     receiptSubLotRDTOs = sublots.Select(x =>
                     {
+                        var material = x.SubLot.GetMaterial();
                         var receiptSubLotRDTO = new ReceiptSubLotLayoutRDTO(receiptSublotId: x.SubLot.receiptSublotId,
                                                                             lotNumber: x.SubLot.receiptLotId,
                                                                             importedQuantity: x.SubLot.importedQuantity,
                                                                             locationId: x.SubLot.locationId,
-                                                                            storagePercentage: x.StoragePercentage <= 1.0f ? x.StoragePercentage : 1.0f);
+                                                                            storagePercentage: x.StoragePercentage <= 1.0f ? x.StoragePercentage : 1.0f,
+                                                                            storageLevel: material is not null ? material.GetLimitStorageLevel() : 0);
                         return receiptSubLotRDTO;
                     }).ToList();
                 }
