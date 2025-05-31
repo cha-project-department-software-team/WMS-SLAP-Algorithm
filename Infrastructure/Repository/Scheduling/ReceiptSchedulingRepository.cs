@@ -1,4 +1,8 @@
-﻿namespace SLAPScheduling.Infrastructure.Repository.Scheduling
+﻿using SLAPScheduling.Algorithm.DifferentialEvolutions;
+using SLAPScheduling.Algorithm.GeneticAlgorithms;
+using SLAPScheduling.Algorithm.TabuSearch;
+
+namespace SLAPScheduling.Infrastructure.Repository.Scheduling
 {
     public class ReceiptSchedulingRepository : BaseRepository, IReceiptSchedulingRepository
     {
@@ -14,7 +18,7 @@
         /// <param name="warehouseId"></param>
         /// <returns></returns>
         /// <exception cref="Exception"></exception>
-        public async Task<List<(ReceiptSublot SubLot, double StoragePercentage)>> Execute(string warehouseId)
+        public async Task<List<(ReceiptSublot SubLot, double StoragePercentage)>> Execute(string warehouseId, AlgorithmType algorithmType)
         {
             var warehouse = await GetSchedulingWarehouse(warehouseId);
             if (warehouse is null)
@@ -60,9 +64,23 @@
             var availableLocations = GetAvailableLocations(locations, receiptLots);
             ConstraintsChecking.SetPenaltyCoefficientValues(availableLocations);
 
-            // Find the optimal solution of location assignment for each receipt sublot using Tabu Search algorithm
-            TabuSearch tabuSearch = new TabuSearch(receiptSubLots, availableLocations.ToList());
-            List<Location> optimalLocations = tabuSearch.Implement();
+            var optimalLocations = new List<Location>();
+            if (algorithmType is AlgorithmType.TabuSearch)
+            {
+                // Find the optimal solution of location assignment for each receipt sublot using Tabu Search algorithm
+                TabuSearch tabuSearch = new TabuSearch(receiptSubLots, availableLocations.ToList());
+                optimalLocations = tabuSearch.Implement();
+            }
+            else if (algorithmType is AlgorithmType.GeneticAlgorithm)
+            {
+                GeneticAlgorithms ga = new GeneticAlgorithms(receiptSubLots, availableLocations.ToList());
+                optimalLocations = ga.Implement();
+            }
+            else if (algorithmType is AlgorithmType.DifferentialEvolution)
+            {
+                DESolver deSolver = new DESolver();
+                optimalLocations = deSolver.Implement(receiptSubLots, availableLocations.ToList());
+            }
 
             // Reallocate for receipt sublots after implementing the SLAP algorithm
             ReceiptSublotReallocation receiptLotReallocation = new ReceiptSublotReallocation();

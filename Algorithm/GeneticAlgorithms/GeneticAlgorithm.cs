@@ -73,11 +73,11 @@ namespace SLAPScheduling.Algorithm.GeneticAlgorithms
 
             this.sw.Stop();
 
-            using (TextWriter writer = File.CreateText(@"C:\Users\AnhTu\Master Subjects\Luan van Thac si\Document\SchedulingResult.json"))
-            {
-                var serializer = new JsonSerializer();
-                serializer.Serialize(writer, timeChangeObjectValues);
-            }
+            //using (TextWriter writer = File.CreateText(@"C:\Users\AnhTu\Master Subjects\Luan van Thac si\Document\SchedulingResult.json"))
+            //{
+            //    var serializer = new JsonSerializer();
+            //    serializer.Serialize(writer, timeChangeObjectValues);
+            //}
 
             var optimalLocations = bestSolution.GetLocations(locationDictionary);
             return optimalLocations?.Count() > 0 ? optimalLocations.ToList() : new List<Location>();
@@ -134,7 +134,7 @@ namespace SLAPScheduling.Algorithm.GeneticAlgorithms
 
             var solution = chromosome.GetSolution();
             double objectValue = solution.CalculateObjectValue(receiptSubLots, locationDictionary);
-            double fitness = 1 - objectValue / (numberOfReceiptSubLots * 1000);
+            double fitness = 1 - objectValue / (numberOfReceiptSubLots * 10000);
             return fitness;
         }
 

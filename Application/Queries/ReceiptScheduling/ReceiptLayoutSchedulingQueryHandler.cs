@@ -28,10 +28,14 @@ namespace SLAPScheduling.Application.Queries.ReceiptScheduling
             if (locations is null || locations.Count == 0)
                 throw new EntityNotFoundException(nameof(Location), request.WarehouseId);
 
-            var sublotResults = await _schedulingRepository.Execute(request.WarehouseId);
-            if (sublotResults is null)
+            var sublotResults = new List<(ReceiptSublot SubLot, double StoragePercentage)>();
+            if (Enum.TryParse(request.AlgorithmType, out AlgorithmType algorithmType))
             {
-                throw new Exception("No result for Storage Locations Assignment Problem");
+                sublotResults = await _schedulingRepository.Execute(request.WarehouseId, algorithmType);
+                if (sublotResults is null)
+                {
+                    throw new Exception("No result for Storage Locations Assignment Problem");
+                }
             }
 
             var locationRDTOs = new List<LocationRDTO>();

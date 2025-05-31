@@ -15,10 +15,14 @@ namespace SLAPScheduling.Application.Queries.ReceiptScheduling
 
         public async Task<IEnumerable<ReceiptSubLotDetailRDTO>> Handle(ReceiptDetailSchedulingQuery request, CancellationToken cancellationToken)
         {
-            var sublotResults = await _schedulingRepository.Execute(request.WarehouseId);
-            if (sublotResults is null || sublotResults.Count == 0)
+            var sublotResults = new List<(ReceiptSublot SubLot, double StoragePercentage)>();
+            if (Enum.TryParse(request.AlgorithmType, out AlgorithmType algorithmType))
             {
-                throw new Exception("No result for Storage Locations Assignment Problem");
+                sublotResults = await _schedulingRepository.Execute(request.WarehouseId, algorithmType);
+                if (sublotResults is null || sublotResults.Count == 0)
+                {
+                    throw new Exception("No result for Storage Locations Assignment Problem");
+                }
             }
 
             var receiptSubLotDetailRDTOs = sublotResults.Select(x => new ReceiptSubLotDetailRDTO(receiptSublotId: x.SubLot.receiptSublotId,

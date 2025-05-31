@@ -14,17 +14,17 @@ namespace SLAPScheduling.Application.Controllers
         }
 
         [HttpGet("GetReceiptLayoutScheduling")]
-        public async Task<IEnumerable<LocationRDTO>> GetReceiptLayoutScheduling(string warehouseId = "BB01")
+        public async Task<IEnumerable<LocationRDTO>> GetReceiptLayoutScheduling(string warehouseId = "BB01", string algorithmType = "TabuSearch")
         {
-            var query = new ReceiptLayoutSchedulingQuery(warehouseId);
+            var query = new ReceiptLayoutSchedulingQuery(warehouseId, algorithmType);
 
             return await _mediator.Send(query);
         }
 
         [HttpGet("GetReceiptDetailScheduling")]
-        public async Task<IEnumerable<ReceiptSubLotDetailRDTO>> GetReceiptDetailScheduling(string warehouseId = "BB01")
+        public async Task<IEnumerable<ReceiptSubLotDetailRDTO>> GetReceiptDetailScheduling(string warehouseId = "BB01", string algorithmType = "TabuSearch")
         {
-            var query = new ReceiptDetailSchedulingQuery(warehouseId);
+            var query = new ReceiptDetailSchedulingQuery(warehouseId, algorithmType);
 
             return await _mediator.Send(query);
         }
