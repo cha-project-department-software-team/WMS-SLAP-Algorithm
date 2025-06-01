@@ -51,11 +51,11 @@ namespace SLAPScheduling.Algorithm.DifferentialEvolutions
 
             sw.Stop();
 
-            using (TextWriter writer = File.CreateText(@"C:\Users\AnhTu\Master Subjects\Luan van Thac si\Document\SchedulingResult.json"))
-            {
-                var serializer = new JsonSerializer();
-                serializer.Serialize(writer, timeChangeObjectValues);
-            }
+            //using (TextWriter writer = File.CreateText(@"C:\Users\AnhTu\Master Subjects\Luan van Thac si\Document\SchedulingResult.json"))
+            //{
+            //    var serializer = new JsonSerializer();
+            //    serializer.Serialize(writer, timeChangeObjectValues);
+            //}
 
             var locationDictionary = Enumerable.Range(0, availableLocations.Count).ToDictionary(index => index, index => availableLocations[index]);
             var optimalLocations = bestSolution.GetLocations(locationDictionary);
