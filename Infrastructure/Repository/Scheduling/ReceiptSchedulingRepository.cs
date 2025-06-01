@@ -83,15 +83,43 @@ namespace SLAPScheduling.Infrastructure.Repository.Scheduling
             }
 
             // Reallocate for receipt sublots after implementing the SLAP algorithm
-            ReceiptSublotReallocation receiptLotReallocation = new ReceiptSublotReallocation();
-            var results = receiptLotReallocation.Reallocate(optimalLocations, receiptSubLots);
+            //ReceiptSublotReallocation receiptLotReallocation = new ReceiptSublotReallocation();
+            //var results = receiptLotReallocation.Reallocate(optimalLocations, receiptSubLots);
 
-            return results ?? new List<(ReceiptSublot SubLot, double StoragePercentage)>();
+            //return results ?? new List<(ReceiptSublot SubLot, double StoragePercentage)>();
+
+            var results = AssignLocationsForReceiptSubLots(optimalLocations, receiptSubLots);
+            return results.ToList();
         }
 
         #endregion
 
         #region Supporting Methods
+
+        /// <summary>
+        /// Assign the Locations to each ReceiptSubLot based on the optimal solution
+        /// </summary>
+        /// <param name="locations"></param>
+        /// <param name="receiptSubLots"></param>
+        private IEnumerable<(ReceiptSublot SubLot, double StoragePercentage)> AssignLocationsForReceiptSubLots(List<Location> locations, List<ReceiptSublot> receiptSubLots)
+        {
+            if (receiptSubLots?.Count > 0 && locations?.Count > 0)
+            {
+                for (int i = 0; i < receiptSubLots.Count; i++)
+                {
+                    receiptSubLots[i].UpdateLocation(locations[i]);
+                }
+
+                foreach (var receiptSubLot in receiptSubLots)
+                {
+                    var location = receiptSubLot.location;
+                    var storagePercentage = receiptSubLot.GetStoragePercentage(location);
+
+                    yield return (receiptSubLot, storagePercentage);
+                }
+            }
+        }
+
 
         private void UpdateRequiredLocationNumberForMaterials(List<ReceiptSublot> receiptSublots)
         {
