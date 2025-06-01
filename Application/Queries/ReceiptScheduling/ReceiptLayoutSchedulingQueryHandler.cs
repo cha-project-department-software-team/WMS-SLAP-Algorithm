@@ -64,6 +64,8 @@ namespace SLAPScheduling.Application.Queries.ReceiptScheduling
                     {
                         var material = x.SubLot.GetMaterial();
                         var receiptSubLotRDTO = new ReceiptSubLotLayoutRDTO(receiptSublotId: x.SubLot.receiptSublotId,
+                                                                            materialId: x.SubLot.GetMaterialId(),
+                                                                            materialName: x.SubLot.GetMaterialName(),
                                                                             lotNumber: x.SubLot.receiptLotId,
                                                                             importedQuantity: x.SubLot.importedQuantity,
                                                                             locationId: x.SubLot.locationId,
