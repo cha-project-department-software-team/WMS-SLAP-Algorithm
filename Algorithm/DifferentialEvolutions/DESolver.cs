@@ -71,10 +71,11 @@ namespace SLAPScheduling.Algorithm.DifferentialEvolutions
 
                 for (int j = 0; j < Parameters.Dimensions; j++)
                 {
-                    double randomNumber = RandomGenerator.GetDoubleRangeRandomNumber(Parameters.Domain.Item1, Parameters.Domain.Item2);
-                    individual.Elements.Add(randomNumber);
+                    //double randomNumber = RandomGenerator.GetDoubleRangeRandomNumber(Parameters.Domain.Item1, Parameters.Domain.Item2);
+                    individual.Elements.Add(j);
                 }
 
+                individual.Elements.ShuffleFast();
                 individuals.Add(individual);
             }
 

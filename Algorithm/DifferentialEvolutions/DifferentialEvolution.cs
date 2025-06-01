@@ -67,20 +67,31 @@ namespace SLAPScheduling.Algorithm.DifferentialEvolutions
                         if (ri < CR || i == R)
                         {
                             // simple mutation
-                            double newElement = individual1.Elements[i] + F * (individual2.Elements[i] - individual3.Elements[i]);
+                            int newElement = (int)(individual1.Elements[i] + F * (individual2.Elements[i] - individual3.Elements[i]));
 
-                            if (CheckIfWithinDomain(newElement, Parameters))
+                            if (CheckIfWithinDomain(newElement, Parameters) && !candidate.Elements.Contains(newElement))
                             {
                                 candidate.Elements.Add(newElement);
                             }
-                            else
+                            else if (!candidate.Elements.Contains(originalElement))
                             {
                                 candidate.Elements.Add(originalElement);
+                            }
+                            else if (FindFallbackValue(candidate.Elements, Parameters, out int nonExistingNumber))
+                            {
+                                candidate.Elements.Add(nonExistingNumber);
                             }
                         }
                         else
                         {
-                            candidate.Elements.Add(originalElement);
+                            if (!candidate.Elements.Contains(originalElement))
+                            {
+                                candidate.Elements.Add(originalElement);
+                            }
+                            else if (FindFallbackValue(candidate.Elements, Parameters, out int nonExistingNumber))
+                            {
+                                candidate.Elements.Add(nonExistingNumber);
+                            }
                         }
 
                         i++;
@@ -114,6 +125,21 @@ namespace SLAPScheduling.Algorithm.DifferentialEvolutions
         private bool CheckIfWithinDomain(double newElement, Parameters parameters)
         {
             return newElement >= parameters.Domain.Item1 && newElement < parameters.Domain.Item2;
+        }
+
+        private bool FindFallbackValue(List<int> used, Parameters parameters, out int nonExistingNumber)
+        {
+            for (int x = (int)parameters.Domain.Item1; x <= parameters.Domain.Item2; x++)
+            {
+                if (!used.Contains(x))
+                {
+                    nonExistingNumber = x;
+                    return true;
+                }
+            }
+
+            nonExistingNumber = -1;
+            return false;
         }
     }
 }
