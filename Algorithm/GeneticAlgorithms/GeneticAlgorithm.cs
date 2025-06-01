@@ -79,8 +79,8 @@ namespace SLAPScheduling.Algorithm.GeneticAlgorithms
             //    serializer.Serialize(writer, timeChangeObjectValues);
             //}
 
-            var optimalLocations = bestSolution.GetLocations(locationDictionary);
-            return optimalLocations?.Count() > 0 ? optimalLocations.ToList() : new List<Location>();
+            var optimalLocations = bestSolution.GetGALocations(locationDictionary);
+            return optimalLocations?.Count > 0 ? optimalLocations : new List<Location>();
         }
 
         public Population CreateChromosomes(int maxGeneration, int populationSize)

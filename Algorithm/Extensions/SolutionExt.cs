@@ -32,15 +32,37 @@ namespace SLAPScheduling.Algorithm.Extensions
         /// </summary>
         /// <param name="solution"></param>
         /// <returns></returns>
-        public static IEnumerable<Location> GetLocations(this Solution solution, Dictionary<int, Location> locationDictionary)
+        public static List<Location> GetLocations(this Solution solution, Dictionary<int, Location> locationDictionary)
         {
+            var locations = new List<Location>();
             foreach (var locationIndex in solution.Indices)
             {
                 if (locationDictionary.TryGetValue(locationIndex, out Location? location))
                 {
-                    yield return location;
+                    locations.Add(location);
                 }
             }
+
+            return locations;
+        }
+
+        /// <summary>
+        /// Retrieve a list of locations from the solution
+        /// </summary>
+        /// <param name="solution"></param>
+        /// <returns></returns>
+        public static List<Location> GetGALocations(this Solution solution, Dictionary<int, Location> locationDictionary)
+        {
+            var locations = new List<Location>();
+            foreach (var locationIndex in solution.Indices)
+            {
+                if (locationDictionary.TryGetValue(locationIndex - 1, out Location? location))
+                {
+                    locations.Add(location);
+                }
+            }
+
+            return locations;
         }
     }
 }
