@@ -37,7 +37,7 @@ namespace SLAPScheduling.Algorithm.DifferentialEvolutions
                 CR = 0.95,
                 AgentsCount = 300,
                 Dimensions = availableLocations.Count,
-                Iterations = 3000
+                Iterations = 1000
             };
 
             Population population = CreatePopulation();
