@@ -79,7 +79,7 @@ namespace SLAPScheduling.Algorithm.GeneticAlgorithms
             //    serializer.Serialize(writer, timeChangeObjectValues);
             //}
 
-            var optimalLocations = bestSolution.GetGALocations(locationDictionary);
+            var optimalLocations = bestSolution.GetLocations(locationDictionary);
             return optimalLocations?.Count > 0 ? optimalLocations : new List<Location>();
         }
 
@@ -89,7 +89,7 @@ namespace SLAPScheduling.Algorithm.GeneticAlgorithms
             for (var p = 0; p < maxGeneration; p++)
             {
                 var chromosome = new Chromosome();
-                for (var g = 1; g <= populationSize; g++)
+                for (var g = 0; g < populationSize; g++)
                 {
                     chromosome.Genes.Add(new Gene(g));
                 }

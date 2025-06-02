@@ -45,24 +45,5 @@ namespace SLAPScheduling.Algorithm.Extensions
 
             return locations;
         }
-
-        /// <summary>
-        /// Retrieve a list of locations from the solution
-        /// </summary>
-        /// <param name="solution"></param>
-        /// <returns></returns>
-        public static List<Location> GetGALocations(this Solution solution, Dictionary<int, Location> locationDictionary)
-        {
-            var locations = new List<Location>();
-            foreach (var locationIndex in solution.Indices)
-            {
-                if (locationDictionary.TryGetValue(locationIndex - 1, out Location? location))
-                {
-                    locations.Add(location);
-                }
-            }
-
-            return locations;
-        }
     }
 }
