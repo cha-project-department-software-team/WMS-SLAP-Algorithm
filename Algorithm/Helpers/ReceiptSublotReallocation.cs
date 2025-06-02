@@ -20,21 +20,36 @@
             for (int index = 0; index < this.allocatedLocations.Count; index++)
             {
                 var location = this.allocatedLocations[index];
-                var storagePercent = location.GetReceiptAndMaterialStoragePercentage();
-                if (storagePercent <= 0.7f)
+                //var storagePercent = location.GetReceiptAndMaterialStoragePercentage();
+                //if (storagePercent <= 0.7f)
+                //{
+                //    var subLots = location.GetReceiptSublots();
+                //    if (subLots?.Count > 0)
+                //    {
+                //        var addedSubLots = new List<ReceiptSublot>();
+                //        for (int replaceIndex = 0; replaceIndex < index; replaceIndex++)
+                //        {
+                //            var replaceLocation = this.allocatedLocations[replaceIndex];
+                //            if (TryAddReceiptSublots(subLots, replaceLocation, out addedSubLots))
+                //            {
+                //                ReallocateReceiptSublots(addedSubLots, location, replaceLocation);
+                //                break;
+                //            }
+                //        }
+                //    }
+                //}
+
+                var subLots = location.GetReceiptSublots();
+                if (subLots?.Count > 0)
                 {
-                    var subLots = location.GetReceiptSublots();
-                    if (subLots?.Count > 0)
+                    var addedSubLots = new List<ReceiptSublot>();
+                    for (int replaceIndex = 0; replaceIndex < index; replaceIndex++)
                     {
-                        var addedSubLots = new List<ReceiptSublot>();
-                        for (int replaceIndex = 0; replaceIndex < index; replaceIndex++)
+                        var replaceLocation = this.allocatedLocations[replaceIndex];
+                        if (TryAddReceiptSublots(subLots, replaceLocation, out addedSubLots))
                         {
-                            var replaceLocation = this.allocatedLocations[replaceIndex];
-                            if (TryAddReceiptSublots(subLots, replaceLocation, out addedSubLots))
-                            {
-                                ReallocateReceiptSublots(addedSubLots, location, replaceLocation);
-                                break;
-                            }
+                            ReallocateReceiptSublots(addedSubLots, location, replaceLocation);
+                            break;
                         }
                     }
                 }
