@@ -83,13 +83,13 @@ namespace SLAPScheduling.Infrastructure.Repository.Scheduling
             }
 
             // Reallocate for receipt sublots after implementing the SLAP algorithm
-            ReceiptSublotReallocation receiptLotReallocation = new ReceiptSublotReallocation();
-            var results = receiptLotReallocation.Reallocate(optimalLocations, receiptSubLots);
+            //ReceiptSublotReallocation receiptLotReallocation = new ReceiptSublotReallocation();
+            //var results = receiptLotReallocation.Reallocate(optimalLocations, receiptSubLots);
 
-            return results ?? new List<(ReceiptSublot SubLot, double StoragePercentage)>();
+            //return results ?? new List<(ReceiptSublot SubLot, double StoragePercentage)>();
 
-            //var results = AssignLocationsForReceiptSubLots(optimalLocations, receiptSubLots);
-            //return results.ToList();
+            var results = AssignLocationsForReceiptSubLots(optimalLocations, receiptSubLots);
+            return results.ToList();
         }
 
         #endregion
