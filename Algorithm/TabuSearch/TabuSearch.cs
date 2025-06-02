@@ -126,6 +126,7 @@ namespace SLAPScheduling.Algorithm.TabuSearch
         {
             // The initial solution has a huge impact on the finding for optimal solution, so it must be chosen appropriate.
             var groupedLocations = locationDictionary.GroupBy(loc => loc.Value.GetStorageLevel())
+                                    .OrderBy(x => x.Key)
                                     .Select(group => new
                                     {
                                         Index = group.Key,
