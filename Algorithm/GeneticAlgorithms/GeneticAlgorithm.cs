@@ -5,7 +5,7 @@ namespace SLAPScheduling.Algorithm.GeneticAlgorithms
 {
     public class GeneticAlgorithms
     {
-        private static int terminate => 1000;
+        private static int terminate => 5000;
         private static int maxGeneration => 300;
         private static int elitism => 15;
         private static float crossoverProbability => 0.95f;

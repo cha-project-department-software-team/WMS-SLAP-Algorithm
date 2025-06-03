@@ -33,11 +33,11 @@ namespace SLAPScheduling.Algorithm.DifferentialEvolutions
             Parameters = new Parameters
             {
                 Domain = new Tuple<double, double>(0, availableLocations.Count),
-                F = 0.9,
-                CR = 0.7, 
+                F = 0.5,
+                CR = 0.95, 
                 AgentsCount = 300,
                 Dimensions = availableLocations.Count,
-                Iterations = 1000
+                Iterations = 5000
             };
 
             Population population = CreatePopulation(availableLocations.Count);

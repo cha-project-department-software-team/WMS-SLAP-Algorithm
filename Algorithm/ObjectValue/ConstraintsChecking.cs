@@ -12,7 +12,8 @@
         /// <param name="locations"></param>
         public static void SetPenaltyCoefficientValues(IEnumerable<Location> locations)
         {
-            levelCoefficient = locations.Max(x => x.GetDistanceToIOPoint());
+            //levelCoefficient = locations.Max(x => x.GetDistanceToIOPoint());
+            levelCoefficient = locations.Sum(x => x.GetDistanceToIOPoint());
             storageCoefficient = locations.Sum(x => x.GetDistanceToIOPoint());
         }
 
