@@ -37,7 +37,7 @@ namespace SLAPScheduling.Algorithm.DifferentialEvolutions
                 CR = 0.95, 
                 AgentsCount = 300,
                 Dimensions = availableLocations.Count,
-                Iterations = 5000
+                Iterations = 1000
             };
 
             Population population = CreatePopulation(availableLocations.Count);
@@ -50,6 +50,12 @@ namespace SLAPScheduling.Algorithm.DifferentialEvolutions
             DE.Run(Parameters.Iterations, Parameters.CR, Parameters.F);
 
             sw.Stop();
+
+            //using (TextWriter writer = File.CreateText(@"C:\Users\AnhTu\Master Subjects\Luan van Thac si\Document\Excel\DifferentialEvolutionSchedulingResult.json"))
+            //{
+            //    var serializer = new JsonSerializer();
+            //    serializer.Serialize(writer, timeChangeObjectValues);
+            //}
 
             var locationDictionary = Enumerable.Range(0, availableLocations.Count).ToDictionary(index => index, index => availableLocations[index]);
             var optimalLocations = bestSolution.GetLocations(locationDictionary);

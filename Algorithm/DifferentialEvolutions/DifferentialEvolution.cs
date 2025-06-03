@@ -64,14 +64,25 @@ public class DifferentialEvolution
                         {
                             candidate.Elements.Add(newElement);
                         }
-                        else
+                        else if (!candidate.Elements.Contains(original.Elements[i]))
                         {
                             candidate.Elements.Add(original.Elements[i]); // Keep original if duplicate
+                        }
+                        else if (FindFallbackValue(candidate.Elements, Parameters, out int nonExistingNumber))
+                        {
+                            candidate.Elements.Add(nonExistingNumber);
                         }
                     }
                     else
                     {
-                        candidate.Elements.Add(original.Elements[i]);
+                        if (!candidate.Elements.Contains(original.Elements[i]))
+                        {
+                            candidate.Elements.Add(original.Elements[i]);
+                        }
+                        else if (FindFallbackValue(candidate.Elements, Parameters, out int nonExistingNumber))
+                        {
+                            candidate.Elements.Add(nonExistingNumber);
+                        }
                     }
                 }
 
@@ -105,5 +116,20 @@ public class DifferentialEvolution
         }
 
         OnRunComplete?.Invoke(Population, new EventArgs());
+    }
+
+    private bool FindFallbackValue(List<int> used, Parameters parameters, out int nonExistingNumber)
+    {
+        for (int x = (int)parameters.Domain.Item1; x <= parameters.Domain.Item2; x++)
+        {
+            if (!used.Contains(x))
+            {
+                nonExistingNumber = x;
+                return true;
+            }
+        }
+
+        nonExistingNumber = -1;
+        return false;
     }
 }

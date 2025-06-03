@@ -6,7 +6,7 @@ namespace SLAPScheduling.Algorithm.TabuSearch
 {
     public class TabuSearch
     {
-        private static int iterations => 100;
+        private static int iterations => 1000;
         private List<ReceiptSublot> receiptSubLots { get; set; }
         private Dictionary<int, Location> locationDictionary { get; set; }
         private Solution bestSolution { get; set; }
@@ -109,7 +109,7 @@ namespace SLAPScheduling.Algorithm.TabuSearch
 
             sw.Stop();
 
-            //using (TextWriter writer = File.CreateText(@"C:\Users\AnhTu\Master Subjects\Luan van Thac si\Document\SchedulingResult.json"))
+            //using (TextWriter writer = File.CreateText(@"C:\Users\AnhTu\Master Subjects\Luan van Thac si\Document\Excel\TabuSearchSchedulingResult.json"))
             //{
             //    var serializer = new JsonSerializer();
             //    serializer.Serialize(writer, timeChangeObjectValues);
