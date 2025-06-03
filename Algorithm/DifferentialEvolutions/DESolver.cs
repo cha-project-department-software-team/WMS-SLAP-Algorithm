@@ -17,30 +17,30 @@ namespace SLAPScheduling.Algorithm.DifferentialEvolutions
 
         public DESolver()
         {
-            this.Parameters = new Parameters();
-            this.bestObjectValues = new List<double>();
-            this.timeChangeObjectValues = new List<(double Time, double ObjectValue)>();
-            this.solutionChangeObjectValues = new List<(int SolutionCount, double ObjectValue)>();
-            this.bestSolution = new Solution();
-            this.numberOfEvaluatedSolutions = 0;
-            this.sw = new Stopwatch();
+            Parameters = new Parameters();
+            bestObjectValues = new List<double>();
+            timeChangeObjectValues = new List<(double Time, double ObjectValue)>();
+            solutionChangeObjectValues = new List<(int SolutionCount, double ObjectValue)>();
+            bestSolution = new Solution();
+            numberOfEvaluatedSolutions = 0;
+            sw = new Stopwatch();
         }
 
         public List<Location> Implement(List<ReceiptSublot> receiptSubLots, List<Location> availableLocations)
         {
             sw.Start();
 
-            this.Parameters = new Parameters
+            Parameters = new Parameters
             {
                 Domain = new Tuple<double, double>(0, availableLocations.Count),
-                F = 0.5,
-                CR = 0.95,
+                F = 0.9,
+                CR = 0.7, 
                 AgentsCount = 300,
                 Dimensions = availableLocations.Count,
                 Iterations = 1000
             };
 
-            Population population = CreatePopulation();
+            Population population = CreatePopulation(availableLocations.Count);
             DifferentialEvolution DE = new DifferentialEvolution(population, Parameters, receiptSubLots, availableLocations);
 
             DE.OnSolutionComplete += DE_OnSolutionComplete;
@@ -51,34 +51,26 @@ namespace SLAPScheduling.Algorithm.DifferentialEvolutions
 
             sw.Stop();
 
-            //using (TextWriter writer = File.CreateText(@"C:\Users\AnhTu\Master Subjects\Luan van Thac si\Document\SchedulingResult.json"))
-            //{
-            //    var serializer = new JsonSerializer();
-            //    serializer.Serialize(writer, timeChangeObjectValues);
-            //}
-
             var locationDictionary = Enumerable.Range(0, availableLocations.Count).ToDictionary(index => index, index => availableLocations[index]);
             var optimalLocations = bestSolution.GetLocations(locationDictionary);
             return optimalLocations?.Count() > 0 ? optimalLocations.ToList() : new List<Location>();
         }
 
-        public Population CreatePopulation()
+        public Population CreatePopulation(int locationCount)
         {
             List<Individual> individuals = new List<Individual>();
-            for (int i = 1; i < Parameters.AgentsCount; i++)
+            Random rand = RandomGenerator.Instance.Random;
+            for (int i = 0; i < Parameters.AgentsCount; i++)
             {
                 Individual individual = new Individual();
-
                 for (int j = 0; j < Parameters.Dimensions; j++)
                 {
-                    //double randomNumber = RandomGenerator.GetDoubleRangeRandomNumber(Parameters.Domain.Item1, Parameters.Domain.Item2);
-                    individual.Elements.Add(j);
+                    int randomLocation = rand.Next(0, locationCount);
+                    individual.Elements.Add(randomLocation);
                 }
-
                 individual.Elements.ShuffleFast();
                 individuals.Add(individual);
             }
-
             return new Population(individuals);
         }
 
@@ -86,14 +78,11 @@ namespace SLAPScheduling.Algorithm.DifferentialEvolutions
         {
             Population population = (Population)sender;
             Individual bestIndividual = population.GetBest();
-
-            this.bestSolution = bestIndividual.GetSolution();
-            this.bestObjectValue = bestIndividual.Fitness;
-            this.bestObjectValues.Add(this.bestObjectValue);
-
-            this.timeChangeObjectValues.Add((this.sw.Elapsed.TotalSeconds, this.bestObjectValue));
-            this.solutionChangeObjectValues.Add((this.numberOfEvaluatedSolutions, this.bestObjectValue));
-
+            bestSolution = bestIndividual.GetSolution();
+            bestObjectValue = bestIndividual.Fitness;
+            bestObjectValues.Add(bestObjectValue);
+            timeChangeObjectValues.Add((sw.Elapsed.TotalSeconds, bestObjectValue));
+            solutionChangeObjectValues.Add((numberOfEvaluatedSolutions, bestObjectValue));
             Console.WriteLine("Run complete");
         }
 
@@ -101,22 +90,17 @@ namespace SLAPScheduling.Algorithm.DifferentialEvolutions
         {
             Population population = (Population)sender;
             Individual bestIndividual = population.GetBest();
-
-            this.bestSolution = bestIndividual.GetSolution();
-            this.bestObjectValue = bestIndividual.Fitness;
-            this.bestObjectValues.Add(this.bestObjectValue);
-
-            this.timeChangeObjectValues.Add((this.sw.Elapsed.TotalSeconds, this.bestObjectValue));
-            this.solutionChangeObjectValues.Add((this.numberOfEvaluatedSolutions, this.bestObjectValue));
-
-            Console.Write("Fitness: " + Math.Round(bestIndividual.Fitness, 4));
-            Console.WriteLine(string.Format(" - coordinate: ({0})", bestIndividual.ToString()));
+            bestSolution = bestIndividual.GetSolution();
+            bestObjectValue = bestIndividual.Fitness;
+            bestObjectValues.Add(bestObjectValue);
+            timeChangeObjectValues.Add((sw.Elapsed.TotalSeconds, bestObjectValue));
+            solutionChangeObjectValues.Add((numberOfEvaluatedSolutions, bestObjectValue));
+            Console.WriteLine($"Fitness: {Math.Round(bestIndividual.Fitness, 4)} - Coordinate: {bestIndividual}");
         }
 
         private void DE_OnSolutionComplete(object sender, EventArgs e)
         {
-            int evaluatedSolutions = (int)sender;
-            this.numberOfEvaluatedSolutions += evaluatedSolutions;
+            numberOfEvaluatedSolutions++;
         }
     }
 }

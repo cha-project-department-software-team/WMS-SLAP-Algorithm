@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using Newtonsoft.Json;
+using System.Data;
 using System.Diagnostics;
 
 namespace SLAPScheduling.Algorithm.TabuSearch

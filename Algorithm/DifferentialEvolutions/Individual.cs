@@ -4,13 +4,8 @@ namespace SLAPScheduling.Algorithm.DifferentialEvolutions
 {
     public class Individual
     {
+        public List<int> Elements { get; set; } = new List<int>();
         public double Fitness { get; set; }
-        public List<int> Elements { get; set; }
-
-        public Individual(List<int> Elements)
-        {
-            this.Elements = Elements;
-        }
 
         public Individual()
         {
@@ -19,6 +14,8 @@ namespace SLAPScheduling.Algorithm.DifferentialEvolutions
 
         public double Evaluate(List<ReceiptSublot> receiptSubLots, Dictionary<int, Location> locationDictionary, int numberOfReceiptSubLots)
         {
+            // Placeholder for fitness evaluation (to be implemented based on SLAP objectives)
+            // Example: Sum of distances from locations to I/O point
             var solution = this.GetSolution();
             Fitness = solution.CalculateObjectValue(receiptSubLots, locationDictionary);
             return Fitness;
@@ -26,14 +23,7 @@ namespace SLAPScheduling.Algorithm.DifferentialEvolutions
 
         public override string ToString()
         {
-            StringBuilder s = new StringBuilder();
-            foreach (var item in Elements)
-            {
-                s.Append(Math.Round((decimal)item, 4) + ", ");
-            }
-
-            s.Remove(s.Length - 2, 2);
-            return s.ToString();
+            return string.Join(", ", Elements);
         }
     }
 }
