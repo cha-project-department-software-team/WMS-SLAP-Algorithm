@@ -134,7 +134,7 @@ namespace SLAPScheduling.Algorithm.GeneticAlgorithms
 
             var solution = chromosome.GetSolution();
             double objectValue = solution.CalculateObjectValue(receiptSubLots, locationDictionary);
-            double fitness = 1 - objectValue / (numberOfReceiptSubLots * 10000);
+            double fitness = 1 - objectValue / (numberOfReceiptSubLots * 100000);
             return fitness;
         }
 
